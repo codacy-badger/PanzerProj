@@ -1,0 +1,87 @@
+<NewUserRegistration>:
+
+    name: 'registration'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: [10,0,10,0]
+
+        Label:
+            text: "Create new account"
+            font_size: 20
+
+        Label:
+            text: 'Username. Minimal length - 3'
+            font_size: 16
+            halign: 'left'
+            text_size: root.width, 16
+
+        TextInput:
+            id: username
+            multiline:False
+            font_size: 14
+
+        Label:
+            text: 'First Name. Minimal length - 3'
+            font_size: 16
+            halign: 'left'
+            text_size: root.width, 16
+
+        TextInput:
+            id: first_name
+            multiline:False
+            font_size: 14
+
+        Label:
+            text: 'Last Name. Minimal length - 3'
+            font_size: 16
+            halign: 'left'
+            text_size: root.width, 16
+
+        TextInput:
+            id: last_name
+            multiline:False
+            font_size: 14
+
+        Label:
+            text: 'E-mail. Insert valid email for activation!'
+            font_size: 16
+            halign: 'left'
+            text_size: root.width, 16
+
+        TextInput:
+            id: email
+            multiline:False
+            font_size: 14
+
+        Label:
+            text: 'Password. Minimal length - 6'
+            font_size: 16
+            halign: 'left'
+            text_size: root.width, 16
+
+        TextInput:
+            id: password_first
+            password:True
+            multiline:False
+            font_size: 14
+
+        Label:
+            text: 'Reenter password. Minimal length - 6'
+            font_size: 16
+            halign: 'left'
+            text_size: root.width, 16
+
+        TextInput:
+            id: password_second
+            password:True
+            multiline:False
+            font_size: 14
+
+        Button:
+            on_press: root.data_validation(username.text,email.text,first_name.text,last_name.text,password_second.text,password_first.text)
+            text: 'Registration'
+            font_size: 16
+        Button:
+            on_release: app.root.current = 'login'
+            text: 'Back to login'
+            font_size: 16
