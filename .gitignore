@@ -2,3 +2,4 @@
 .idea
 .designer
 kivy-designer
+*.pyc

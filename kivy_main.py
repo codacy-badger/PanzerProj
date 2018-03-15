@@ -17,6 +17,7 @@ from config import connection, or_, and_
 from connected import Connected
 from registration import NewUserRegistration
 from login import Login
+from profile import UserProfile
 
 # load .kv files
 Builder.load_file('kv_files/login_page.kv')
@@ -32,13 +33,9 @@ class MainApp(App):
         manager.add_widget(Login(name='login'))
         manager.add_widget(Connected(name='connected'))
         manager.add_widget(NewUserRegistration(name='registration'))
+        manager.add_widget(UserProfile(name='profile'))
 
         return manager
-
-
-
-
-
 
 if __name__ == '__main__':
     MainApp().run()
