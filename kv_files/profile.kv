@@ -4,6 +4,13 @@
 
         orientation: 'vertical'
         BoxLayout:
+            Button:
+                text: 'Exit'
+                pos_hint: {'left': 0.1, 'top': 1}
+                size: 10,10
+                on_release: app.root.current = 'login'
+
+        BoxLayout:
             Image:
                 source: root.source
                 size: 20,20
