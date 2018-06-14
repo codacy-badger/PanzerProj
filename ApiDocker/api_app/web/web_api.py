@@ -1,6 +1,7 @@
 import json
-
 import falcon
+
+from .database.models import Base
 
 
 class Resource(object):

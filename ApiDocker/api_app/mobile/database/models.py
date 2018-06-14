@@ -1,40 +1,19 @@
-import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
 
-SAModel = declarative_base()
+# автоматический сбор инфомрации о таблицах в БД
+Base = automap_base()
 
+# подключаемся к БД
+engine = create_engine('postgresql://fitness_admin:veryhardpass@localhost:5432/fitness_db')
 
-class UserScores(SAModel):
-    __tablename__ = 'users'
+# получаем схему таблиц в БД
+Base.prepare(engine, reflect=True)
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    username = sa.Column(sa.String(128), unique=True)
-    company = sa.Column(sa.String(128))
-    score = sa.Column(sa.Integer)
+# получаем структуры конеретных таблиц из БД
+auth_group = Base.classes.auth_group
+auth_user = Base.classes.auth_user
 
-    def __init__(self, username, company, score):
-        self.username = username
-        self.company = company
-        self.score = score
-
-    @property
-    def as_dict(self):
-        return {
-            'username': self.username,
-            'company': self.company,
-            'score': self.score
-        }
-
-    def save(self, session):
-        with session.begin():
-            session.add(self)
-
-    @classmethod
-    def get_list(cls, session):
-        models = []
-
-        with session.begin():
-            query = session.query(cls)
-            models = query.all()
-
-        return models
+# создаём сессию для работы
+session = Session(engine)

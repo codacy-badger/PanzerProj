@@ -12,3 +12,7 @@ api.add_route('/search_data', main)
 api.add_route('/send_mail', main)
 api.add_route('/change_info', main)
 
+if __name__ == '__main__':
+    from wsgiref.simple_server import make_server
+    server = make_server('127.0.0.1', 8000, api)
+    server.serve_forever()
