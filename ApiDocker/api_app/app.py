@@ -2,7 +2,13 @@ import falcon
 
 from web import Resource
 
-app = application = falcon.API()
+api = application = falcon.API()
 
 main = Resource()
-app.add_route('/main', main)
+
+api.add_route('/main', main)
+api.add_route('/received_data', main)
+api.add_route('/search_data', main)
+api.add_route('/send_mail', main)
+api.add_route('/change_info', main)
+
