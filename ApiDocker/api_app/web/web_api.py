@@ -1,41 +1,36 @@
 import json
 import falcon
 
-from .database.models import Base
+from .database.models import User
 
 
-class Resource(object):
+class UserInfo(object):
 
-    def on_get(self, req, resp):
-        doc = {
-            'images': [
-                {
-                    'href': '/images/1eaf6ef1-7f2d-4ecc-a8d5-6e8adba7cc0e.png'
-                }
-            ]
-        }
+    def on_get(self, request, response, user_id):
+        db_response = User().get_user_base(user_id)
 
-        # Create a JSON representation of the resource
-        resp.body = json.dumps(doc, ensure_ascii=False)
+        json_response = {'user':db_response}
 
-        # The following line can be omitted because 200 is the default
-        # status returned by the framework, but it is included here to
-        # illustrate how this may be overridden as needed.
-        resp.status = falcon.HTTP_200
+        response.body = json.dumps(json_response, ensure_ascii = False)
 
-    def on_post(self, req, resp):
-        doc = {
-            'images': [
-                {
-                    'href': '/images/1eaf6ef1-7f2d-4ecc-a8d5-6e8adba7cc0e.png'
-                }
-            ]
-        }
+        if db_response['success']:
+            # если ответ получен
+            response.status = falcon.HTTP_200
+        else:
+            response.status = falcon.HTTP_404
 
-        # Create a JSON representation of the resource
-        resp.body = json.dumps(doc, ensure_ascii=False)
+class NewUserCreating(object):
 
-        # The following line can be omitted because 200 is the default
-        # status returned by the framework, but it is included here to
-        # illustrate how this may be overridden as needed.
-        resp.status = falcon.HTTP_200
+    def on_post(self, request, response, user_info):
+        db_response = User().create_new_user(new_user_data = user_info)
+
+        json_response = {'result':db_response}
+
+        response.body = json.dumps(json_response, ensure_ascii = False)
+
+        if db_response:
+            # если ответ получен
+            response.status = falcon.HTTP_200
+        else:
+            # при ощибке
+            response.status = falcon.HTTP_404

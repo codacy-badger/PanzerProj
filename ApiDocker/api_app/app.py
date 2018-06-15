@@ -1,16 +1,11 @@
 import falcon
 
-from web import Resource
+from web import UserInfo, NewUserCreating
 
 api = application = falcon.API()
 
-main = Resource()
-
-api.add_route('/main', main)
-api.add_route('/received_data', main)
-api.add_route('/search_data', main)
-api.add_route('/send_mail', main)
-api.add_route('/change_info', main)
+api.add_route('/user_base_info/{user_id:int}', UserInfo())
+api.add_route('/new_user_creating/{user_info}', NewUserCreating())
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
