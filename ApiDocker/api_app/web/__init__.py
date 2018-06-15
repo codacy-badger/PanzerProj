@@ -1,1 +1,1 @@
-from .web_api import Resource
+from .web_api import UserInfo, NewUserCreating
