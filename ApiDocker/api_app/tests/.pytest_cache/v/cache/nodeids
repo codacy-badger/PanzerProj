@@ -1,4 +1,5 @@
 [
-  "test_web_api.py::TestUrls::()::test_web_api_routs",
-  "test_web_api.py::TestUrls::()::test_invalid_routs"
+  "test_web_api.py::TestRouts::()::test_user_base_info",
+  "test_web_api.py::TestRouts::()::test_invalid_user_base_info",
+  "test_web_api.py::TestDatabase::()::test_new_user_creating"
 ]
