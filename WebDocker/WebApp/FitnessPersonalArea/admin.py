@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainSchedule, Setting, UserSetting
+from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
+    UserSetting
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)

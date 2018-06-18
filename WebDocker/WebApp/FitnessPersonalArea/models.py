@@ -149,7 +149,7 @@ class TrainGym(models.Model):
 
 
 # train schedule
-class TrainSchedule(models.Model):
+class TrainingSchedule(models.Model):
     """
     Модель для указания залов в которых тренерует тренер
     target_user - foreign-key с моделью FitnessUser, для которого составляется расписание
@@ -293,7 +293,7 @@ class UserDiary(models.Model):
 
 
 # train contract
-class TrainContract(models.Model):
+class TrainingContract(models.Model):
     """
     Модель отвечает за создание соглашения между тренером(trainer) и подопечным(ward) для тренировок по определённой
     цене на определённый срок
@@ -337,6 +337,54 @@ class TrainContract(models.Model):
     contract_end_datetime = models.DateTimeField()
 
 
+# train payment
+class TrainingPayment(models.Model):
+    """
+    Модель отвечает за создание платежа между тренером(trainer) и подопечным(target)
+    payment_contract - foreign-key с моделью TrainingContract, в которой хранится контракт заключенный между
+                        пользователями
+    payment_training_schedule - foreign-key с моделью TrainSchedule, в которой хранится занятие созданное по расписанию
+                                 в этот временной промежуток (не обязательно к заполнению)
+
+    payment_user_trainer - foreign-key с моделью FitnessTrainer, который будет выступать тренером.
+    payment_user_target - foreign-key с моделью FitnessUser, который будет выступать подопечным.
+
+    payment_training_time - время которое проводилась тренеровка
+
+    payment_price_per_hour - почасовая цена оплаты тренеровки
+    payment_currency - валюта оплаты тренеровки
+
+    payment_trainer_success - подтверждение тренера об получении оплаты
+    payment_target_success - подтверждение подопечного о совершении оплаты
+
+    payment_create_datetime - дата создания платежа
+    payment_expire_datetime - дата окончания возможности погашения платежа
+    payment_end_datetime - дата совершения оплаты и подтверждение обеими сторонами
+    """
+    # contract
+    payment_contract = models.ForeignKey(TrainingContract, on_delete=models.CASCADE)
+    # train schedule
+    payment_training_schedule = models.ForeignKey(TrainingSchedule, on_delete=models.CASCADE, null=True)
+    # payment user author
+    payment_user_trainer = models.ForeignKey(FitnessTrainer, on_delete=models.CASCADE)
+    # payment user target
+    payment_user_target = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
+    # training time
+    payment_training_time = models.TimeField()
+    # training price per hour
+    payment_price_per_hour = models.FloatField()
+    # payment currency
+    payment_currency = models.CharField(max_length=20)
+    # create datetime
+    payment_create_datetime = models.DateTimeField(default=now)
+    # expire datetime
+    payment_expire_datetime = models.DateTimeField()
+    # end datetime
+    payment_end_datetime = models.DateTimeField()
+    # trainer payment success
+    payment_trainer_success = models.BooleanField(default=False)
+    # target(ward) payment success
+    payment_target_success = models.BooleanField(default=False)
 
 
 
