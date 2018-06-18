@@ -387,7 +387,40 @@ class TrainingPayment(models.Model):
     payment_target_success = models.BooleanField(default=False)
 
 
+# user body parameters
+class BodyParameter(models.Model):
+    """
+    Модель предназначена для записи кастомных параметров пользователя
+    user - foreign-key с моделью FitnessUser, пользователем который вносит параметр
+    body_title - название параметра
+    body_data - значение параметра (float)
+    body_datetime - дата внесения параметра в список
+    """
+    user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
+    # body parameter title
+    body_title = models.CharField(max_length = 100)
+    # body parameter data
+    body_data = models.FloatField()
+    # body parameter creating datetime
+    body_datetime = models.DateTimeField(default = now)
 
+
+# user body parameters
+class TargetBodyParameter(models.Model):
+    """
+    Модель предназначена для записи кастомных ЦЕЛЕЙ параметров пользователя
+    user - foreign-key с моделью FitnessUser, пользователем который вносит целевой параметр
+    target_body_title - название целевого параметра
+    target_body_data - значение целевого параметра (float)
+    target_body_datetime - дата создания целевого параметра
+    """
+    user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
+    # target body parameter title
+    target_body_title = models.CharField(max_length = 100)
+    # target body parameter data
+    target_body_data = models.FloatField()
+    # body parameter creating datetime
+    target_body_datetime = models.DateTimeField(default = now)
 
 
 
