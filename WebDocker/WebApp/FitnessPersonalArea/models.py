@@ -229,11 +229,17 @@ class Setting(models.Model):
     setting_param -  краткое название параметра для фильтрации
     """
     # setting title
-    setting_title = models.CharField(max_length=100)
+    setting_title = models.CharField(max_length=100, unique = True)
     # description
     setting_description = models.TextField(max_length=1000)
     # param
     setting_param = models.CharField(max_length=30, default='')
+
+    def short_setting_description(self):
+        return f'{self.setting_description[:50]}...'
+
+    def __str__(self):
+        return f'Title: {self.setting_title}; Param: {self.setting_param}'
 
 
 # user setting
@@ -241,7 +247,7 @@ class UserSetting(models.Model):
     """
     Модель для задания персональных настроек FitnessUser
     user - foreign-key с моделью FitnessUser, для которого применяется настройка.
-    user_default_setting - foreign-key с моделью Setting, в которой указывается название настройки.
+    default_setting - foreign-key с моделью Setting, в которой указывается название настройки и стандартный параметр.
     setting_data - данные параметра
     """
     user = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
@@ -250,6 +256,16 @@ class UserSetting(models.Model):
     # персональные данные для настройки
     # data
     setting_data = models.CharField(max_length=100, default='')
+
+    def user_short(self):
+        return self.user.user.username
+
+    def default_setting_short(self):
+        return self.default_setting.setting_title
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Setting: {self.default_setting.setting_title};' \
+               f' Param: {self.setting_data}'
 
 
 # user private photos
@@ -280,8 +296,8 @@ class ProjectionPhoto(models.Model):
     # creation datetime
     projection_view_date = models.DateField(default=now)
     # projection photo
-    image_width = 120
-    image_height = 200
+    image_width = 100
+    image_height = 150
     projection_view_photo = models.ImageField(upload_to = f'projection_view_photo/%Y/%m/%d/', default=None,
                                               width_field = 'image_width', height_field = 'image_height',
                                               verbose_name = 'account photo')
@@ -291,6 +307,12 @@ class ProjectionPhoto(models.Model):
                          f'width="{self.image_width}" height="{self.image_height}" />')
     image_tag.short_description = 'Image'
     image_tag.allow_tags = True
+
+    def user_short(self):
+        return self.user.user.username
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Projection: {self.get_projection_view_type_display()};'
 
 
 # user medical note
@@ -313,6 +335,18 @@ class MedicalNote(models.Model):
     # medical tags
     medical_note_tags = TaggableManager(blank=True)
 
+    def short_title(self):
+        return f'{self.medical_note_title[:50]}...'
+
+    def get_all_tags(self):
+        return self.medical_note_tags.all()
+
+    def user_short(self):
+        return self.user.user.username
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Title: {self.medical_note_title[:50]};'
+
 
 # user diary
 class UserDiary(models.Model):
@@ -333,6 +367,18 @@ class UserDiary(models.Model):
     diary_note_datetime = models.DateTimeField(default=now)
     # medical tags
     diary_note_tags = TaggableManager(blank=True)
+
+    def short_title(self):
+        return f'{self.diary_note_title[:50]}...'
+
+    def get_all_tags(self):
+        return self.diary_note_tags.all()
+
+    def user_short(self):
+        return self.user.user.username
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Title: {self.diary_note_title[:50]}...;'
 
 
 # train contract
@@ -361,9 +407,9 @@ class TrainingContract(models.Model):
     # ward user
     contract_ward_user = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
     # trainer agreement
-    contract_trainer_agreement = models.BooleanField(default=False)
+    contract_trainer_start = models.BooleanField(default=False)
     # ward agreement
-    contract_ward_agreement = models.BooleanField(default=False)
+    contract_ward_start = models.BooleanField(default=False)
     # hour price
     contract_hour_price = models.FloatField(default=0)
     # payment currency
@@ -377,7 +423,17 @@ class TrainingContract(models.Model):
     # expire datetime
     contract_expire_datetime = models.DateTimeField()
     # end datetime
-    contract_end_datetime = models.DateTimeField()
+    contract_end_datetime = models.DateTimeField(blank = True, null = True)
+
+    def trainer_user_short(self):
+        return self.contract_trainer_user.user.user.username
+
+    def ward_user_short(self):
+        return self.contract_ward_user.user.username
+
+    def __str__(self):
+        return f'Trainer: {self.contract_trainer_user.user.user.username}; ' \
+               f'Ward: {self.contract_ward_user.user.username}'
 
 
 # train payment
@@ -407,11 +463,11 @@ class TrainingPayment(models.Model):
     # contract
     payment_contract = models.ForeignKey(TrainingContract, on_delete=models.CASCADE)
     # train schedule
-    payment_training_schedule = models.ForeignKey(TrainingSchedule, on_delete=models.CASCADE, null=True)
+    payment_training_schedule = models.ForeignKey(TrainingSchedule, on_delete=models.CASCADE, blank=True, null = True)
     # payment user author
     payment_user_trainer = models.ForeignKey(FitnessTrainer, on_delete=models.CASCADE)
-    # payment user target
-    payment_user_target = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
+    # payment ward user
+    payment_user_ward = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
     # training time
     payment_training_time = models.TimeField()
     # training price per hour
@@ -423,11 +479,21 @@ class TrainingPayment(models.Model):
     # expire datetime
     payment_expire_datetime = models.DateTimeField()
     # end datetime
-    payment_end_datetime = models.DateTimeField()
+    payment_end_datetime = models.DateTimeField(blank = True, null = True)
     # trainer payment success
     payment_trainer_success = models.BooleanField(default=False)
     # target(ward) payment success
-    payment_target_success = models.BooleanField(default=False)
+    payment_ward_success = models.BooleanField(default=False)
+
+    def trainer_user_short(self):
+        return self.payment_user_trainer.user.user.username
+
+    def ward_user_short(self):
+        return self.payment_user_ward.user.username
+
+    def __str__(self):
+        return f'Trainer: {self.payment_user_trainer.user.user.username}; ' \
+               f'Ward: {self.payment_user_ward.user.username}'
 
 
 # user body parameters
@@ -447,6 +513,16 @@ class BodyParameter(models.Model):
     # body parameter creating datetime
     body_datetime = models.DateTimeField(default = now)
 
+    def user_short(self):
+        return self.user.user.username
+
+    def title_short(self):
+        return f'{self.body_title[:50]}...'
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; ' \
+               f'Param title: {self.body_title[:50]}...'
+
 
 # user body parameters
 class TargetBodyParameter(models.Model):
@@ -465,7 +541,15 @@ class TargetBodyParameter(models.Model):
     # body parameter creating datetime
     target_body_datetime = models.DateTimeField(default = now)
 
+    def user_short(self):
+        return self.user.user.username
 
+    def title_short(self):
+        return f'{self.target_body_title[:50]}...'
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; ' \
+               f'Target param: {self.target_body_title[:50]}...'
 
 
 
