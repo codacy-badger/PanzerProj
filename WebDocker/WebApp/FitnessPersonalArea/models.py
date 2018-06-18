@@ -106,16 +106,15 @@ class TrainerPrice(models.Model):
 # trainer gym
 class TrainerGym(models.Model):
     """
-    Модель для указания залов в которых тренерует тренер
-    user - foreign-key с моделью FitnessTrainer
+    Модель для указания залов в которых тренеруется пользователь
+    user - foreign-key с моделью FitnessUser
     gym_name - название зала
     gym_description - описание зала
     gym_destination - место расположения зала (страна/город/улица)
     gym_geolocation - точка на карте(json с ключами: latitude/longitude) на которой находится зал
                       (выбирается на гугл-карте, автоматически заполняется `gym_destination` и `gym_name`)
-    gym_open_for_trainings - возможность тренировки
     """
-    user = models.ForeignKey(FitnessTrainer, on_delete = models.CASCADE)
+    user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
     # gym name
     gym_name = models.CharField(max_length=100)
     # gym full description
@@ -124,8 +123,33 @@ class TrainerGym(models.Model):
     gym_destination = models.CharField(max_length=100)
     # gym geolocation (latitude/longitude)
     gym_geolocation = JSONField(db_index=True, default={'latitude': float(), 'longitude': float()})
-    # gym open for trainings
-    gym_open_for_trainings = models.BooleanField(default=True)
+
+
+# train schedule
+class TrainSchedule(models.Model):
+    """
+    Модель для указания залов в которых тренерует тренер
+    target_user - foreign-key с моделью FitnessUser, для которого составляется расписание
+    author_user - foreign-key с моделью FitnessUser, который составил расписание
+    schedule_gym - название зала
+    schedule_date - дата тренировки
+    schedule_train_end - вермя окончания тренеровки
+    schedule_train_start - время начала тренеровки
+    schedule_train_type - тип тренеровки
+    """
+    target_user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE, related_name='target_schedule_user')
+    author_user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE, related_name='author_schedule_user')
+    # gym
+    schedule_gym = models.ForeignKey(TrainerGym, on_delete = models.CASCADE, related_name='schedule_gym')
+    # train date
+    schedule_date = models.DateField(default=now)
+    # train start time
+    schedule_train_end = models.TimeField(default=now)
+    # train end time
+    schedule_train_start = models.TimeField(default=now)
+    # train type
+    schedule_train_type = models.CharField(max_length=100)
+
 
 
 
