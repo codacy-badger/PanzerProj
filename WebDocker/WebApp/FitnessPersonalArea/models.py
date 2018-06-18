@@ -425,12 +425,6 @@ class TrainingContract(models.Model):
     # end datetime
     contract_end_datetime = models.DateTimeField(blank = True, null = True)
 
-    def trainer_user_short(self):
-        return self.contract_trainer_user.user.user.username
-
-    def ward_user_short(self):
-        return self.contract_ward_user.user.username
-
     def __str__(self):
         return f'Trainer: {self.contract_trainer_user.user.user.username}; ' \
                f'Ward: {self.contract_ward_user.user.username}'

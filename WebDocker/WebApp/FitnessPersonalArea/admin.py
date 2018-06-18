@@ -120,13 +120,23 @@ class ExtendedUserDiary(admin.ModelAdmin):
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedTrainingContract(admin.ModelAdmin):
     # поля, отображаемые в модели
-    list_display = ('trainer_user_short', 'ward_user_short', 'contract_trainer_start', 'contract_ward_start',
+    list_display = ('trainer_short_name', 'ward_short_name', 'contract_trainer_start', 'contract_ward_start',
                     'contract_trainer_end', 'contract_ward_end', 'contract_create_datetime', 'contract_expire_datetime',
                     'contract_end_datetime')
     # поля для поиска
     search_fields = ('id', 'contract_trainer_user__user__user__id', 'contract_trainer_user__user__user__username')
     # поля для фильтрации
     list_filter = ('contract_trainer_start', 'contract_ward_start', 'contract_trainer_end', 'contract_ward_end')
+
+    def ward_short_name(self, obj):
+        return obj.contract_ward_user.user.username
+
+    def trainer_short_name(self, obj):
+        return obj.contract_trainer_user.user.user.username
+
+    # переименование полей для отображения
+    trainer_short_name.short_description = 'Trainer name'
+    ward_short_name.short_description = 'Ward name'
 
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
