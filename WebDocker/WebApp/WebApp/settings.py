@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'FitnessPersonalArea.apps.FitnesswebConfig',
     # social
     'social_django',
+    # tags
+    'taggit'
 ]
 
 AUTHENTICATION_BACKENDS = (
