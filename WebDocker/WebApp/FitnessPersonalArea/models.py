@@ -5,10 +5,6 @@ from django.utils.timezone import now
 from taggit.managers import TaggableManager
 from django.utils.safestring import mark_safe
 
-import datetime
-import random
-import os
-
 
 # fitness user
 class FitnessUser(models.Model):
@@ -82,6 +78,10 @@ class FitnessTrainer(models.Model):
     def __str__(self):
         return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
 
+    # для вывода в username
+    def user_short(self):
+        return self.user.user.username
+
 
 # trainer docs
 class TrainerDoc(models.Model):
@@ -102,7 +102,11 @@ class TrainerDoc(models.Model):
         return f'{self.doc_title[:50]} ...'
 
     def __str__(self):
-        return f'User: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
+        return f'Trainer: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
+
+    # для вывода в username
+    def user_short(self):
+        return self.user.user.user.username
 
 
 # trainer prices
@@ -125,6 +129,13 @@ class TrainerPrice(models.Model):
     # торги по цене
     trainer_price_bargaining = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f'Trainer: {self.user.user.user.username}; Price: {self.trainer_price_currency}'
+
+    # для вывода в username
+    def user_short(self):
+        return self.user.user.user.username
+
 
 # trainer gym
 class TrainGym(models.Model):
@@ -146,6 +157,20 @@ class TrainGym(models.Model):
     gym_destination = models.CharField(max_length=100)
     # gym geolocation (latitude/longitude)
     gym_geolocation = JSONField(db_index=True, default={'latitude': float(), 'longitude': float()})
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Gym: {self.gym_short_name()}'
+
+    # для вывода краткой информации о зале
+    def gym_short_name(self):
+        return f'{self.gym_name[:50]}...'
+
+    def gym_short_description(self):
+        return f'{self.gym_description[:50]}...'
+
+    # для вывода в username
+    def user_short(self):
+        return self.user.user.username
 
 
 # train schedule
@@ -175,6 +200,24 @@ class TrainingSchedule(models.Model):
     schedule_train_type = models.CharField(max_length=100)
     # train tags
     schedule_train_tags = TaggableManager(blank=True)
+
+    def __str__(self):
+        return f'Author: {self.author_user.user.username}; Target: {self.target_user.user.username}; ' \
+               f'Gym: {self.schedule_gym.gym_short_name()}; Date: {self.schedule_date}'
+
+    def get_all_tags(self):
+        return self.schedule_train_tags.all()
+
+    # для вывода в username задействованных аккаунтов
+    def target_user_short(self):
+        return self.target_user.user.username
+
+    def author_user_short(self):
+        return self.author_user.user.username
+
+    # краткое название зала из расписания
+    def gym_short(self):
+        return self.schedule_gym.gym_short_name()
 
 
 # list of all settings
