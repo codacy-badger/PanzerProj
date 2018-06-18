@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainerGym, TrainSchedule
+from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainSchedule, Setting, UserSetting
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)
@@ -36,9 +36,22 @@ class ExtendedTrainerDocs(admin.ModelAdmin):
     list_filter = ('user__user__user__is_active', 'user__user__user__last_login', 'user__user__user__date_joined')
 
 
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedTrainerPrice(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('user', 'trainer_price_hour', 'trainer_price_currency', 'trainer_price_creating_datetime',
+                    'trainer_price_bargaining')
+    # поля для поиска
+    search_fields = ('id', 'user__user__id', 'user__user__username', 'trainer_price_hour', 'trainer_price_currency')
+    # поля для фильтрации
+    list_filter = ('user__user__user__is_active', 'user__user__user__last_login', 'user__user__user__date_joined',
+                   'trainer_price_bargaining', 'trainer_price_currency')
+
+
 admin.site.register(FitnessUser, ExtendedFitnessUser)
 admin.site.register(FitnessTrainer, ExtendedFitnessTrainer)
 admin.site.register(TrainerDoc, ExtendedTrainerDocs)
+admin.site.register(TrainerPrice, ExtendedTrainerPrice)
 
 
 
