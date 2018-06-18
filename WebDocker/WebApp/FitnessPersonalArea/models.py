@@ -4,10 +4,11 @@ from django.db import models
 from taggit.managers import TaggableManager
 from django.utils.timezone import now
 from django.db.models import Q
+from django.utils.safestring import mark_safe
 
 import datetime
 import random
-import time
+import os
 
 
 # fitness user
@@ -20,7 +21,7 @@ class FitnessUser(models.Model):
     fitness_user_gender - пол пользователя (М/Ж/неопределился)
     trainer_destination_city - город/местность в которой пользователь находится
     """
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='user_account')
     # type пользователя
     teacher_user = "TRN"
     usual_user = "USL"
@@ -30,12 +31,14 @@ class FitnessUser(models.Model):
     )
     fitness_user_type = models.CharField(max_length=3,
                                          choices=fitness_user_type_choice,
-                                         default=usual_user)
+                                         default=usual_user,
+                                         verbose_name='user type')
     # фотография пользователя
-    image_width = 50
-    image_height = 50
+    image_width = 120
+    image_height = 120
     fitness_user_photo = models.ImageField(upload_to = f'profiles_photo/%Y/%m/%d/', default=None,
-                                           width_field = 'image_width', height_field = 'image_height')
+                                           width_field = 'image_width', height_field = 'image_height',
+                                           verbose_name='account photo')
     # gender пользователя
     male_gender = "MAL"
     female_gender = "FEM"
@@ -47,9 +50,20 @@ class FitnessUser(models.Model):
     )
     fitness_user_gender = models.CharField(max_length=3,
                                            choices=fitness_user_gender_choice,
-                                           default=male_gender)
+                                           default=male_gender,
+                                           verbose_name='user gender')
     # destination city
-    fitness_user_destination_city = models.CharField(max_length=50, default='')
+    fitness_user_destination_city = models.CharField(max_length=50, default='', verbose_name='destination city')
+
+    def image_tag(self):
+        return mark_safe(f'<img src="/media/{self.fitness_user_photo}" '
+                         f'width="{self.image_width}" height="{self.image_height}" />')
+    image_tag.short_description = 'Image'
+    image_tag.allow_tags = True
+
+    def __str__(self):
+        return f'User: {self.user.username}; User type: {self.get_fitness_user_type_display()}; ' \
+               f'User destination: {self.fitness_user_destination_city}'
 
 
 # trainer account
@@ -64,11 +78,14 @@ class FitnessTrainer(models.Model):
     # busy status
     trainer_employment_status = models.BooleanField(default=False)
     # personal description
-    trainer_description = models.CharField(max_length=5000)
+    trainer_description = models.TextField(max_length=5000)
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
 
 
 # trainer docs
-class TrainerDocs(models.Model):
+class TrainerDoc(models.Model):
     """
     Модель для сохранения различных документов(сертификаты/грамоты и прочее) Тренера.
     user - one-to-one с моделью FitnessTrainer
@@ -77,9 +94,16 @@ class TrainerDocs(models.Model):
     """
     user = models.OneToOneField(FitnessTrainer, on_delete = models.CASCADE)
     # doc title
-    doc_title = models.CharField(max_length=1000)
+    doc_title = models.TextField(max_length=1000)
     # doc file
     doc_file = models.FileField(upload_to = f'trainer_docs/%Y/%m/%d/')
+
+    # preview названия документа
+    def doc_title_preview(self):
+        return f'{self.doc_title[:50]} ...'
+
+    def __str__(self):
+        return f'User: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
 
 
 # trainer prices
