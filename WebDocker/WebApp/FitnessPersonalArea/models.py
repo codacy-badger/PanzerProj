@@ -189,7 +189,7 @@ class TrainingSchedule(models.Model):
                f'Gym: {self.schedule_gym.gym_short_name()}; Date: {self.schedule_date}'
 
     def get_all_tags(self):
-        return self.schedule_train_tags.all()
+        return list(tag for tag in self.schedule_train_tags.all())
 
     # краткое название зала из расписания
     def gym_short(self):
@@ -309,7 +309,7 @@ class MedicalNote(models.Model):
             return self.medical_note_title
 
     def get_all_tags(self):
-        return self.medical_note_tags.all()
+        return list(tag for tag in self.medical_note_tags.all())
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title};'
@@ -342,7 +342,7 @@ class UserDiary(models.Model):
             return self.diary_note_title
 
     def get_all_tags(self):
-        return self.diary_note_tags.all()
+        return list(tag for tag in self.diary_note_tags.all())
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title()}...;'
@@ -507,8 +507,53 @@ class TargetBodyParameter(models.Model):
                f'Target param: {self.title_short()}...'
 
 
+# users chat
+class Chat(models.Model):
+    """
+    Модель отвечает за чат между двумя пользователями
+    users - пользователи принимающие участие в чате
+    chat_alive - доступность чата(если один из пользователей заблокировал его, то никто не сможет писать)
+    """
+    users = models.ManyToManyField(FitnessUser)
+    # chat alive
+    chat_alive = models.BooleanField(default = True)
+
+    def users_list(self):
+        return list(participant.user.username for participant in self.users.all())
+
+    users_list.short_description = 'Participants names'
+
+    def __str__(self):
+        return f'Users: {self.users_list()}; Alive: {self.chat_alive}'
 
 
+# chat message
+class ChatMessage(models.Model):
+    """
+    Модель отвечает за сообщение пользователя
+    user - автор сообщения
+    message_chat - чат в который было отправлено сообщение
+    message_text - текст сообщения
+    message_file - файл в сообщении (необязательное поле)
+    """
+    # message author
+    user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
+    # chat
+    message_chat = models.ForeignKey(Chat, on_delete = models.CASCADE)
+    # message text
+    message_text = models.TextField(max_length = 1000)
+    # message file
+    message_file = models.FileField(blank = True, null = True, upload_to = f'chat_files/%Y/%m/%d/')
+
+    def __str__(self):
+        return f'User: {self.user.user.username}; Chat: {self.message_chat.users_list()}; ' \
+               f'Message: {self.short_message()}'
+
+    def short_message(self):
+        if len(self.message_text) > 50:
+            return f'{self.message_text[:50]}...'
+        else:
+            return self.message_text
 
 
 
