@@ -5,9 +5,37 @@ from django.utils.timezone import now
 from taggit.managers import TaggableManager
 
 
+"""
+Files upload functions  
+"""
+
+
+# место для хранения файлов из чата
+def chat_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return f'chat_files/chat_{instance.message_chat.id}/user_{instance.user.user.id}/{filename}'
+
+
 # место для хранения аватаров
 def profile_photo_path(instance, filename):
     return f'profiles_photo/user_{instance.user.id}/{filename}'
+
+
+# место для хранения документов тренера
+def trainer_docs_path(instance, filename):
+    return f'trainer_docs/trainer_{instance.user.user.id}/{filename}'
+
+
+# место для хранения фотографий пользователя в различных проекциях
+def projection_photo_path(instance, filename):
+    return f'projection_view_photo/user_{instance.user.user.id}/' \
+           f'projection_{instance.get_projection_view_type_display()}/' \
+           f'date_{instance.projection_view_date}/{filename}'
+
+
+"""
+User models
+"""
 
 
 # fitness user
@@ -59,6 +87,11 @@ class FitnessUser(models.Model):
                f'User destination: {self.fitness_user_destination_city}'
 
 
+"""
+Trainer specific models
+"""
+
+
 # trainer account
 class FitnessTrainer(models.Model):
     """
@@ -75,11 +108,6 @@ class FitnessTrainer(models.Model):
 
     def __str__(self):
         return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
-
-
-# место для хранения документов тренера
-def trainer_docs_path(instance, filename):
-    return f'trainer_docs/trainer_{instance.user.user.id}/{filename}'
 
 
 # trainer docs
@@ -129,6 +157,11 @@ class TrainerPrice(models.Model):
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Price: {self.trainer_price_currency}'
+
+
+"""
+Users gym and schedule models
+"""
 
 
 # trainer gym
@@ -209,6 +242,11 @@ class TrainingSchedule(models.Model):
         return self.schedule_gym.gym_short_name()
 
 
+"""
+User settings models
+"""
+
+
 # list of all settings
 class Setting(models.Model):
     """
@@ -257,11 +295,9 @@ class UserSetting(models.Model):
                f' Param: {self.setting_data}'
 
 
-# место для хранения фотографий пользователя в различных проекциях
-def projection_photo_path(instance, filename):
-    return f'projection_view_photo/user_{instance.user.user.id}/' \
-           f'projection_{instance.get_projection_view_type_display()}/' \
-           f'date_{instance.projection_view_date}/{filename}'
+"""
+Users projections photos model
+"""
 
 
 # user private photos
@@ -300,6 +336,11 @@ class ProjectionPhoto(models.Model):
 
     def __str__(self):
         return f'User: {self.user.user.username}; Projection: {self.get_projection_view_type_display()};'
+
+
+"""
+User notes models
+"""
 
 
 # user medical note
@@ -366,6 +407,11 @@ class UserDiary(models.Model):
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title()}...;'
+
+
+"""
+Trainer/Ward contracts and payments models
+"""
 
 
 # train contract
@@ -471,6 +517,11 @@ class TrainingPayment(models.Model):
                f'Ward: {self.payment_user_ward.user.username}'
 
 
+"""
+User body params models
+"""
+
+
 # user body parameters
 class BodyParameter(models.Model):
     """
@@ -527,6 +578,11 @@ class TargetBodyParameter(models.Model):
                f'Target param: {self.title_short()}...'
 
 
+"""
+Chat models
+"""
+
+
 # users chat
 class Chat(models.Model):
     """
@@ -545,12 +601,6 @@ class Chat(models.Model):
 
     def __str__(self):
         return f'Users: {self.users_list()}; Alive: {self.chat_alive}'
-
-
-# место для хранения файлов из чата
-def chat_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return f'chat_files/chat_{instance.message_chat.id}/user_{instance.user.user.id}/{filename}'
 
 
 # chat message
@@ -580,7 +630,6 @@ class ChatMessage(models.Model):
             return f'{self.message_text[:50]}...'
         else:
             return self.message_text
-
 
 
 
