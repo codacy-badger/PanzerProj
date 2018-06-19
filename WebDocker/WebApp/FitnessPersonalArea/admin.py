@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
-    UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
+    UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, \
+    TargetBodyParameter, Chat, ChatMessage
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)
@@ -260,6 +261,31 @@ class ExtendedTargetBodyParameter(admin.ModelAdmin):
     user_short.short_description = 'User name'
 
 
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedChat(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('users_list', 'chat_alive')
+    # поля для поиска
+    search_fields = ('id', 'users_list')
+    # поля для фильтрации
+    list_filter = ('chat_alive',)
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedChatMessage(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('user_short', 'short_message', 'message_chat', 'message_file')
+    # поля для поиска
+    search_fields = ('id', 'users')
+    # поля для фильтрации
+    list_filter = ('message_chat__chat_alive',)
+
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'Message author'
+
+
 admin.site.register(FitnessUser, ExtendedFitnessUser)
 admin.site.register(FitnessTrainer, ExtendedFitnessTrainer)
 admin.site.register(TrainerDoc, ExtendedTrainerDocs)
@@ -275,7 +301,8 @@ admin.site.register(TrainingContract, ExtendedTrainingContract)
 admin.site.register(TrainingPayment, ExtendedTrainingPayment)
 admin.site.register(BodyParameter, ExtendedBodyParameter)
 admin.site.register(TargetBodyParameter, ExtendedTargetBodyParameter)
-
+admin.site.register(Chat, ExtendedChat)
+admin.site.register(ChatMessage, ExtendedChatMessage)
 
 
 
