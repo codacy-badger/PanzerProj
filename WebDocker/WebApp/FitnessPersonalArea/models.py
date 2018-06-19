@@ -3,7 +3,6 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
 from taggit.managers import TaggableManager
-from django.utils.safestring import mark_safe
 
 
 # fitness user
@@ -50,12 +49,6 @@ class FitnessUser(models.Model):
     # destination city
     fitness_user_destination_city = models.CharField(max_length=50, default='', verbose_name='destination city')
 
-    def image_tag(self):
-        return mark_safe(f'<img src="/media/{self.fitness_user_photo}" '
-                         f'width="{self.image_width}" height="{self.image_height}" />')
-    image_tag.short_description = 'Image'
-    image_tag.allow_tags = True
-
     def __str__(self):
         return f'User: {self.user.username}; User type: {self.get_fitness_user_type_display()}; ' \
                f'User destination: {self.fitness_user_destination_city}'
@@ -78,10 +71,6 @@ class FitnessTrainer(models.Model):
     def __str__(self):
         return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
 
-    # для вывода в username
-    def user_short(self):
-        return self.user.user.username
-
 
 # trainer docs
 class TrainerDoc(models.Model):
@@ -103,10 +92,6 @@ class TrainerDoc(models.Model):
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
-
-    # для вывода в username
-    def user_short(self):
-        return self.user.user.user.username
 
 
 # trainer prices
@@ -132,10 +117,6 @@ class TrainerPrice(models.Model):
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Price: {self.trainer_price_currency}'
 
-    # для вывода в username
-    def user_short(self):
-        return self.user.user.user.username
-
 
 # trainer gym
 class TrainGym(models.Model):
@@ -152,7 +133,7 @@ class TrainGym(models.Model):
     # gym name
     gym_name = models.CharField(max_length=100)
     # gym full description
-    gym_description = models.CharField(max_length=1000)
+    gym_description = models.TextField(max_length=1000)
     # gym destination
     gym_destination = models.CharField(max_length=100)
     # gym geolocation (latitude/longitude)
@@ -163,14 +144,16 @@ class TrainGym(models.Model):
 
     # для вывода краткой информации о зале
     def gym_short_name(self):
-        return f'{self.gym_name[:50]}...'
+        if len(self.gym_name) > 50:
+            return f'{self.gym_name[:50]}...'
+        else:
+            return self.gym_name
 
     def gym_short_description(self):
-        return f'{self.gym_description[:50]}...'
-
-    # для вывода в username
-    def user_short(self):
-        return self.user.user.username
+        if len(self.gym_description) > 50:
+            return f'{self.gym_description[:50]}...'
+        else:
+            return self.gym_description
 
 
 # train schedule
@@ -208,13 +191,6 @@ class TrainingSchedule(models.Model):
     def get_all_tags(self):
         return self.schedule_train_tags.all()
 
-    # для вывода в username задействованных аккаунтов
-    def target_user_short(self):
-        return self.target_user.user.username
-
-    def author_user_short(self):
-        return self.author_user.user.username
-
     # краткое название зала из расписания
     def gym_short(self):
         return self.schedule_gym.gym_short_name()
@@ -236,7 +212,10 @@ class Setting(models.Model):
     setting_param = models.CharField(max_length=30, default='')
 
     def short_setting_description(self):
-        return f'{self.setting_description[:50]}...'
+        if len(self.setting_description) > 50:
+            return f'{self.setting_description[:50]}...'
+        else:
+            return self.setting_description
 
     def __str__(self):
         return f'Title: {self.setting_title}; Param: {self.setting_param}'
@@ -256,9 +235,6 @@ class UserSetting(models.Model):
     # персональные данные для настройки
     # data
     setting_data = models.CharField(max_length=100, default='')
-
-    def user_short(self):
-        return self.user.user.username
 
     def default_setting_short(self):
         return self.default_setting.setting_title
@@ -302,15 +278,6 @@ class ProjectionPhoto(models.Model):
                                               width_field = 'image_width', height_field = 'image_height',
                                               verbose_name = 'account photo')
 
-    def image_tag(self):
-        return mark_safe(f'<img src="/media/{self.projection_view_photo}" '
-                         f'width="{self.image_width}" height="{self.image_height}" />')
-    image_tag.short_description = 'Image'
-    image_tag.allow_tags = True
-
-    def user_short(self):
-        return self.user.user.username
-
     def __str__(self):
         return f'User: {self.user.user.username}; Projection: {self.get_projection_view_type_display()};'
 
@@ -336,16 +303,16 @@ class MedicalNote(models.Model):
     medical_note_tags = TaggableManager(blank=True)
 
     def short_title(self):
-        return f'{self.medical_note_title[:50]}...'
+        if len(self.medical_note_title) > 50:
+            return f'{self.medical_note_title[:50]}...'
+        else:
+            return self.medical_note_title
 
     def get_all_tags(self):
         return self.medical_note_tags.all()
 
-    def user_short(self):
-        return self.user.user.username
-
     def __str__(self):
-        return f'User: {self.user.user.username}; Title: {self.medical_note_title[:50]};'
+        return f'User: {self.user.user.username}; Title: {self.short_title};'
 
 
 # user diary
@@ -369,16 +336,16 @@ class UserDiary(models.Model):
     diary_note_tags = TaggableManager(blank=True)
 
     def short_title(self):
-        return f'{self.diary_note_title[:50]}...'
+        if len(self.diary_note_title) > 50:
+            return f'{self.diary_note_title[:50]}...'
+        else:
+            return self.diary_note_title
 
     def get_all_tags(self):
         return self.diary_note_tags.all()
 
-    def user_short(self):
-        return self.user.user.username
-
     def __str__(self):
-        return f'User: {self.user.user.username}; Title: {self.diary_note_title[:50]}...;'
+        return f'User: {self.user.user.username}; Title: {self.short_title()}...;'
 
 
 # train contract
@@ -479,12 +446,6 @@ class TrainingPayment(models.Model):
     # target(ward) payment success
     payment_ward_success = models.BooleanField(default=False)
 
-    def trainer_user_short(self):
-        return self.payment_user_trainer.user.user.username
-
-    def ward_user_short(self):
-        return self.payment_user_ward.user.username
-
     def __str__(self):
         return f'Trainer: {self.payment_user_trainer.user.user.username}; ' \
                f'Ward: {self.payment_user_ward.user.username}'
@@ -507,15 +468,15 @@ class BodyParameter(models.Model):
     # body parameter creating datetime
     body_datetime = models.DateTimeField(default = now)
 
-    def user_short(self):
-        return self.user.user.username
-
     def title_short(self):
-        return f'{self.body_title[:50]}...'
+        if len(self.body_title) > 50:
+            return f'{self.body_title[:50]}...'
+        else:
+            return self.body_title
 
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
-               f'Param title: {self.body_title[:50]}...'
+               f'Param title: {self.title_short()}...'
 
 
 # user body parameters
@@ -535,15 +496,15 @@ class TargetBodyParameter(models.Model):
     # body parameter creating datetime
     target_body_datetime = models.DateTimeField(default = now)
 
-    def user_short(self):
-        return self.user.user.username
-
     def title_short(self):
-        return f'{self.target_body_title[:50]}...'
+        if len(self.target_body_title) > 50:
+            return f'{self.target_body_title[:50]}...'
+        else:
+            return self.target_body_title
 
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
-               f'Target param: {self.target_body_title[:50]}...'
+               f'Target param: {self.title_short()}...'
 
 
 

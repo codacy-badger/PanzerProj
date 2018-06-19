@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
     UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
@@ -15,6 +16,13 @@ class ExtendedFitnessUser(admin.ModelAdmin):
     list_filter = ('user__is_active', 'user__last_login', 'user__date_joined', 'fitness_user_type',
                    'fitness_user_gender')
 
+    def image_tag(self, obj):
+        return mark_safe(f'<img src="/media/{obj.fitness_user_photo}" '
+                         f'width="{obj.image_width}" height="{obj.image_height}" />')
+
+    image_tag.short_description = 'Image'
+    image_tag.allow_tags = True
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedFitnessTrainer(admin.ModelAdmin):
@@ -26,6 +34,12 @@ class ExtendedFitnessTrainer(admin.ModelAdmin):
     list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined',
                    'trainer_employment_status')
 
+    # для вывода в username
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели TrainerDocs (раширения модели медицинских записей)
 class ExtendedTrainerDocs(admin.ModelAdmin):
@@ -35,6 +49,12 @@ class ExtendedTrainerDocs(admin.ModelAdmin):
     search_fields = ('id', 'user__user__id', 'user__user__username', 'doc_title')
     # поля для фильтрации
     list_filter = ('user__user__user__is_active', 'user__user__user__last_login', 'user__user__user__date_joined')
+
+    # для вывода в username
+    def user_short(self, obj):
+        return obj.user.user.user.username
+
+    user_short.short_description = 'User name'
 
 
 #  класс для кастомизации модели TrainerPrice (раширения модели цены тренесркой работы)
@@ -48,6 +68,12 @@ class ExtendedTrainerPrice(admin.ModelAdmin):
     list_filter = ('user__user__user__is_active', 'user__user__user__last_login', 'user__user__user__date_joined',
                    'trainer_price_bargaining', 'trainer_price_currency')
 
+    # для вывода в username
+    def user_short(self, obj):
+        return obj.user.user.user.username
+
+    user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели ExtendedTrainGym (раширения модели для описания зала)
 class ExtendedTrainGym(admin.ModelAdmin):
@@ -58,6 +84,12 @@ class ExtendedTrainGym(admin.ModelAdmin):
     # поля для фильтрации
     list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined')
 
+    # для вывода в username
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели TrainingSchedule (раширения модели расписания тренировок)
 class ExtendedTrainingSchedule(admin.ModelAdmin):
@@ -65,6 +97,16 @@ class ExtendedTrainingSchedule(admin.ModelAdmin):
     list_display = ('target_user_short', 'author_user_short', 'gym_short', 'get_all_tags')
     # поля для поиска
     search_fields = ('user__user__username', 'gym_name', 'gym_description', 'gym_destination')
+
+    # для вывода в username
+    def target_user_short(self, obj):
+        return obj.target_user.user.username
+
+    def author_user_short(self, obj):
+        return obj.author_user.user.username
+
+    target_user_short.short_description = 'Target name'
+    author_user_short.short_description = 'Author name'
 
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
@@ -85,6 +127,11 @@ class ExtendedUserSetting(admin.ModelAdmin):
     list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined',
                    'default_setting__setting_title')
 
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedProjectionPhoto(admin.ModelAdmin):
@@ -96,6 +143,17 @@ class ExtendedProjectionPhoto(admin.ModelAdmin):
     list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined', 'projection_view_type',
                    'projection_view_date')
 
+    def image_tag(self, obj):
+        return mark_safe(f'<img src="/media/{obj.projection_view_photo}" '
+                         f'width="{obj.image_width}" height="{obj.image_height}" />')
+
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
+    image_tag.short_description = 'Image'
+    image_tag.allow_tags = True
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedMedicalNote(admin.ModelAdmin):
@@ -106,6 +164,11 @@ class ExtendedMedicalNote(admin.ModelAdmin):
     # поля для фильтрации
     list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined', 'medical_note_datetime')
 
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedUserDiary(admin.ModelAdmin):
@@ -115,6 +178,11 @@ class ExtendedUserDiary(admin.ModelAdmin):
     search_fields = ('id', 'user__user__id', 'user__user__username')
     # поля для фильтрации
     list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined', 'diary_note_datetime')
+
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
 
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
@@ -151,6 +219,16 @@ class ExtendedTrainingPayment(admin.ModelAdmin):
     # поля для фильтрации
     list_filter = ('payment_currency', 'payment_trainer_success', 'payment_ward_success')
 
+    def trainer_user_short(self, obj):
+        return obj.payment_user_trainer.user.user.username
+
+    def ward_user_short(self, obj):
+        return obj.payment_user_ward.user.username
+
+    # переименование полей для отображения
+    trainer_user_short.short_description = 'Trainer name'
+    ward_user_short.short_description = 'Ward name'
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedBodyParameter(admin.ModelAdmin):
@@ -161,6 +239,11 @@ class ExtendedBodyParameter(admin.ModelAdmin):
     # поля для фильтрации
     list_filter = ('body_datetime',)
 
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedTargetBodyParameter(admin.ModelAdmin):
@@ -170,6 +253,11 @@ class ExtendedTargetBodyParameter(admin.ModelAdmin):
     search_fields = ('id', 'user__user__id', 'user__user__username', 'target_body_title')
     # поля для фильтрации
     list_filter = ('target_body_datetime',)
+
+    def user_short(self, obj):
+        return obj.user.user.username
+
+    user_short.short_description = 'User name'
 
 
 admin.site.register(FitnessUser, ExtendedFitnessUser)
