@@ -5,6 +5,11 @@ from django.utils.timezone import now
 from taggit.managers import TaggableManager
 
 
+# место для хранения аватаров
+def profile_photo_path(instance, filename):
+    return f'profiles_photo/user_{instance.user.id}/{filename}'
+
+
 # fitness user
 class FitnessUser(models.Model):
     """
@@ -30,7 +35,7 @@ class FitnessUser(models.Model):
     # фотография пользователя
     image_width = 120
     image_height = 120
-    fitness_user_photo = models.ImageField(upload_to = f'profiles_photo/%Y/%m/%d/', default=None,
+    fitness_user_photo = models.ImageField(upload_to = profile_photo_path, default=None,
                                            width_field = 'image_width', height_field = 'image_height',
                                            verbose_name='account photo')
     # gender пользователя
@@ -72,6 +77,11 @@ class FitnessTrainer(models.Model):
         return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
 
 
+# место для хранения документов тренера
+def trainer_docs_path(instance, filename):
+    return f'trainer_docs/trainer_{instance.user.user.id}/{filename}'
+
+
 # trainer docs
 class TrainerDoc(models.Model):
     """
@@ -84,11 +94,14 @@ class TrainerDoc(models.Model):
     # doc title
     doc_title = models.TextField(max_length=1000)
     # doc file
-    doc_file = models.FileField(upload_to = f'trainer_docs/%Y/%m/%d/')
+    doc_file = models.FileField(upload_to = trainer_docs_path)
 
     # preview названия документа
     def doc_title_preview(self):
-        return f'{self.doc_title[:50]} ...'
+        if len(self.doc_title) > 50:
+            return f'{self.doc_title[:50]} ...'
+        else:
+            return self.doc_title
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
@@ -244,6 +257,13 @@ class UserSetting(models.Model):
                f' Param: {self.setting_data}'
 
 
+# место для хранения фотографий пользователя в различных проекциях
+def projection_photo_path(instance, filename):
+    return f'projection_view_photo/user_{instance.user.user.id}/' \
+           f'projection_{instance.get_projection_view_type_display()}/' \
+           f'date_{instance.projection_view_date}/{filename}'
+
+
 # user private photos
 class ProjectionPhoto(models.Model):
     """
@@ -274,7 +294,7 @@ class ProjectionPhoto(models.Model):
     # projection photo
     image_width = 100
     image_height = 150
-    projection_view_photo = models.ImageField(upload_to = f'projection_view_photo/%Y/%m/%d/', default=None,
+    projection_view_photo = models.ImageField(upload_to = projection_photo_path, default=None,
                                               width_field = 'image_width', height_field = 'image_height',
                                               verbose_name = 'account photo')
 
@@ -527,6 +547,12 @@ class Chat(models.Model):
         return f'Users: {self.users_list()}; Alive: {self.chat_alive}'
 
 
+# место для хранения файлов из чата
+def chat_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return f'chat_files/chat_{instance.message_chat.id}/user_{instance.user.user.id}/{filename}'
+
+
 # chat message
 class ChatMessage(models.Model):
     """
@@ -543,7 +569,7 @@ class ChatMessage(models.Model):
     # message text
     message_text = models.TextField(max_length = 1000)
     # message file
-    message_file = models.FileField(blank = True, null = True, upload_to = f'chat_files/%Y/%m/%d/')
+    message_file = models.FileField(blank = True, null = True, upload_to = chat_directory_path)
 
     def __str__(self):
         return f'User: {self.user.user.username}; Chat: {self.message_chat.users_list()}; ' \
