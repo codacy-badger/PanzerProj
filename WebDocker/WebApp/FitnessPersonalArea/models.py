@@ -634,6 +634,43 @@ class ChatMessage(models.Model):
             return self.message_text
 
 
+# users feed-backs
+class Feedback(models.Model):
+    """
+    Модель отвечает за фидбеки пользователей после заключения/окончания контракта
+    target_user - FitnessUser на которого пишется фидбэк
+    author_user - FitnessUser который написал фидбэк
+    feedback_title - тема фидбэка
+    feedback_text - текст фидбэка
+    feedback_rate - рейтинг поставленный одним пользователем, другому
+    feedback_datetime - дата создания фидбэка
+    """
+    # target user
+    target_user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE, related_name='target_feedback_user')
+    # feedback author user
+    author_user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE, related_name='author_feedback_user')
+    # title
+    feedback_title = models.CharField(max_length = 100)
+    # text
+    feedback_text = models.TextField(max_length = 4000)
+    # rate
+    feedback_rate = models.PositiveSmallIntegerField(default = 0)
+    # datetime
+    feedback_datetime = models.DateTimeField(default = now)
 
+    def __str__(self):
+        return f'Target: {self.target_user.user.username}; Rate: {self.feedback_rate}'
+
+    def short_title(self):
+        if len(self.feedback_title) > 50:
+            return f'{self.feedback_title[:50]}...'
+        else:
+            return self.feedback_title
+
+    def short_text(self):
+        if len(self.feedback_text) > 50:
+            return f'{self.feedback_text[:50]}...'
+        else:
+            return self.feedback_text
 
 

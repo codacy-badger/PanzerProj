@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
     UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, \
-    TargetBodyParameter, Chat, ChatMessage
+    TargetBodyParameter, Chat, ChatMessage, Feedback
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)
@@ -286,6 +286,25 @@ class ExtendedChatMessage(admin.ModelAdmin):
     user_short.short_description = 'Message author'
 
 
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedFeedback(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('target_user_short', 'author_user_short', 'short_title', 'short_text', 'feedback_rate')
+    # поля для поиска
+    search_fields = ('target_user', 'author_user', 'feedback_title', 'feedback_text')
+    # поля для фильтрации
+    list_filter = ('feedback_datetime', 'feedback_rate')
+
+    def target_user_short(self, obj):
+        return obj.target_user.user.username
+
+    def author_user_short(self, obj):
+        return obj.author_user.user.username
+
+    target_user_short.short_description = 'Feedback target'
+    author_user_short.short_description = 'Feedback author'
+
+
 admin.site.register(FitnessUser, ExtendedFitnessUser)
 admin.site.register(FitnessTrainer, ExtendedFitnessTrainer)
 admin.site.register(TrainerDoc, ExtendedTrainerDocs)
@@ -303,6 +322,7 @@ admin.site.register(BodyParameter, ExtendedBodyParameter)
 admin.site.register(TargetBodyParameter, ExtendedTargetBodyParameter)
 admin.site.register(Chat, ExtendedChat)
 admin.site.register(ChatMessage, ExtendedChatMessage)
+admin.site.register(Feedback, ExtendedFeedback)
 
 
 
