@@ -2,6 +2,8 @@ from django.contrib.auth.models import Group, User
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
+
 from taggit.managers import TaggableManager
 
 
@@ -53,8 +55,8 @@ class FitnessUser(models.Model):
     teacher_user = "TRN"
     usual_user = "USL"
     fitness_user_type_choice = (
-        (teacher_user, 'Trainer'),
-        (usual_user, 'Usual'),
+        (teacher_user, _('Тренер')),
+        (usual_user, _('Подопечный')),
     )
     fitness_user_type = models.CharField(max_length=3,
                                          choices=fitness_user_type_choice,
@@ -71,9 +73,9 @@ class FitnessUser(models.Model):
     female_gender = "FEM"
     other_gender = "OTH"
     fitness_user_gender_choice = (
-        (male_gender, 'Male'),
-        (female_gender, 'Female'),
-        (other_gender, 'Other'),
+        (male_gender, _('Мужчина')),
+        (female_gender, _('Женщина')),
+        (other_gender, _('Другой')),
     )
     fitness_user_gender = models.CharField(max_length=3,
                                            choices=fitness_user_gender_choice,
@@ -316,10 +318,10 @@ class ProjectionPhoto(models.Model):
     side_second_view_photo = "SD2"
     back_view_photo = "BCK"
     projection_view_type_choice = (
-        (front_view_photo, 'Front'),
-        (side_first_view_photo, 'Side first'),
-        (side_second_view_photo, 'Side second'),
-        (back_view_photo, 'Back'),
+        (front_view_photo, _('Передний вид')),
+        (side_first_view_photo, _('Боковой вид №1')),
+        (side_second_view_photo, _('Боковой вид №2')),
+        (back_view_photo, _('Задний вид')),
     )
     projection_view_type = models.CharField(max_length=3,
                                             choices=projection_view_type_choice,
