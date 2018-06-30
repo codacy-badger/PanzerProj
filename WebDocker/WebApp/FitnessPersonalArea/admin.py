@@ -278,7 +278,7 @@ class ExtendedChatMessage(admin.ModelAdmin):
     # поля для поиска
     search_fields = ('id', 'users')
     # поля для фильтрации
-    list_filter = ('message_chat__chat_alive','message_datetime')
+    list_filter = ('message_chat__chat_alive', 'message_datetime', 'message_readed')
 
     def user_short(self, obj):
         return obj.user.user.username
