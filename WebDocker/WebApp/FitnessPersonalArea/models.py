@@ -11,11 +11,11 @@ from taggit.managers import TaggableManager
 Files upload functions  
 """
 
-
 # место для хранения файлов из чата
 def chat_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return f'chat_files/chat_{instance.message_chat.id}/user_{instance.user.user.id}/{filename}'
+    return f'chat_files/chat_{instance.message_chat.id}/user_{instance.user.user.id}/' \
+           f'{now().date().strftime("%Y/%m/%d")}/{filename}'
 
 
 # место для хранения аватаров
@@ -32,7 +32,7 @@ def trainer_docs_path(instance, filename):
 def projection_photo_path(instance, filename):
     return f'projection_view_photo/user_{instance.user.user.id}/' \
            f'projection_{instance.get_projection_view_type_display()}/' \
-           f'date_{instance.projection_view_date}/{filename}'
+           f'{now().date().strftime("%Y/%m/%d")}/{filename}'
 
 
 """
