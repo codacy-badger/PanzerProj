@@ -620,6 +620,8 @@ class ChatMessage(models.Model):
     message_chat = models.ForeignKey(Chat, on_delete = models.CASCADE)
     # message text
     message_text = models.TextField(max_length = 1000)
+    # message creating datetime
+    message_datetime = models.DateTimeField(default = now)
     # message file
     message_file = models.FileField(blank = True, null = True, upload_to = chat_directory_path)
 
