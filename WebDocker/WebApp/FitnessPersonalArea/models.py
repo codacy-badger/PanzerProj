@@ -237,7 +237,7 @@ class TrainingSchedule(models.Model):
                f'Gym: {self.schedule_gym.gym_short_name()}; Date: {self.schedule_date}'
 
     def get_all_tags(self):
-        return list(tag for tag in self.schedule_train_tags.all())
+        return [tag for tag in self.schedule_train_tags.all()]
 
     # краткое название зала из расписания
     def gym_short(self):
@@ -372,7 +372,7 @@ class MedicalNote(models.Model):
             return self.medical_note_title
 
     def get_all_tags(self):
-        return list(tag for tag in self.medical_note_tags.all())
+        return [tag for tag in self.medical_note_tags.all()]
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title};'
@@ -405,7 +405,7 @@ class UserDiary(models.Model):
             return self.diary_note_title
 
     def get_all_tags(self):
-        return list(tag for tag in self.diary_note_tags.all())
+        return [tag for tag in self.diary_note_tags.all()]
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title()}...;'
@@ -597,7 +597,7 @@ class Chat(models.Model):
     chat_alive = models.BooleanField(default = True)
 
     def users_list(self):
-        return list(participant.user.username for participant in self.users.all())
+        return [participant.user.username for participant in self.users.all()]
 
     users_list.short_description = 'Participants names'
 
@@ -700,6 +700,15 @@ class DefExerciseType(models.Model):
     # default type description
     type_description = models.TextField(max_length=5000)
 
+    def short_title(self):
+        return self.type_title if len(self.type_title) < 50 else self.type_title[:50]+' ...'
+
+    def short_description(self):
+        return self.type_description if len(self.type_description) < 50 else self.type_description[:50]+' ...'
+
+    def __str__(self):
+        return f'Title: {self.short_title()}'
+
 
 # default type/subtype bundle
 class DefTypesBundle(models.Model):
@@ -713,6 +722,16 @@ class DefTypesBundle(models.Model):
                                     related_name = 'bundled_type')
     # bundled exercises subtypes
     bundle_subtypes = models.ManyToManyField(DefExerciseType, blank = True, related_name = 'bundled_subtypes')
+
+    def short_type(self):
+        return self.bundle_type.type_title if len(self.bundle_type.type_title) < 50 \
+                                           else self.bundle_type.type_title[:50]+' ...'
+
+    def bundled_types(self):
+        return [type_title.short_title() for type_title in self.bundle_subtypes.all()]
+
+    def __str__(self):
+        return f'Type: {self.short_type()}; Subtypes: {self.bundled_types}'
 
 
 # default exercises model
