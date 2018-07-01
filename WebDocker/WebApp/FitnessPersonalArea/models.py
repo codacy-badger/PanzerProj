@@ -638,6 +638,11 @@ class ChatMessage(models.Model):
             return self.message_text
 
 
+"""
+Feedback model 
+"""
+
+
 # users feed-backs
 class Feedback(models.Model):
     """
@@ -676,5 +681,64 @@ class Feedback(models.Model):
             return f'{self.feedback_text[:50]}...'
         else:
             return self.feedback_text
+
+
+"""
+Default exercise models
+"""
+
+
+# default exercise type
+class DefExerciseType(models.Model):
+    """
+    Модель отвечает за хранение стандартных типов упражнений
+    type_title - название типа упражнения
+    type_description - описание типа упражнения
+    """
+    # default type title
+    type_title = models.CharField(max_length = 100)
+    # default type description
+    type_description = models.TextField(max_length=5000)
+
+
+# default type/subtype bundle
+class DefTypesBundle(models.Model):
+    """
+    Модель отвечает за хранение стандартных связей между типами/подтипами упражнений
+    bundle_type - тип упражнения
+    bundle_subtypes - подтипы данного типа упражнения
+    """
+    # bundled exercise type
+    bundle_type = models.ForeignKey(DefExerciseType, on_delete = models.SET_NULL, null = True, blank = True,
+                                    related_name = 'bundled_type')
+    # bundled exercises subtypes
+    bundle_subtypes = models.ManyToManyField(DefExerciseType, blank = True, related_name = 'bundled_subtypes')
+
+
+# default exercises model
+class DefExercise(models.Model):
+    """
+    Модель отвечает за хранение стандартных упражнений
+    exercise_type - тип к которому относится упражнение
+    exercise_title - название упражнения
+    exercise_description - описание упражнения
+    exercise_approaches - кол-во подходов данного упражнения
+    exercise_set - сеты в которые включено данное упражнение
+    """
+    # default exercise type
+    exercise_type = models.ManyToManyField(DefExerciseType, blank = True)
+    # default exercise title
+    exercise_title = models.CharField(max_length = 100)
+    # default exercise description
+    exercise_description = models.TextField(max_length=5000)
+    # default approaches number
+    exercise_approaches = models.IntegerField(default = 0)
+    # bundled set
+    # exercise_set = models.ManyToManyField(on_delete = models.SET_NULL, null = True, blank = True)
+
+
+
+
+
 
 

@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
     UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, \
-    TargetBodyParameter, Chat, ChatMessage, Feedback
+    TargetBodyParameter, Chat, ChatMessage, Feedback, DefExerciseType, DefTypesBundle, DefExercise
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)
@@ -324,11 +324,6 @@ admin.site.register(Chat, ExtendedChat)
 admin.site.register(ChatMessage, ExtendedChatMessage)
 admin.site.register(Feedback, ExtendedFeedback)
 
-
-
-
-
-
-
-
-
+admin.site.register(DefExerciseType)
+admin.site.register(DefTypesBundle)
+admin.site.register(DefExercise)
