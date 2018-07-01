@@ -305,6 +305,22 @@ class ExtendedFeedback(admin.ModelAdmin):
     author_user_short.short_description = 'Feedback author'
 
 
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedDefExerciseType(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('short_title', 'short_description')
+    # поля для поиска
+    search_fields = ('type_title', 'type_description')
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedDefTypesBundle(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('short_type', 'bundled_types')
+    # поля для поиска
+    search_fields = ('bundle_type', 'bundle_type__type_description')
+
+
 admin.site.register(FitnessUser, ExtendedFitnessUser)
 admin.site.register(FitnessTrainer, ExtendedFitnessTrainer)
 admin.site.register(TrainerDoc, ExtendedTrainerDocs)
@@ -323,7 +339,7 @@ admin.site.register(TargetBodyParameter, ExtendedTargetBodyParameter)
 admin.site.register(Chat, ExtendedChat)
 admin.site.register(ChatMessage, ExtendedChatMessage)
 admin.site.register(Feedback, ExtendedFeedback)
+admin.site.register(DefExerciseType, ExtendedDefExerciseType)
+admin.site.register(DefTypesBundle, ExtendedDefTypesBundle)
 
-admin.site.register(DefExerciseType)
-admin.site.register(DefTypesBundle)
 admin.site.register(DefExercise)
