@@ -3,7 +3,8 @@ from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
     UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, \
-    TargetBodyParameter, Chat, ChatMessage, Feedback, DefExerciseType, DefTypesBundle, DefExercise
+    TargetBodyParameter, Chat, ChatMessage, Feedback, DefExerciseType, DefTypesBundle, DefExercise, ExerciseType,\
+    TypesBundle, Exercise, ExerciseSet, SharedExercise, SharedSet
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)
@@ -316,30 +317,141 @@ class ExtendedDefExerciseType(admin.ModelAdmin):
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedDefTypesBundle(admin.ModelAdmin):
     # поля, отображаемые в модели
-    list_display = ('short_type', 'bundled_types')
+    list_display = ('short_type', 'get_bundled_types')
     # поля для поиска
-    search_fields = ('bundle_type', 'bundle_type__type_description')
+    search_fields = ('bundle_type', 'bundle_subtypes')
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedDefExercise(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('short_title', 'short_description', 'exercise_type')
+    # поля для поиска
+    search_fields = ('exercise_type', 'exercise_title', 'exercise_description')
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedExerciseType(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('user_short', 'short_title', 'short_description', 'type_datetime')
+    # поля для поиска
+    search_fields = ('type_owner', 'short_title', 'short_description')
+    # поля для фильтрации
+    list_filter = ('type_datetime',)
+
+    def user_short(self, obj):
+        return obj.type_owner.user.username
+
+    user_short.short_description = 'User owner'
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedTypesBundle(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('short_type', 'get_bundled_types',)
+    # поля для поиска
+    search_fields = ('bundle_type', 'bundle_subtypes')
+    # поля для фильтрации
+    list_filter = ('bundle_datetime',)
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedExercise(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('user_short', 'exercise_type', 'short_title', 'short_description')
+    # поля для поиска
+    search_fields = ('exercise_owner', 'exercise_title', 'exercise_description', 'exercise_type')
+    # поля для фильтрации
+    list_filter = ('exercise_datetime',)
+
+    def user_short(self, obj):
+        return obj.exercise_owner.user.username
+
+    user_short.short_description = 'User owner'
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedExerciseSet(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('user_short', 'short_title', 'short_description', 'get_set_exercises', 'get_set_def_exercises')
+    # поля для поиска
+    search_fields = ('set_owner', 'set_title', 'set_description', 'set_exercises', 'set_def_exercises')
+    # поля для фильтрации
+    list_filter = ('set_datetime',)
+
+    def user_short(self, obj):
+        return obj.set_owner.user.username
+
+    user_short.short_description = 'User owner'
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedSharedExercise(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('shared_exercise_short', 'shared_rate', 'shared_copies', 'shared_datetime')
+    # поля для поиска
+    search_fields = ('shared_exercise', )
+    # поля для фильтрации
+    list_filter = ('shared_datetime',)
+
+    def shared_exercise_short(self, obj):
+        return obj.shared_exercise.short_title()
+
+    shared_exercise_short.short_description = 'Shared exercise'
+
+
+#  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
+class ExtendedSharedSet(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('shared_set_short', 'shared_rate', 'shared_copies', 'shared_datetime')
+    # поля для поиска
+    search_fields = ('shared_set', )
+    # поля для фильтрации
+    list_filter = ('shared_datetime',)
+
+    def shared_set_short(self, obj):
+        return obj.shared_set.short_title()
+
+    shared_set_short.short_description = 'Shared set'
 
 
 admin.site.register(FitnessUser, ExtendedFitnessUser)
+
 admin.site.register(FitnessTrainer, ExtendedFitnessTrainer)
 admin.site.register(TrainerDoc, ExtendedTrainerDocs)
 admin.site.register(TrainerPrice, ExtendedTrainerPrice)
+
 admin.site.register(TrainGym, ExtendedTrainGym)
 admin.site.register(TrainingSchedule, ExtendedTrainingSchedule)
+
 admin.site.register(Setting, ExtendedSetting)
 admin.site.register(UserSetting, ExtendedUserSetting)
+
 admin.site.register(ProjectionPhoto, ExtendedProjectionPhoto)
+
 admin.site.register(MedicalNote, ExtendedMedicalNote)
 admin.site.register(UserDiary, ExtendedUserDiary)
+
 admin.site.register(TrainingContract, ExtendedTrainingContract)
 admin.site.register(TrainingPayment, ExtendedTrainingPayment)
+
 admin.site.register(BodyParameter, ExtendedBodyParameter)
 admin.site.register(TargetBodyParameter, ExtendedTargetBodyParameter)
+
 admin.site.register(Chat, ExtendedChat)
 admin.site.register(ChatMessage, ExtendedChatMessage)
+
 admin.site.register(Feedback, ExtendedFeedback)
+
 admin.site.register(DefExerciseType, ExtendedDefExerciseType)
 admin.site.register(DefTypesBundle, ExtendedDefTypesBundle)
+admin.site.register(DefExercise, ExtendedDefExercise)
 
-admin.site.register(DefExercise)
+admin.site.register(ExerciseType, ExtendedExerciseType)
+admin.site.register(TypesBundle, ExtendedTypesBundle)
+admin.site.register(Exercise, ExtendedExercise)
+
+admin.site.register(ExerciseSet, ExtendedExerciseSet)
+
+admin.site.register(SharedExercise, ExtendedSharedExercise)
+admin.site.register(SharedSet, ExtendedSharedSet)
