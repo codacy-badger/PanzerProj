@@ -11,6 +11,7 @@ from taggit.managers import TaggableManager
 Files upload functions  
 """
 
+
 # место для хранения файлов из чата
 def chat_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
@@ -727,11 +728,11 @@ class DefTypesBundle(models.Model):
         return self.bundle_type.type_title if len(self.bundle_type.type_title) < 50 \
                                            else self.bundle_type.type_title[:50]+' ...'
 
-    def bundled_types(self):
+    def get_bundled_types(self):
         return [type_title.short_title() for type_title in self.bundle_subtypes.all()]
 
     def __str__(self):
-        return f'Type: {self.short_type()}; Subtypes: {self.bundled_types}'
+        return f'Type: {self.short_type()}; Subtypes: {self.get_bundled_types()}'
 
 
 # default exercises model
@@ -745,7 +746,99 @@ class DefExercise(models.Model):
     exercise_set - сеты в которые включено данное упражнение
     """
     # default exercise type
-    exercise_type = models.ManyToManyField(DefExerciseType, blank = True)
+    exercise_type = models.ForeignKey(DefExerciseType, on_delete = models.SET_NULL, null = True, blank = True)
+    # default exercise title
+    exercise_title = models.CharField(max_length = 100)
+    # default exercise description
+    exercise_description = models.TextField(max_length=5000)
+    # default approaches number
+    exercise_approaches = models.IntegerField(default = 0, blank = True, null = True)
+
+    def short_title(self):
+        return self.exercise_title if len(self.exercise_title) < 50 else self.exercise_title[:50]+' ...'
+
+    def short_description(self):
+        return self.exercise_description if len(self.exercise_description) < 50 \
+                                         else self.exercise_description[:50]+' ...'
+
+    def __str__(self):
+        return f'Title: {self.short_title()}'
+
+
+"""
+Users exercise models
+"""
+
+
+# exercise type
+class ExerciseType(models.Model):
+    """
+    Модель отвечает за хранение пользовательских типов упражнений
+    type_title - название типа упражнения
+    type_description - описание типа упражнения
+    type_datetime - дата создания типа
+    """
+    # user owner
+    type_owner = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
+    # type title
+    type_title = models.CharField(max_length = 100)
+    # type description
+    type_description = models.TextField(max_length=5000)
+    # create datetime
+    type_datetime = models.DateTimeField(default = now)
+
+    def short_title(self):
+        return self.type_title if len(self.type_title) < 50 else self.type_title[:50]+' ...'
+
+    def short_description(self):
+        return self.type_description if len(self.type_description) < 50 else self.type_description[:50]+' ...'
+
+    def __str__(self):
+        return f'Title: {self.short_title()}'
+
+
+# type/subtype bundle
+class TypesBundle(models.Model):
+    """
+    Модель отвечает за хранение пользовательских связей между типами/подтипами упражнений
+    bundle_type - тип упражнения
+    bundle_subtypes - подтипы данного типа упражнения
+    bundle_datetime - дата создания связи
+    """
+    # bundled exercise type
+    bundle_type = models.ForeignKey(ExerciseType, on_delete = models.SET_NULL, null = True, blank = True,
+                                    related_name = 'bundled_type')
+    # bundled exercises subtypes
+    bundle_subtypes = models.ManyToManyField(ExerciseType, blank = True, related_name = 'bundled_subtypes')
+    # bundle creating datetime
+    bundle_datetime = models.DateTimeField(default = now)
+
+    def short_type(self):
+        return self.bundle_type.type_title if len(self.bundle_type.type_title) < 50 \
+                                           else self.bundle_type.type_title[:50]+' ...'
+
+    def get_bundled_types(self):
+        return [type_title.short_title() for type_title in self.bundle_subtypes.all()]
+
+    def __str__(self):
+        return f'Type: {self.short_type()}; Subtypes: {self.get_bundled_types()}'
+
+
+# exercises model
+class Exercise(models.Model):
+    """
+    Модель отвечает за хранение пользовательских упражнений
+    exercise_owner - владелец упражнения
+    exercise_type - тип к которому относится упражнение
+    exercise_title - название упражнения
+    exercise_description - описание упражнения
+    exercise_approaches - кол-во подходов данного упражнения
+    exercise_datetime - дата создания упражнения
+    """
+    # user owner
+    exercise_owner = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
+    # default exercise type
+    exercise_type = models.ForeignKey(ExerciseType, on_delete = models.SET_NULL, null = True, blank = True)
     # default exercise title
     exercise_title = models.CharField(max_length = 100)
     # default exercise description
