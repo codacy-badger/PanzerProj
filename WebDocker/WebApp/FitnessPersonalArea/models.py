@@ -633,10 +633,7 @@ class ChatMessage(models.Model):
                f'Message: {self.short_message()}'
 
     def short_message(self):
-        if len(self.message_text) > 50:
-            return f'{self.message_text[:50]}...'
-        else:
-            return self.message_text
+        return self.message_text if len(self.message_text) < 50 else self.message_text[:50] + ' ...'
 
 
 """
