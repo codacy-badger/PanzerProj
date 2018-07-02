@@ -664,7 +664,7 @@ class Feedback(models.Model):
     # text
     feedback_text = models.TextField(max_length = 4000)
     # rate
-    feedback_rate = models.PositiveSmallIntegerField(default = 0)
+    feedback_rate = models.FloatField(default = 0)
     # datetime
     feedback_datetime = models.DateTimeField(default = now)
 
@@ -844,9 +844,117 @@ class Exercise(models.Model):
     # default exercise description
     exercise_description = models.TextField(max_length=5000)
     # default approaches number
-    exercise_approaches = models.IntegerField(default = 0)
-    # bundled set
-    # exercise_set = models.ManyToManyField(on_delete = models.SET_NULL, null = True, blank = True)
+    exercise_approaches = models.IntegerField(default = 0, blank = True, null = True)
+    # create datetime
+    exercise_datetime = models.DateTimeField(default = now)
+
+    def short_title(self):
+        return self.exercise_title if len(self.exercise_title) < 50 else self.exercise_title[:50]+' ...'
+
+    def short_description(self):
+        return self.exercise_description if len(self.exercise_description) < 50 \
+                                         else self.exercise_description[:50]+' ...'
+
+    def __str__(self):
+        return f'Title: {self.short_title()}; Type: {self.exercise_type.short_title()}'
+
+
+"""
+Exercises set
+"""
+
+
+# exercises set model
+class ExerciseSet(models.Model):
+    """
+    Модель отвечает за хранение сетов упражнений пользователя
+    set_owner - владелец сета
+    set_exercises - пользовательские упражнения в сете
+    set_title - название сета
+    set_description - полное описание сета
+    set_def_exercises - стандартные упражнения в сете
+    set_datetime - дата создания сета
+    """
+    # set owner
+    set_owner = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
+    # set title
+    set_title = models.CharField(max_length = 100)
+    # set description
+    set_description = models.TextField(max_length = 5000)
+    # set exercises
+    set_exercises = models.ManyToManyField(Exercise, blank = True)
+    # set default exercises
+    set_def_exercises = models.ManyToManyField(DefExercise, blank = True)
+    # create datetime
+    set_datetime = models.DateTimeField(default = now)
+
+    def short_title(self):
+        return self.set_title if len(self.set_title) < 50 else self.set_title[:50]+' ...'
+
+    def short_description(self):
+        return self.set_description if len(self.set_description) < 50 else self.set_description[:50]+' ...'
+
+    def get_set_exercises(self):
+        return [type_title.short_title() for type_title in self.set_exercises.all()]
+
+    def get_set_def_exercises(self):
+        return [type_title.short_title() for type_title in self.set_def_exercises.all()]
+
+    def __str__(self):
+        return f'Title: {self.short_title()}; Owner: {self.set_owner.user.username}'
+
+
+"""
+Share models
+"""
+
+
+# shared exercise model
+class SharedExercise(models.Model):
+    """
+    Модель отвечает за хранение расшаренных пользователем упражнений
+    shared_exercise - упражнение которое расшарил пользователь
+    shared_rate - рейтинг расшаренного упражнения
+    shared_copies - кол-во копий данного упражнения
+    shared_datetime - дата создания данного расшаренного упражнения
+    """
+    # shared exercises
+    shared_exercise = models.OneToOneField(Exercise, on_delete = models.CASCADE)
+    # share exercise rate
+    shared_rate = models.FloatField(default = 0)
+    # copies taken
+    shared_copies = models.IntegerField(default = 0)
+    # create datetime
+    shared_datetime = models.DateTimeField(default = now)
+
+    def __str__(self):
+        return f'Exercise: {self.shared_exercise.short_title()}; Rate: {self.shared_rate}'
+
+
+# shared exercises set model
+class SharedSet(models.Model):
+    """
+    Модель отвечает за хранение расшаренных пользователем сетов упражнений
+    shared_set - сет, который расшарил пользователь
+    shared_rate - рейтинг сета
+    shared_copies - кол-во копий сета
+    shared_datetime  - дата создания сета
+    """
+    # shared sets
+    shared_set = models.OneToOneField(ExerciseSet, on_delete = models.CASCADE)
+    # share set rate
+    shared_rate = models.FloatField(default = 0)
+    # copies taken
+    shared_copies = models.IntegerField(default = 0)
+    # create datetime
+    shared_datetime = models.DateTimeField(default = now)
+
+    def __str__(self):
+        return f'Set: {self.shared_set.short_title()}; Rate: {self.shared_rate}'
+
+
+
+
 
 
 
