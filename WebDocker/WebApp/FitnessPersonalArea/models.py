@@ -458,7 +458,7 @@ class TrainingPayment(models.Model):
                                  в этот временной промежуток (не обязательно к заполнению)
 
     payment_user_trainer - foreign-key с моделью FitnessTrainer, который будет выступать тренером.
-    payment_user_target - foreign-key с моделью FitnessUser, который будет выступать подопечным.
+    payment_user_ward - foreign-key с моделью FitnessUser, который будет выступать подопечным.
 
     payment_training_time - время которое проводилась тренеровка
 
