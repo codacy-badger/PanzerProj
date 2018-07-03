@@ -1,3 +1,4 @@
 {
-  "test_app.py::TestClass::()::test_web_api_routs": true
+  "test_app.py::TestClass::()::test_web_api_routs": true,
+  "test_web_api.py::TestRouts::()::test_user_base_info": true
 }

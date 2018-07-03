@@ -1,5 +1,6 @@
 [
-  "test_web_api.py::TestRouts::()::test_user_base_info",
-  "test_web_api.py::TestRouts::()::test_invalid_user_base_info",
-  "test_web_api.py::TestDatabase::()::test_new_user_creating"
+  "Selenium/admin_panel_test.py::AdminSearchTest::test_admin_login",
+  "Selenium/admin_panel_test.py::AdminSearchTest::test_personal_area_models",
+  "Selenium/admin_panel_test.py::AdminElementsCreating::test_body_parameter_creating",
+  "Selenium/admin_panel_test.py::AdminElementsCreating::test_chat_message_creating"
 ]
