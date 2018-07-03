@@ -129,10 +129,7 @@ class TrainerDoc(models.Model):
 
     # preview названия документа
     def doc_title_preview(self):
-        if len(self.doc_title) > 50:
-            return f'{self.doc_title[:50]} ...'
-        else:
-            return self.doc_title
+        return self.doc_title if len(self.doc_title) < 50 else self.doc_title[:50]+' ...'
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
@@ -193,16 +190,10 @@ class TrainGym(models.Model):
 
     # для вывода краткой информации о зале
     def gym_short_name(self):
-        if len(self.gym_name) > 50:
-            return f'{self.gym_name[:50]}...'
-        else:
-            return self.gym_name
+        return self.gym_name if len(self.gym_name) < 50 else self.gym_name[:50]+' ...'
 
     def gym_short_description(self):
-        if len(self.gym_description) > 50:
-            return f'{self.gym_description[:50]}...'
-        else:
-            return self.gym_description
+        return self.gym_description if len(self.gym_description) < 50 else self.gym_description[:50]+' ...'
 
 
 # train schedule
@@ -266,10 +257,7 @@ class Setting(models.Model):
     setting_param = models.CharField(max_length=30, default='')
 
     def short_setting_description(self):
-        if len(self.setting_description) > 50:
-            return f'{self.setting_description[:50]}...'
-        else:
-            return self.setting_description
+        return self.setting_description if len(self.setting_description) < 50 else self.setting_description[:50]+' ...'
 
     def __str__(self):
         return f'Title: {self.setting_title}; Param: {self.setting_param}'
@@ -367,10 +355,7 @@ class MedicalNote(models.Model):
     medical_note_tags = TaggableManager(blank=True)
 
     def short_title(self):
-        if len(self.medical_note_title) > 50:
-            return f'{self.medical_note_title[:50]}...'
-        else:
-            return self.medical_note_title
+        return self.medical_note_title if len(self.medical_note_title) < 50 else self.medical_note_title[:50]+' ...'
 
     def get_all_tags(self):
         return [tag for tag in self.medical_note_tags.all()]
@@ -400,10 +385,7 @@ class UserDiary(models.Model):
     diary_note_tags = TaggableManager(blank=True)
 
     def short_title(self):
-        if len(self.diary_note_title) > 50:
-            return f'{self.diary_note_title[:50]}...'
-        else:
-            return self.diary_note_title
+        return self.diary_note_title if len(self.diary_note_title) < 50 else self.diary_note_title[:50]+' ...'
 
     def get_all_tags(self):
         return [tag for tag in self.diary_note_tags.all()]
@@ -543,10 +525,7 @@ class BodyParameter(models.Model):
     body_datetime = models.DateTimeField(default = now)
 
     def title_short(self):
-        if len(self.body_title) > 50:
-            return f'{self.body_title[:50]}...'
-        else:
-            return self.body_title
+        return self.body_title if len(self.body_title) < 50 else self.body_title[:50]+' ...'
 
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
@@ -571,10 +550,7 @@ class TargetBodyParameter(models.Model):
     target_body_datetime = models.DateTimeField(default = now)
 
     def title_short(self):
-        if len(self.target_body_title) > 50:
-            return f'{self.target_body_title[:50]}...'
-        else:
-            return self.target_body_title
+        return self.target_body_title if len(self.target_body_title) < 50 else self.target_body_title[:50]+' ...'
 
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
@@ -669,16 +645,10 @@ class Feedback(models.Model):
         return f'Target: {self.target_user.user.username}; Rate: {self.feedback_rate}'
 
     def short_title(self):
-        if len(self.feedback_title) > 50:
-            return f'{self.feedback_title[:50]}...'
-        else:
-            return self.feedback_title
+        return self.feedback_title if len(self.feedback_title) < 50 else self.feedback_title[:50]+' ...'
 
     def short_text(self):
-        if len(self.feedback_text) > 50:
-            return f'{self.feedback_text[:50]}...'
-        else:
-            return self.feedback_text
+        return self.feedback_text if len(self.feedback_text) < 50 else self.feedback_text[:50]+' ...'
 
 
 """
