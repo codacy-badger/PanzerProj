@@ -6,7 +6,41 @@ from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 
-# смена языка
+# log in
+class LoginPage(View):
+    """
+    Класс отвечает за страницу логина
+    """
+    content = {}
+
+    def get(self, request):
+        self.content.update({
+            'doc': 'pages/login.html',
+        })
+        return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        pass
+
+
+# registration
+class RegistrationPage(View):
+    """
+    Класс отвечает за страницу регистрации
+    """
+    content = {}
+
+    def get(self, request):
+        self.content.update({
+            'doc': 'pages/registration.html',
+        })
+        return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        pass
+
+
+# change language
 class ChangeLanguage(View):
     """
     Класс отвечает за смену языка интерфейса

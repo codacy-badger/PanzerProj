@@ -6,6 +6,10 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
+    # авторизация
+    path('login/', views.LoginPage.as_view(), name='login'),
+    # регистрация
+    path('registration/', views.RegistrationPage.as_view(), name='registration'),
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social_auth')),
     # смена языка
