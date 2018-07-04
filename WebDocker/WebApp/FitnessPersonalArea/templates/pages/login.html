@@ -1,11 +1,21 @@
 {% block login %}
 {% load static %}
     <link href="{% static "/css/login.css" %}" rel="stylesheet">
-    <form class="form-signin">
+    <form class="form-signin" method="post" name="login">
+        {% csrf_token %}
         <img class="mb-4" src="{% static '/images/login_img.ico' %}" alt="" width="72" height="72">
         <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
+
+        {% if messages %}
+            {% block message %}
+
+                {% include 'elements/message.html' %}
+
+            {% endblock %}
+        {% endif %}
+
         <label for="inputLogin" class="sr-only">Логин</label>
-        <input type="text" id="inputLogin" name="login" class="form-control" placeholder="Логин" required autofocus="">
+        <input type="text" id="inputLogin" name="username" class="form-control" placeholder="Логин" required autofocus>
         <label for="inputPassword" class="sr-only">Пароль</label>
         <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Пароль" required>
 
