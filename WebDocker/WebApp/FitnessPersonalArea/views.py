@@ -62,6 +62,26 @@ class RegistrationPage(View):
         pass
 
 
+# registration
+class SuccessLogin(View):
+    """
+    Класс отвечает за страницу регистрации
+    """
+    content = {}
+
+    def get(self, request):
+        print(request)
+        print(request.GET)
+        messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
+        return redirect('/private/login/')
+
+    def post(self, request):
+        print(request)
+        print(request.POST)
+        messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
+        return redirect('/private/login/')
+
+
 # change language
 class ChangeLanguage(View):
     """

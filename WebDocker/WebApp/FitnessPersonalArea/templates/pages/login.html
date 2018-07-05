@@ -5,6 +5,40 @@
         {% csrf_token %}
         <img class="mb-4" src="{% static '/images/login_img.ico' %}" alt="" width="72" height="72">
         <h1 class="h3 mb-3 font-weight-normal">Вход</h1>
+        <div class="col-12">
+            <div class="col-md-12 col-xs-12 col-sm-12">
+                <a href="{% url 'social:begin' 'google-oauth2' %}" class="social_button" data-toggle="tooltip"
+                   data-placement="top" title="Google">
+                    <span class="input-group-text"
+                          style="background: #c32f10;
+                          color: white;
+                          padding-left: 30%;"><i class="fab fa-google-plus-g" style="padding-right: 20px;"></i>Google</span>
+                </a>
+            </div>
+            <div class="col-md-12 col-xs-12 col-sm-12">
+                <a class="social_button" href="{% url 'social:begin' 'vk-oauth2' %}" data-toggle="tooltip"
+                   data-placement="top" title="VK">
+                <span class="input-group-text"
+                      style="background: #4a76a8;
+                      color: white;
+                      padding-left: 30%;"><i class="fab fa-vk" style="padding-right: 20px;"></i>VK</span>
+                </a>
+            </div>
+            <div class="col-md-12 col-xs-12 col-sm-12">
+                <a  class="social_button"href="{% url 'social:begin' 'twitter' %}" data-toggle="tooltip"
+                    data-placement="top" title="Twitter">
+                    <span class="input-group-text"
+                          style="background: #1B95E0;
+                          color: white;
+                          padding-left: 30%;"><i class="fab fa-twitter" style="padding-right: 20px;"></i>Twitter</span>
+                </a>
+            </div>
+
+
+
+        </div>
+
+    <hr>
 
         {% if messages %}
             {% block message %}
