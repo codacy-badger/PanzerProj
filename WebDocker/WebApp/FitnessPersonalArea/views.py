@@ -60,23 +60,33 @@ class RegistrationPage(View):
 
     def post(self, request):
         if 'new_account_btn' in request.POST:
-            if request.POST['password']==request.POST['password']:
-                # создаём нового пользователя
-                new_user = User.objects.create_user(username = request.POST['username'],
-                                                    email = request.POST['e-mail'],
-                                                    password = request.POST['password'],
-                                                    first_name = request.POST['name'],
-                                                    last_name = request.POST['surname'])
-                new_user.is_active = False
-                new_user.save()
-                # создаём нового пользователя с дополнительными полями
-                FitnessUser.objects.create(user = new_user,
-                                           fitness_user_type = request.POST['account_type'],
-                                           fitness_user_gender = request.POST['gender'])
+            # проверяем одинаковость ввелённых паролей
+            if request.POST['password']==request.POST['password_repeat']:
+                # проверяем отсутствие email среди зарегистрированных
+                if not User.objects.filter(email = request.POST['e-mail']):
+                    try:
+                        # создаём нового пользователя
+                        new_user = User.objects.create_user(username = request.POST['username'],
+                                                            email = request.POST['e-mail'],
+                                                            password = request.POST['password'],
+                                                            first_name = request.POST['name'],
+                                                            last_name = request.POST['surname'])
+                        new_user.is_active = False
+                        new_user.save()
+                        # создаём нового пользователя с дополнительными полями
+                        FitnessUser.objects.create(user = new_user,
+                                                   fitness_user_type = request.POST['account_type'],
+                                                   fitness_user_gender = request.POST['gender'])
 
-                messages.add_message(request, messages.SUCCESS, _("На почту выслана ссылка для активации аккаунта"))
+                        messages.add_message(request, messages.SUCCESS, _("На почту выслана ссылка для активации аккаунта"))
 
-                return redirect('/private/login/')
+                        return redirect('/private/login/')
+                    except:
+                        messages.add_message(request, messages.ERROR, _("Ошибка при создании пользователя. "
+                                                                        "Ваша почта/логин не уникальны"))
+                else:
+                    messages.add_message(request, messages.ERROR, _('Email уже используется'))
+
             else:
                 messages.add_message(request, messages.ERROR, _('Введены два разных пароля'))
 
