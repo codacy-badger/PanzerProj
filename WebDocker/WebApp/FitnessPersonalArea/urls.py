@@ -12,6 +12,10 @@ urlpatterns = [
     path('success/', views.SuccessLogin.as_view(), name='success_login'),
     # регистрация
     path('registration/', views.RegistrationPage.as_view(), name='registration'),
+    # проверка имени пользователя на занятость
+    path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
+    # проверка имени пользователя на занятость
+    path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),
     # смена языка

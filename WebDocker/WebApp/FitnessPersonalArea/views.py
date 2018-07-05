@@ -6,6 +6,7 @@ from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.http import JsonResponse
 
 from .models import User, FitnessUser
 
@@ -120,9 +121,36 @@ class ChangeLanguage(View):
 
         return redirect('home')
 
+# check username in use
+class UsernameCheckAjax(View):
+    def get(self, request):
+        self.content = {'answer': False}
+        if request.is_ajax():
+            # выбираем переданное имя пользователя
+            username = request.GET['username']
+            # ищем пользователя с таким же ником в БД
+            user = User.objects.filter(username = username)
+            if user:
+                # если пользователь найден - возвращаем True, иначе False остаётся
+                self.content.update({'answer': True})
+
+            return JsonResponse(self.content)
 
 
+# check email in use
+class EmailCheckAjax(View):
+    def get(self, request):
+        self.content = {'answer': False}
+        if request.is_ajax():
+            # выбираем переданное email
+            email = request.GET['email']
+            # ищем пользователя с таким же email в БД
+            user = User.objects.filter(email = email)
+            if user:
+                # если пользователь найден - возвращаем True, иначе False остаётся
+                self.content.update({'answer': True})
 
+            return JsonResponse(self.content)
 
 
 
