@@ -4,6 +4,10 @@ from django.shortcuts import redirect
 from django.utils.translation import activate
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+
+from .models import User, FitnessUser
 
 
 # log in
@@ -20,9 +24,27 @@ class LoginPage(View):
         return render(request, 'base.html', self.content)
 
     def post(self, request):
-        pass
+        email_username = request.POST['email_username']
+        password = request.POST['password']
+        try:
+            if '@' in email_username:
+                username = User.objects.get(email = email_username).username
+            else:
+                username = email_username
+            user = authenticate(request, password = password, username = username)
+            if user is not None:
+                login(request, user)
+                messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
+            else:
+                messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
+        except:
+            messages.add_message(request, messages.ERROR, _('Такой E-mail не существует'))
+
+        # TODO заменить на ссылку в личный кабинет
+        return redirect('/private/login/')
 
 
+# TODO убрать и перенести все настройки в личный кабинет
 # registration
 class RegistrationPage(View):
     """
