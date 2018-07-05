@@ -12,14 +12,28 @@
 
     <!-- Bootstrap 4 core CSS -->
     <link href="{% static "/bootstrap_4/css/bootstrap.css" %}" rel="stylesheet">
+    <link href="{% static "/css/footer.css" %}" rel="stylesheet">
+    <link href="{% static "/css/body.css" %}" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 
   </head>
 <body>
+{% block header %}
+    {% include 'elements/header.html' %}
+{% endblock %}
 
-{% block main_content %}
-    {% include doc %}
+
+<main role="main" class="container">
+
+    {% block main_content %}
+        {% include doc %}
+    {% endblock %}
+
+</main>
+
+{% block footer %}
+    {% include 'elements/footer.html' %}
 {% endblock %}
 
 <script src="{% static "/bootstrap_4/js/bootstrap.js" %}"></script>
