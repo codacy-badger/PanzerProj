@@ -35,16 +35,15 @@ class LoginPage(View):
             if user is not None:
                 login(request, user)
                 messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
+                return redirect('/private/login/')
             else:
                 messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
         except:
             messages.add_message(request, messages.ERROR, _('Такой E-mail не существует'))
 
-        # TODO заменить на ссылку в личный кабинет
         return redirect('/private/login/')
 
 
-# TODO убрать и перенести все настройки в личный кабинет
 # registration
 class RegistrationPage(View):
     """
@@ -59,7 +58,28 @@ class RegistrationPage(View):
         return render(request, 'base.html', self.content)
 
     def post(self, request):
-        pass
+        if 'new_account_btn' in request.POST:
+            if request.POST['password']==request.POST['password']:
+                # создаём нового пользователя
+                new_user = User.objects.create_user(username = request.POST['username'],
+                                                    email = request.POST['e-mail'],
+                                                    password = request.POST['password'],
+                                                    first_name = request.POST['name'],
+                                                    last_name = request.POST['surname'])
+                new_user.is_active = False
+                new_user.save()
+                # создаём нового пользователя с дополнительными полями
+                FitnessUser.objects.create(user = new_user,
+                                           fitness_user_type = request.POST['account_type'],
+                                           fitness_user_gender = request.POST['gender'])
+
+                messages.add_message(request, messages.SUCCESS, _("На почту выслана ссылка для активации аккаунта"))
+
+                return redirect('/private/login/')
+            else:
+                messages.add_message(request, messages.ERROR, _('Введены два разных пароля'))
+
+        return redirect('/private/registration/')
 
 
 # registration

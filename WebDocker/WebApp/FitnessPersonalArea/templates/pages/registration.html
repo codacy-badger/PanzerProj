@@ -38,15 +38,15 @@
 
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="btn btn-secondary" title="Мужской">
-                    <input type="radio" name="gender" value="male" autocomplete="off">
+                    <input type="radio" name="gender" value="MAL" autocomplete="off">
                     <i class="fas fa-male"></i>
                 </label>
                 <label class="btn btn-secondary" title="Женский">
-                    <input type="radio" name="gender" value="female" autocomplete="off">
+                    <input type="radio" name="gender" value="FEM" autocomplete="off">
                     <i class="fas fa-female"></i>
                 </label>
                 <label class="btn btn-secondary active" title="Секрет">
-                    <input type="radio" name="gender" value="secret" autocomplete="off" checked>
+                    <input type="radio" name="gender" value="SEC" autocomplete="off" checked>
                     <i class="fas fa-user-secret"></i>
                 </label>
             </div>
@@ -66,11 +66,11 @@
 
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="type btn btn-secondary" title="Тренер">
-                    <input type="radio" name="account_type" value="trainer" autocomplete="off">
+                    <input type="radio" name="account_type" value="TRN" autocomplete="off">
                     <i class="fas fa-dumbbell"></i>
                 </label>
                 <label class="type btn btn-secondary active" title="Тренерующийся">
-                    <input type="radio" name="account_type" value="ward" autocomplete="off" checked>
+                    <input type="radio" name="account_type" value="WRD" autocomplete="off" checked>
                     <i class="fas fa-child"></i>
                 </label>
             </div>
@@ -106,7 +106,7 @@
             <input name="password_repeat" id="second_pass" required class="form-control" minlength="8" maxlength="16"
                    placeholder="Повторите пароль" type="password">
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" onclick="CheckPass()">Регистрация</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" name="new_account_btn" onclick="CheckPass()">Регистрация</button>
         <p class="text-center">Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a> </p>
     </form>
     <script>

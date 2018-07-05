@@ -54,36 +54,37 @@ class FitnessUser(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='user_account')
     # type пользователя
     teacher_user = "TRN"
-    usual_user = "USL"
+    ward_user = "WRD"
     fitness_user_type_choice = (
         (teacher_user, _('Тренер')),
-        (usual_user, _('Подопечный')),
+        (ward_user, _('Подопечный')),
     )
     fitness_user_type = models.CharField(max_length=3,
                                          choices=fitness_user_type_choice,
-                                         default=usual_user,
+                                         default=ward_user,
                                          verbose_name='user type')
     # фотография пользователя
     image_width = 120
     image_height = 120
-    fitness_user_photo = models.ImageField(upload_to = profile_photo_path, default=None,
+    fitness_user_photo = models.ImageField(upload_to = profile_photo_path, default=None, blank = True, null = True,
                                            width_field = 'image_width', height_field = 'image_height',
                                            verbose_name='account photo')
     # gender пользователя
     male_gender = "MAL"
     female_gender = "FEM"
-    other_gender = "OTH"
+    secret_gender = "SEC"
     fitness_user_gender_choice = (
         (male_gender, _('Мужчина')),
         (female_gender, _('Женщина')),
-        (other_gender, _('Другой')),
+        (secret_gender, _('Секрет')),
     )
     fitness_user_gender = models.CharField(max_length=3,
                                            choices=fitness_user_gender_choice,
                                            default=male_gender,
                                            verbose_name='user gender')
     # destination city
-    fitness_user_destination_city = models.CharField(max_length=50, default='', verbose_name='destination city')
+    fitness_user_destination_city = models.CharField(max_length=50, default='', verbose_name='destination city',
+                                                     blank = True, null = True)
 
     def __str__(self):
         return f'User: {self.user.username}; User type: {self.get_fitness_user_type_display()}; ' \
