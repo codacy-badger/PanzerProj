@@ -118,16 +118,12 @@ class SuccessLogin(View):
     content = {}
 
     def get(self, request):
-        print(request)
-        print(request.GET)
         messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
-        return redirect('/private/login/')
+        return redirect('/private/personal/')
 
     def post(self, request):
-        print(request)
-        print(request.POST)
         messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
-        return redirect('/private/login/')
+        return redirect('/private/personal/')
 
 
 # change language
@@ -147,6 +143,21 @@ class ChangeLanguage(View):
         request.session[translation.LANGUAGE_SESSION_KEY] = language
 
         return redirect('home')
+
+
+# logout
+class LogOutPage(View):
+    # get request
+    def get(self, request):
+
+        logout(request)
+
+        return redirect('/')
+
+"""
+Ajax views
+"""
+
 
 # check username in use
 class UsernameCheckAjax(View):
