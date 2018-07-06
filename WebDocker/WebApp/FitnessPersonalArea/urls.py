@@ -12,14 +12,20 @@ urlpatterns = [
     path('success/', views.SuccessLogin.as_view(), name='success_login'),
     # регистрация
     path('registration/', views.RegistrationPage.as_view(), name='registration'),
-    # проверка имени пользователя на занятость
-    path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
-    # проверка имени пользователя на занятость
-    path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
+    # личный кабинет
+    path('personal/', views.PersonalAreaPage.as_view(), name='personal_page'),
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),
     # смена языка
     path('change-language/<slug:language>/', views.ChangeLanguage.as_view(), name='language'),
+    # выход
+    path('logout/', views.LogOutPage.as_view(), name='logout'),
+
+    #Ajax
+    # проверка имени пользователя на занятость
+    path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
+    # проверка имени пользователя на занятость
+    path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
 ]
 
 if settings.DEBUG:

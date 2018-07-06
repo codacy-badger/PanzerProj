@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.utils.translation import activate
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
 
@@ -36,7 +36,7 @@ class LoginPage(View):
             if user is not None:
                 login(request, user)
                 messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
-                return redirect('/private/login/')
+                return redirect('/private/personal/')
             else:
                 messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
         except:
@@ -91,6 +91,23 @@ class RegistrationPage(View):
                 messages.add_message(request, messages.ERROR, _('Введены два разных пароля'))
 
         return redirect('/private/registration/')
+
+
+# personal area
+class PersonalAreaPage(View):
+    """
+    Класс отвечает за страницу логина
+    """
+    content = {}
+
+    def get(self, request):
+        self.content.update({
+            'doc': 'pages/personal_area.html',
+        })
+        return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        return redirect('/private/login/')
 
 
 # registration
