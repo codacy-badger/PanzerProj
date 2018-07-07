@@ -61,7 +61,7 @@ class RegistrationPage(View):
     def post(self, request):
         if 'new_account_btn' in request.POST:
             # проверяем одинаковость ввелённых паролей
-            if request.POST['password']==request.POST['password_repeat']:
+            if request.POST['password'] == request.POST['password_repeat']:
                 # проверяем отсутствие email среди зарегистрированных
                 if not User.objects.filter(email = request.POST['e-mail']):
                     try:
@@ -78,7 +78,8 @@ class RegistrationPage(View):
                                                    fitness_user_type = request.POST['account_type'],
                                                    fitness_user_gender = request.POST['gender'])
 
-                        messages.add_message(request, messages.SUCCESS, _("На почту выслана ссылка для активации аккаунта"))
+                        messages.add_message(request, messages.SUCCESS,
+                                             _("На почту выслана ссылка для активации аккаунта"))
 
                         return redirect('/private/login/')
                     except:
