@@ -167,6 +167,49 @@ class LogOutPage(View):
 Ajax views
 """
 
+# get private area page
+class GetPrivatePage(View):
+    available_params = {
+        'user_profile':{'html': 'elements/profile_area.html'},
+        'notes_medical':'',
+        'notes_usual':'',
+        'gyms':'',
+        'trainer':'',
+        'reviews':'',
+        'settings_profile':'',
+        'settings_all':'',
+        'create_train':'',
+        'create_exercise':'',
+        'create_set':'',
+        'my_exercises':'',
+        'my_sets':'',
+        'your_photos':'',
+        'your_targets':'',
+        'your_calendar':'',
+        'search_trainer':'',
+        'search_gym':'',
+        'search_exercise':'',
+        'search_exercise_set':'',
+    }
+    # стандартный ответ на Ajax запрос
+    # success - True/False в зависимости от результата поиска по БД. Если без ошибок - True. Иначе - False.
+    # html_file - Если Успешно данные найдены - вохвращается HTML страница
+    content = {'success': False,
+               'html_file': ''}
+    def get(self, request):
+
+        if request.is_ajax() and request.user.is_authenticated:
+            try:
+                # выбираем по параметру - функцию для выполнения
+                func = self.available_params[request.GET['parameter']]
+                self.content.update({'success': True,
+                                     'html_file':render_to_string('elements/profile_area.html',
+                                                                  {'koko': 'kookoko',
+                                                                   'request':request})})
+            except:
+                self.content.update({'success':False})
+
+            return JsonResponse(self.content)
 
 # check username in use
 class UsernameCheckAjax(View):

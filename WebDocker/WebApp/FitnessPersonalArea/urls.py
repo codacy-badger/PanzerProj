@@ -26,6 +26,8 @@ urlpatterns = [
     path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
     # проверка имени пользователя на занятость
     path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
+    # обновление страницы в личном кабинете при выборе пункта меню
+    path('private-area-page/', views.GetPrivatePage.as_view(), name='private_area_page'),
 ]
 
 if settings.DEBUG:
