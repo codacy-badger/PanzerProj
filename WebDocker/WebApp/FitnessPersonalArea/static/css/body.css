@@ -2,6 +2,9 @@ body > .container {
     padding-top: 56px;
 }
 
+body{
+    background-color: #dedede;
+}
 a.social_button{
   text-decoration: none
 }

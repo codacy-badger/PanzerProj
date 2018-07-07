@@ -1,0 +1,108 @@
+{% block left_menu %}
+{% load static %}
+{% load i18n %}
+
+
+        <div class="col-md-3 float-left col-1 pl-0 pr-0 collapse width show" id="sidebar">
+            <div class="list-group border-0 card text-center text-md-left">
+
+                <a href="#menuProfile" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                   aria-expanded="false"><i class="fas fa-user-circle"></i>
+                    <span class="d-none d-md-inline">{% trans "Вошли как"%}: {{ user.username }}</span>
+                </a>
+                <div class="collapse" id="menuProfile" data-parent="#sidebar">
+
+                    <a href="{% url 'personal_page' %}" class="list-group-item">
+                        <i class="far fa-user-circle"></i>
+                        {% trans "Профиль" %}
+                    </a>
+
+
+                    <a href="#menuNotes" class="list-group-item" data-toggle="collapse" aria-expanded="false">
+                        <i class="fas fa-pencil-alt"></i>
+                        {% trans "Записи" %}
+                    </a>
+                    <div class="collapse" id="menuNotes" data-parent="#menuProfile">
+                        <a href="#" class="list-group-item" data-parent="#menuNotes">
+                            <i class="fas fa-notes-medical"></i>
+                            {% trans "Медицинские" %}
+                        </a>
+                        <a href="#" class="list-group-item" data-parent="#menuNotes">
+                            <i class="fas fa-book-open"></i>
+                            {% trans "Дневник" %}
+                        </a>
+                    </div>
+
+
+                    <a href="{% url 'personal_page' %}" class="list-group-item">
+                        <i class="fas fa-map-marked-alt"></i>
+                        {% trans "Залы" %}
+                    </a>
+
+                    <a href="#" class="list-group-item">
+                        <i class="fas fa-eye"></i>
+                        {% trans "Отзывы" %}
+                    </a>
+
+                    <a href="#menuSettings" class="list-group-item" data-toggle="collapse" aria-expanded="false">
+                        <i class="fas fa-cog"></i>
+                        {% trans "Настройки" %}
+                    </a>
+                    <div class="collapse" id="menuSettings" data-parent="#menuProfile">
+                        <a href="#" class="list-group-item" data-parent="#menuSettings">
+                            <i class="fas fa-sliders-h"></i>
+                            {% trans "Настройки профиля" %}
+                        </a>
+                        <a href="#" class="list-group-item" data-parent="#menuSettings">
+                            <i class="fas fa-wrench"></i>
+                            {% trans "Общие настройки" %}
+                        </a>
+                    </div>
+
+                </div>
+
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
+                    <i class="fas fa-images"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваши фотографии" %}</span>
+                </a>
+
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
+                    <i class="fas fa-bullseye"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваши цели" %}</span>
+                </a>
+
+                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваш календарь" %}</span>
+                </a>
+
+                <a href="#menuStock" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                   aria-expanded="false">
+                    <i class="fab fa-sticker-mule"></i>
+
+
+                    <span class="d-none d-md-inline">Биржи</span>
+                </a>
+
+                <div class="collapse" id="menuStock" data-parent="#sidebar">
+
+                    <a href="#" class="list-group-item">
+                        <i class="fas fa-users"></i>
+                        {% trans "Тренера" %}
+                    </a>
+
+                    <a href="#" class="list-group-item" >
+                        <i class="fas fa-ellipsis-h"></i>
+                        {% trans "Упражнения" %}
+                    </a>
+
+                    <a href="#" class="list-group-item">
+                        <i class="fas fa-grip-horizontal"></i>
+                        {% trans "Сеты упражнений" %}
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+{% endblock %}
