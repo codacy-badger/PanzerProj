@@ -12,38 +12,22 @@
 
         {% endblock %}
 
-        <main class="col-md-9 float-left col px-5 pl-md-2 pt-2 main">
-            <a href="#" data-target="#sidebar" data-toggle="collapse"><i class="fa fa-navicon fa-2x py-2 p-1"></i></a>
-            <div class="page-header">
-                <h2>Bootstrap 4 Sidebar Menu</h2>
-            </div>
-            <p class="lead">A responsive, multi-level vertical accordion.</p>
-            <hr>
-            <div class="row">
-                <div class="col-lg-6">
-                    <button role="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo" aria-expanded="true">
-                        horizontal collapsible
-                    </button>
-                    <div id="demo" class="width collapse show" aria-expanded="true">
-                        <div class="list-group" style="width:400px">
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <button role="button" class="btn btn-danger" data-toggle="collapse" data-target="#demo2" aria-expanded="true">
-                       vertical collapsible
-                    </button>
-                    <div id="demo2" class="height collapse show" aria-expanded="true">
-                        <div>
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+        <div  id="personal_main_area" class="col-md-8  col-sm-7  col-lg-9 float-left col px-5 pl-md-2 pt-2 main">
+
+            {% if messages %}
+                {% block message %}
+
+                    {% include 'elements/message.html' %}
+
+                {% endblock %}
+            {% endif %}
+
+                {% block private_content %}
+
+                    {% include private_doc %}
+
+                {% endblock %}
+        </div>
     </div>
 </div>
 {% endblock %}

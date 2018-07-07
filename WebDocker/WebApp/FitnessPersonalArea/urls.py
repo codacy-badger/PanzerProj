@@ -13,7 +13,7 @@ urlpatterns = [
     # регистрация
     path('registration/', views.RegistrationPage.as_view(), name='registration'),
     # личный кабинет
-    path('personal/', views.PersonalAreaPage.as_view(), name='personal_page'),
+    path('personal/', views.PersonalAreaPage.as_view(), name='personal_area'),
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),
     # смена языка

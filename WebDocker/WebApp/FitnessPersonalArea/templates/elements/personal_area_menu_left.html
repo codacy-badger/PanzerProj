@@ -3,7 +3,7 @@
 {% load i18n %}
 
 
-        <div class="col-md-3 float-left col-1 pl-0 pr-0 collapse width show" id="sidebar">
+        <div class="col-md-4 col-sm-5 col-lg-3 float-left col-1 pl-0 pr-0 collapse width show" id="sidebar">
             <div class="list-group border-0 card text-center text-md-left">
 
                 <a href="#menuProfile" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
@@ -12,10 +12,10 @@
                 </a>
                 <div class="collapse" id="menuProfile" data-parent="#sidebar">
 
-                    <a href="{% url 'personal_page' %}" class="list-group-item">
+                    <button class="list-group-item button" value="user_profile" onclick="GetMainContent(this)">
                         <i class="far fa-user-circle"></i>
                         {% trans "Профиль" %}
-                    </a>
+                    </button>
 
 
                     <a href="#menuNotes" class="list-group-item" data-toggle="collapse" aria-expanded="false">
@@ -23,86 +23,157 @@
                         {% trans "Записи" %}
                     </a>
                     <div class="collapse" id="menuNotes" data-parent="#menuProfile">
-                        <a href="#" class="list-group-item" data-parent="#menuNotes">
+                        <button class="list-group-item button" value="notes_medical" onclick="GetMainContent(this)">
                             <i class="fas fa-notes-medical"></i>
                             {% trans "Медицинские" %}
-                        </a>
-                        <a href="#" class="list-group-item" data-parent="#menuNotes">
+                        </button>
+                        <button class="list-group-item button" value="notes_usual" onclick="GetMainContent(this)">
                             <i class="fas fa-book-open"></i>
                             {% trans "Дневник" %}
-                        </a>
+                        </button>
                     </div>
 
 
-                    <a href="{% url 'personal_page' %}" class="list-group-item">
+                    <button class="list-group-item button" value="gyms" onclick="GetMainContent(this)">
                         <i class="fas fa-map-marked-alt"></i>
                         {% trans "Залы" %}
-                    </a>
+                    </button>
 
-                    <a href="#" class="list-group-item">
+                    <button class="list-group-item button" value="trainer" onclick="GetMainContent(this)">
+                        <i class="fas fa-user-graduate"></i>
+                        {% trans "Тренер" %}
+                    </button>
+
+                    <button class="list-group-item button" value="reviews" onclick="GetMainContent(this)">
                         <i class="fas fa-eye"></i>
                         {% trans "Отзывы" %}
-                    </a>
+                    </button>
 
                     <a href="#menuSettings" class="list-group-item" data-toggle="collapse" aria-expanded="false">
                         <i class="fas fa-cog"></i>
                         {% trans "Настройки" %}
                     </a>
                     <div class="collapse" id="menuSettings" data-parent="#menuProfile">
-                        <a href="#" class="list-group-item" data-parent="#menuSettings">
+                        <button class="list-group-item button" value="settings_profile" onclick="GetMainContent(this)">
                             <i class="fas fa-sliders-h"></i>
                             {% trans "Настройки профиля" %}
-                        </a>
-                        <a href="#" class="list-group-item" data-parent="#menuSettings">
+                        </button>
+                        <button class="list-group-item button" value="settings_all" onclick="GetMainContent(this)">
                             <i class="fas fa-wrench"></i>
                             {% trans "Общие настройки" %}
-                        </a>
+                        </button>
                     </div>
 
                 </div>
 
-                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
-                    <i class="fas fa-images"></i>
-                    <span class="d-none d-md-inline">{% trans "Ваши фотографии" %}</span>
-                </a>
 
-                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
-                    <i class="fas fa-bullseye"></i>
-                    <span class="d-none d-md-inline">{% trans "Ваши цели" %}</span>
-                </a>
-
-                <a href="#" class="list-group-item d-inline-block collapsed" data-parent="#sidebar">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span class="d-none d-md-inline">{% trans "Ваш календарь" %}</span>
-                </a>
-
-                <a href="#menuStock" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                <a href="#menuTrainers" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
                    aria-expanded="false">
-                    <i class="fab fa-sticker-mule"></i>
-
-
-                    <span class="d-none d-md-inline">Биржи</span>
+                    <i class="fas fa-dumbbell"></i>
+                    <span class="d-none d-md-inline">{% trans "Тренировка" %}</span>
                 </a>
 
-                <div class="collapse" id="menuStock" data-parent="#sidebar">
+                <div class="collapse" id="menuTrainers" data-parent="#sidebar">
 
-                    <a href="#" class="list-group-item">
-                        <i class="fas fa-users"></i>
-                        {% trans "Тренера" %}
-                    </a>
+                    <button class="list-group-item button" value="create_train" onclick="GetMainContent(this)">
+                        <i class="fas fa-plus-circle"></i>
+                        {% trans "Создать тренировку" %}
+                    </button>
 
-                    <a href="#" class="list-group-item" >
+                    <button class="list-group-item button" value="create_exercise" onclick="GetMainContent(this)">
+                        <i class="fas fa-plus-square"></i>
+                        {% trans "Создать упражнение" %}
+                    </button>
+
+                    <button class="list-group-item button" value="create_set" onclick="GetMainContent(this)">
+                        <i class="fas fa-plus-square"></i>
+                        {% trans "Создать план тренировки" %}
+                    </button>
+
+
+                    <button class="list-group-item button" value="my_exercises" onclick="GetMainContent(this)">
                         <i class="fas fa-ellipsis-h"></i>
-                        {% trans "Упражнения" %}
-                    </a>
+                        {% trans "Мои упражнения" %}
+                    </button>
 
-                    <a href="#" class="list-group-item">
+                    <button class="list-group-item button" value="my_sets" onclick="GetMainContent(this)">
                         <i class="fas fa-grip-horizontal"></i>
-                        {% trans "Сеты упражнений" %}
-                    </a>
+                        {% trans "Мои планы тренеровок" %}
+                    </button>
+
+
                 </div>
 
+
+                <button class="list-group-item button" value="your_photos" onclick="GetMainContent(this)">
+                    <i class="fas fa-images"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваши фото" %}</span>
+                </button>
+
+                <button class="list-group-item button" value="your_targets" onclick="GetMainContent(this)">
+                    <i class="fas fa-bullseye"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваши цели" %}</span>
+                </button>
+
+                <button class="list-group-item button" value="your_calendar" onclick="GetMainContent(this)">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваш календарь" %}</span>
+                </button>
+
+                <a href="#menuSearch" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                   aria-expanded="false">
+                    <i class="fas fa-search"></i>
+                    <span class="d-none d-md-inline">Поиск</span>
+                </a>
+
+                <div class="collapse" id="menuSearch" data-parent="#sidebar">
+
+                    <button class="list-group-item button" value="search_trainer" onclick="GetMainContent(this)">
+                        <i class="fas fa-users"></i>
+                        {% trans "Найти тренера" %}
+                    </button>
+
+                    <button class="list-group-item button" value="search_gym" onclick="GetMainContent(this)">
+                        <i class="fas fa-map-marked-alt"></i>
+                        {% trans "Найти зал" %}
+                    </button>
+
+                    <button class="list-group-item button" value="search_exercise" onclick="GetMainContent(this)">
+                        <i class="fas fa-ellipsis-h"></i>
+                        {% trans "Найти упражнения" %}
+                    </button>
+
+                    <button class="list-group-item button" value="search_exercise_set" onclick="GetMainContent(this)">
+                        <i class="fas fa-grip-horizontal"></i>
+                        {% trans "Найти планы тренеровок" %}
+                    </button>
+                </div>
             </div>
+
         </div>
+    <script>
+        function GetMainContent(element){
+
+        var param= $(element).val();
+        $.ajax({
+            url: '{% url 'private_area_page' %}',
+            type:'GET',
+            contentType: "application/json;charset=UTF-8",
+            data: {
+                'parameter': param
+            },
+            dataType: 'json',
+                success:function(response){
+                    if (response.success == true){
+                        $("#personal_main_area").html(response.html_file);
+                    }
+                    else {
+                        alert('Request Error. Wait please.')
+                    }
+                }
+             })
+
+        }
+    </script>
 
 {% endblock %}

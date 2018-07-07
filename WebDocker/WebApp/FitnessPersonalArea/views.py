@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views import View
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.utils.translation import activate
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
@@ -102,12 +103,18 @@ class PersonalAreaPage(View):
     content = {}
 
     def get(self, request):
-        self.content.update({
-            'doc': 'pages/personal_area.html',
-        })
-        return render(request, 'base.html', self.content)
+        if request.user.is_authenticated:
+            self.content.update({
+                'doc': 'pages/personal_area.html',
+                'private_doc': 'elements/profile_area.html',
+                'fitness_user': FitnessUser.objects.get(user = request.user)
+            })
+            return render(request, 'base.html', self.content)
+        else:
+            return redirect('/private/login/')
 
-    def post(self, request):
+
+    def post(self, request, page):
         return redirect('/private/login/')
 
 
@@ -154,6 +161,7 @@ class LogOutPage(View):
         logout(request)
 
         return redirect('/')
+
 
 """
 Ajax views

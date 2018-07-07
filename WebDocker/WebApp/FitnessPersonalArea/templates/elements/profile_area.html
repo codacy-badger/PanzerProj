@@ -1,0 +1,35 @@
+{% block personal_area_profile %}
+{% load static %}
+{% load i18n %}
+    <div class="page-header">
+        <h2>{% trans 'Ваш профиль' %}</h2>
+    </div>
+    <hr>
+
+
+
+<div class="col-sm-3"><!--left col-->
+    <div class="text-center">
+        {% if fitness_user.fitness_user_photo %}
+
+            <img style="width: 160px;height: 170px" src="/media/{{ fitness_user.fitness_user_photo }}"
+                 class="avatar img-circle img-thumbnail" alt="avatar">
+
+        {% else %}
+
+            <img src="{% static 'images/def_profile_image.png' %}" class="avatar img-circle img-thumbnail" alt="avatar">
+
+            <h6>{% trans "Загрузите свою фотографию" %}...</h6>
+            <form action method="post"  enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" accept="image/jpeg,image/png,image/gif" class="text-center center-block file-upload" required>
+                <button type="submit">{% trans "Обновить фотографию" %}</button>
+            </form>
+        {% endif %}
+    </div>
+    <br>
+
+</div><!--/col-3
+
+
+{% endblock %}

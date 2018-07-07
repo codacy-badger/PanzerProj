@@ -1,7 +1,10 @@
 #sidebar {
     overflow: hidden;
     z-index: 3;
-    max-width: 30%;
+}
+.list-group-item.button{
+    width: 100%;
+    text-align: left;
 }
 .container {
     padding-left: 0px;
@@ -58,18 +61,18 @@
 /* level 1*/
 #sidebar .list-group .collapse .list-group-item,
 #sidebar .list-group .collapsing .list-group-item  {
-  padding-left: 15px;
+  padding-left: 20px;
 }
 
 /* level 2*/
 #sidebar .list-group .collapse > .collapse .list-group-item,
 #sidebar .list-group .collapse > .collapsing .list-group-item {
-  padding-left: 25px;
+  padding-left: 30px;
 }
 
 /* level 3*/
 #sidebar .list-group .collapse > .collapse > .collapse .list-group-item {
-  padding-left: 35px;
+  padding-left: 40px;
 }
 
 @media (max-width:768px) {
@@ -97,7 +100,7 @@
     #sidebar .list-group .collapse.show, #sidebar .list-group .collapsing {
         position: relative;
         z-index: 1;
-        width: 220px;
+        width: 250px;
         top: 0;
         text-align: left;
     }
