@@ -2,6 +2,19 @@
     overflow: hidden;
     z-index: 3;
 }
+img.avatar{
+    max-width: 220px;
+    width: 100%;
+    height: 100%;
+}
+div.avatar{
+    display:table-cell;
+    vertical-align:middle;
+    text-align:center
+}
+#sidebar .list-group{
+    min-height: 0px!important;
+}
 .list-group-item.button{
     width: 100%;
     text-align: left;
@@ -133,4 +146,10 @@
   height: 100%;
   -webkit-transition-timing-function: ease-out;
   transition-timing-function: ease-out;
+}
+.col-md-8.col-sm-12.col-lg-9.float-left.col.px-5.pl-md-2.pt-2.main{
+    padding-bottom: 65px;
+}
+span.elipsis {
+    display:none
 }

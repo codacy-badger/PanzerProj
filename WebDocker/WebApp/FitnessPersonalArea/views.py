@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
 
-from .models import User, FitnessUser
+from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice
 
 
 # log in
@@ -96,7 +96,7 @@ class RegistrationPage(View):
 
 
 # personal area
-class PersonalAreaPage(View):
+class ProfilePage(View):
     """
     Класс отвечает за страницу логина
     """
@@ -104,11 +104,23 @@ class PersonalAreaPage(View):
 
     def get(self, request):
         if request.user.is_authenticated:
+            fitness_user = FitnessUser.objects.get(user = request.user)
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'elements/profile_area.html',
-                'fitness_user': FitnessUser.objects.get(user = request.user)
+                'fitness_user': fitness_user
             })
+
+            # если пользовтель тренер - добавляем данные об аккаунте и документах
+            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+                self.content.update({'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
+                                     'fitness_trainer_docs': TrainerDoc.objects.filter(
+                                                                user=FitnessTrainer.objects.get(user = fitness_user)),
+                                     'fitness_trainer_price': TrainerPrice.objects.filter(
+                                                                user=FitnessTrainer.objects.get(user = fitness_user),
+                                                                trainer_price_show = True)
+                                     })
+
             return render(request, 'base.html', self.content)
         else:
             return redirect('/private/login/')
