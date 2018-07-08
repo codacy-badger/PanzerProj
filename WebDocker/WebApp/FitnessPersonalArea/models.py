@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.models import Group, User, BaseUserManager, AbstractBaseUser
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -122,7 +124,7 @@ class TrainerDoc(models.Model):
     doc_title - заголовок документа(название и описание документа)
     doc_file - сам документ(файл для скачивания и просмотра)
     """
-    user = models.OneToOneField(FitnessTrainer, on_delete = models.CASCADE)
+    user = models.ForeignKey(FitnessTrainer, on_delete = models.CASCADE)
     # doc title
     doc_title = models.TextField(max_length=1000)
     # doc file
@@ -131,6 +133,9 @@ class TrainerDoc(models.Model):
     # preview названия документа
     def doc_title_preview(self):
         return self.doc_title if len(self.doc_title) < 50 else self.doc_title[:50]+' ...'
+
+    def filename(self):
+        return os.path.basename(self.doc_file.name)
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Title: {self.doc_title_preview()}'
@@ -142,19 +147,25 @@ class TrainerPrice(models.Model):
     Модель для указания цен тренировки. Не удаляется, а сохраняется для составления статистики цен.
     user - one-to-one с моделью FitnessTrainer
     trainer_price_hour - цена тренировки за час
+    trainer_price_comment - коментарий тренера к цене
     trainer_price_currency - валюта в которой указана цена
     trainer_price_creating_datetime - дата создания цены(автоматически задаётся)
     trainer_price_bargaining - возможность торга по цене
+    trainer_price_actuality - актуальность данной цены
     """
     user = models.ForeignKey(FitnessTrainer, on_delete = models.CASCADE)
     # trainer hour price
     trainer_price_hour = models.FloatField()
+    # trainer price comment
+    trainer_price_comment = models.CharField(max_length = 100, default = '')
     # currency
     trainer_price_currency = models.CharField(max_length=20)
     # creating datetime
     trainer_price_creating_datetime = models.DateTimeField(default=now)
     # торги по цене
     trainer_price_bargaining = models.BooleanField(default=True)
+    # price actuality
+    trainer_price_actuality = models.BooleanField(default=True)
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Price: {self.trainer_price_currency}'
