@@ -63,12 +63,13 @@ class ExtendedTrainerDocs(admin.ModelAdmin):
 class ExtendedTrainerPrice(admin.ModelAdmin):
     # поля, отображаемые в модели
     list_display = ('user_short', 'trainer_price_hour', 'trainer_price_currency', 'trainer_price_creating_datetime',
-                    'trainer_price_bargaining', 'trainer_price_actuality')
+                    'trainer_price_bargaining', 'trainer_price_actuality', 'trainer_price_show')
     # поля для поиска
     search_fields = ('user__user__user__username', )
     # поля для фильтрации
     list_filter = ('user__user__user__is_active', 'user__user__user__last_login', 'user__user__user__date_joined',
-                   'trainer_price_bargaining', 'trainer_price_currency', 'trainer_price_actuality')
+                   'trainer_price_bargaining', 'trainer_price_currency', 'trainer_price_actuality',
+                   'trainer_price_show')
 
     # для вывода в username
     def user_short(self, obj):

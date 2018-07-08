@@ -166,6 +166,8 @@ class TrainerPrice(models.Model):
     trainer_price_bargaining = models.BooleanField(default=True)
     # price actuality
     trainer_price_actuality = models.BooleanField(default=True)
+    # show/hide if trainer delete price
+    trainer_price_show = models.BooleanField(default = True)
 
     def __str__(self):
         return f'Trainer: {self.user.user.user.username}; Price: {self.trainer_price_currency}'
