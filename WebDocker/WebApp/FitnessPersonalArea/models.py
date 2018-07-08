@@ -459,9 +459,9 @@ class TrainingContract(models.Model):
     # success end by ward
     contract_ward_end = models.BooleanField(default=False)
     # create datetime
-    contract_create_datetime = models.DateTimeField(default=now)
+    contract_create_datetime = models.DateField(default=now)
     # expire datetime
-    contract_expire_datetime = models.DateTimeField()
+    contract_expire_datetime = models.DateField()
     # end datetime
     contract_end_datetime = models.DateTimeField(blank = True, null = True)
 
