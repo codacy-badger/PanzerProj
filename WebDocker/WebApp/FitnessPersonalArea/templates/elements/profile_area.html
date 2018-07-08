@@ -30,6 +30,9 @@
             <p class="font-weight-light">via <strong>{{ user.username }}  <i class="fas fa-edit"></i></strong>
             <hr>
             <dl class="row">
+                <dt class="col-sm-4">{% trans "Дата рождения" %} <i class="fas fa-edit"></i></dt>
+                <dd class="col-sm-8">{{ fitness_user.fitness_user_bdate }}</dd>
+
                 <dt class="col-sm-4">{% trans "Тип аккаунта" %}</dt>
                 <dd class="col-sm-8">{{ fitness_user.get_fitness_user_type_display }}</dd>
 
@@ -130,55 +133,55 @@
         </div>
 
 
-            <div class="card">
-                <h5 class="card-header">{% trans "Расценки тренера" %} <i class="fas fa-plus-square icon-larger"></i></h5>
-                <div class="card-body">
-                    {% if fitness_trainer_price %}
-                        <div style="overflow-x:auto;">
-                            <table class="table  table-striped table-bordered">
-                                <thead class="thead-light">
+        <div class="card">
+            <h5 class="card-header">{% trans "Расценки тренера" %} <i class="fas fa-plus-square "></i></h5>
+            <div class="card-body">
+                {% if fitness_trainer_price %}
+                    <div style="overflow-x:auto;">
+                        <table class="table  table-striped table-bordered">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col">{% trans "Цена/час" %}</th>
+                                <th scope="col">{% trans "Валюта" %}</th>
+                                <th scope="col">{% trans "Торг" %}</th>
+                                <th scope="col">{% trans "Актуальность" %}</th>
+                                <th scope="col">{% trans "Коментарий" %}</th>
+                                <th scope="col">{% trans "Редактировать" %}</th>
+                                <th scope="col">{% trans "Удалить" %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for price in fitness_trainer_price %}
                                 <tr>
-                                    <th scope="col">{% trans "Цена/час" %}</th>
-                                    <th scope="col">{% trans "Валюта" %}</th>
-                                    <th scope="col">{% trans "Торг" %}</th>
-                                    <th scope="col">{% trans "Актуальность" %}</th>
-                                    <th scope="col">{% trans "Коментарий" %}</th>
-                                    <th scope="col">{% trans "Редактировать" %}</th>
-                                    <th scope="col">{% trans "Удалить" %}</th>
+                                    <td>{{ price.trainer_price_hour }}</td>
+                                    <td>{{ price.trainer_price_currency }}</td>
+                                    <td>
+                                        {% if price.trainer_price_bargaining %}
+                                            <i class="fas fa-check-circle" style="color: green"></i>
+                                        {% else %}
+                                            <i class="fas fa-times-circle" style="color: red"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if price.trainer_price_actuality %}
+                                            <i class="fas fa-check-circle" style="color: green"></i>
+                                        {% else %}
+                                            <i class="fas fa-times-circle" style="color: red"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ price.trainer_price_comment }}</td>
+                                    <td><i class="fas fa-edit"></i></td>
+                                    <td><i class="fas fa-trash-alt"></i></td>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                {% for price in fitness_trainer_price %}
-                                    <tr>
-                                        <td>{{ price.trainer_price_hour }}</td>
-                                        <td>{{ price.trainer_price_currency }}</td>
-                                        <td>
-                                            {% if price.trainer_price_bargaining %}
-                                                <i class="fas fa-check-circle" style="color: green"></i>
-                                            {% else %}
-                                                <i class="fas fa-times-circle" style="color: red"></i>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if price.trainer_price_actuality %}
-                                                <i class="fas fa-check-circle" style="color: green"></i>
-                                            {% else %}
-                                                <i class="fas fa-times-circle" style="color: red"></i>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ price.trainer_price_comment }}</td>
-                                        <td><i class="fas fa-edit"></i></td>
-                                        <td><i class="fas fa-trash-alt"></i></td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        {% trans 'Нет активных расценок, добавьте.' %} <i class="fas fa-plus-square"></i>
-                    {% endif %}
-                </div>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    {% trans 'Нет активных расценок, добавьте.' %} <i class="fas fa-plus-square"></i>
+                {% endif %}
             </div>
+        </div>
 
         {% if fitness_trainer_docs %}
 

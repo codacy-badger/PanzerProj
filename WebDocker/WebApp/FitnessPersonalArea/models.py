@@ -54,6 +54,8 @@ class FitnessUser(models.Model):
     trainer_destination_city - город/местность в которой пользователь находится
     """
     user = models.OneToOneField(User, on_delete = models.CASCADE, related_name='user_account')
+    # birthday date
+    fitness_user_bdate = models.DateField(null = True, blank = True)
     # type пользователя
     teacher_user = "TRN"
     ward_user = "WRD"
@@ -222,6 +224,7 @@ class TrainingSchedule(models.Model):
     schedule_train_start - время начала тренеровки
     schedule_train_type - тип тренеровки
     schedule_train_tags - теги для тренировки
+    schedule_exercise_set - привязанный к занятию сет упражнений
     """
     target_user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE, related_name='target_schedule_user')
     author_user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE, related_name='author_schedule_user')
@@ -237,6 +240,8 @@ class TrainingSchedule(models.Model):
     schedule_train_type = models.CharField(max_length=100)
     # train tags
     schedule_train_tags = TaggableManager(blank=True)
+    # train set
+    schedule_exercise_set = models.ForeignKey('ExerciseSet', on_delete = models.SET_NULL, null = True, blank = True)
 
     def __str__(self):
         return f'Author: {self.author_user.user.username}; Target: {self.target_user.user.username}; ' \
