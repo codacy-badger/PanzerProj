@@ -13,7 +13,8 @@ urlpatterns = [
     # регистрация
     path('registration/', views.RegistrationPage.as_view(), name='registration'),
     # личный кабинет
-    path('personal/', views.PersonalAreaPage.as_view(), name='personal_area'),
+    path('personal/', views.ProfilePage.as_view(), name='personal_area'),
+    path('personal/profile/', views.ProfilePage.as_view(), name='personal_profile'),
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),
     # смена языка
@@ -26,8 +27,6 @@ urlpatterns = [
     path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
     # проверка имени пользователя на занятость
     path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
-    # обновление страницы в личном кабинете при выборе пункта меню
-    path('private-area-page/', views.GetPrivatePage.as_view(), name='private_area_page'),
 ]
 
 if settings.DEBUG:
