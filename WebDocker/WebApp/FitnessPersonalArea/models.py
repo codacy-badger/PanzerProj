@@ -243,7 +243,10 @@ class TrainingSchedule(models.Model):
                f'Gym: {self.schedule_gym.gym_short_name()}; Date: {self.schedule_date}'
 
     def get_all_tags(self):
-        return [tag for tag in self.schedule_train_tags.all()]
+        if len(self.schedule_train_tags.all()):
+            return self.schedule_train_tags.all()[0]
+        else:
+            return self.schedule_train_tags.all()
 
     # краткое название зала из расписания
     def gym_short(self):

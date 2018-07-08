@@ -8,8 +8,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db.models import Count, Q
+from django.utils.timezone import now
 
-from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice
+from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, \
+    ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
 
 
 # log in
@@ -108,7 +111,11 @@ class ProfilePage(View):
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'elements/profile_area.html',
-                'fitness_user': fitness_user
+                'fitness_user': fitness_user,
+                'user_gyms': TrainGym.objects.filter(user = fitness_user),
+                'user_training_schedule': TrainingSchedule.objects.filter(
+                                                    Q(target_user = fitness_user) | Q(author_user = fitness_user)).
+                                                    filter(schedule_date__gte = now()).order_by('schedule_date')[:10],
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте и документах

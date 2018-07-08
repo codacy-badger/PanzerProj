@@ -45,6 +45,64 @@
 
     </div>
 
+    <div class="card">
+        <h5 class="card-header">{% trans "Ваши залы" %} <i class="fas fa-plus-square"></i></h5>
+        <div class="card-body">
+            <div class="row">
+                {% for gym in user_gyms %}
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card" style="width: 15rem;">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ gym.gym_name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ gym.gym_destination }}</h6>
+                            <p class="card-text">{{ gym.gym_short_description }}</p>
+
+                            <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                          </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% trans 'Нет ваших залов, добавьте.' %} <i class="fas fa-plus-square"></i>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h5 class="card-header">{% trans "Ваши ближайшие тренеровки" %} <i class="fas fa-plus-square"></i></h5>
+        <div class="card-body">
+            <div class="row">
+                {% for train in user_training_schedule %}
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card" style="width: 15rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ train.schedule_date }} {% trans "в" %} {{ train.gym_short }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ train.schedule_train_type }}</h6>
+
+                                {% if train.schedule_exercise_set %}
+
+                                    <p class="card-text"><strong>{% trans 'План' %}</strong>: {{ train.schedule_exercise_set.short_title }}</p>
+
+                                {% endif %}
+
+                                <p class="card-text">{% trans 'С' %} {{ train.schedule_train_start }} {% trans 'до' %} {{ train.schedule_train_end }}</p>
+
+                                {% if train.get_all_tags %}
+                                    <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ train.get_all_tags }}</h6>
+                                {% endif %}
+
+                                <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% trans 'Нет тренеровок в расписании, добавьте.' %} <i class="fas fa-plus-square"></i>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
     {% if fitness_trainer %}
 
         <div class="card">
@@ -125,7 +183,7 @@
         {% if fitness_trainer_docs %}
 
                 <div class="card">
-                    <h5 class="card-header">{% trans "Документы тренера" %}  <i class="fas fa-plus-square icon-larger"></i></h5>
+                    <h5 class="card-header">{% trans "Документы тренера" %}  <i class="fas fa-plus-square"></i></h5>
                     <div class="card-body">
                         <ul class="list-group list-group-flush">
 
