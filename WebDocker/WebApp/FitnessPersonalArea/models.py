@@ -248,10 +248,7 @@ class TrainingSchedule(models.Model):
                f'Gym: {self.schedule_gym.gym_short_name()}; Date: {self.schedule_date}'
 
     def get_all_tags(self):
-        if len(self.schedule_train_tags.all()):
-            return self.schedule_train_tags.all()[0]
-        else:
-            return self.schedule_train_tags.all()
+        return [tag.name for tag in self.schedule_train_tags.all()]
 
     # краткое название зала из расписания
     def gym_short(self):
@@ -379,8 +376,11 @@ class MedicalNote(models.Model):
     def short_title(self):
         return self.medical_note_title if len(self.medical_note_title) < 50 else self.medical_note_title[:50]+' ...'
 
+    def short_text(self):
+        return self.medical_note_text if len(self.medical_note_text) < 50 else self.medical_note_text[:50]+' ...'
+
     def get_all_tags(self):
-        return [tag for tag in self.medical_note_tags.all()]
+        return [tag.name for tag in self.medical_note_tags.all()]
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title};'
@@ -409,8 +409,11 @@ class UserDiary(models.Model):
     def short_title(self):
         return self.diary_note_title if len(self.diary_note_title) < 50 else self.diary_note_title[:50]+' ...'
 
+    def short_text(self):
+        return self.diary_note_text if len(self.diary_note_text) < 50 else self.diary_note_text[:50]+' ...'
+
     def get_all_tags(self):
-        return [tag for tag in self.diary_note_tags.all()]
+        return [tag.name for tag in self.diary_note_tags.all()]
 
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title()}...;'

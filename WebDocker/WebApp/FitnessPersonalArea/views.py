@@ -115,7 +115,13 @@ class ProfilePage(View):
                 'user_gyms': TrainGym.objects.filter(user = fitness_user),
                 'user_training_schedule': TrainingSchedule.objects.filter(
                                                     Q(target_user = fitness_user) | Q(author_user = fitness_user)).
-                                                    filter(schedule_date__gte = now()).order_by('schedule_date')[:10],
+                                                    filter(schedule_date__gte = now()).order_by('schedule_date')[:6],
+                'user_projection_photos': ProjectionPhoto.objects.filter(user = fitness_user).order_by('id')[:6],
+                'user_train_contracts': TrainingContract.objects.filter(contract_ward_user = fitness_user,
+                                                                        contract_trainer_start = True,
+                                                                        contract_trainer_end = False),
+                'user_medical_notes': MedicalNote.objects.filter(user = fitness_user).order_by('id')[:6],
+                'user_usual_notes': UserDiary.objects.filter(user = fitness_user).order_by('id')[:6]
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте и документах
@@ -125,7 +131,11 @@ class ProfilePage(View):
                                                                 user=FitnessTrainer.objects.get(user = fitness_user)),
                                      'fitness_trainer_price': TrainerPrice.objects.filter(
                                                                 user=FitnessTrainer.objects.get(user = fitness_user),
-                                                                trainer_price_show = True)
+                                                                trainer_price_show = True),
+                                     'fitness_trainer_contracts': TrainingContract.objects.filter(
+                                             contract_trainer_user = FitnessTrainer.objects.get(user = fitness_user),
+                                             contract_trainer_start = True,
+                                             contract_ward_end = False)
                                      })
 
             return render(request, 'base.html', self.content)

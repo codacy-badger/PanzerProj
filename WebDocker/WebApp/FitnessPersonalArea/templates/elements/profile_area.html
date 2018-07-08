@@ -54,9 +54,9 @@
             <div class="row">
                 {% for gym in user_gyms %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem;">
+                        <div class="card" style="width: 15rem; height: 240px">
                           <div class="card-body">
-                            <h5 class="card-title">{{ gym.gym_name }}</h5>
+                            <h5 class="card-title">{{ gym.gym_name }} [ДОЛЖНА БЫТЬ ССЫЛКА НА СТАРНИЦУ ЗАЛА С КАРТОЙ]<i class="fas fa-map-marker-alt"></i></h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ gym.gym_destination }}</h6>
                             <p class="card-text">{{ gym.gym_short_description }}</p>
 
@@ -72,14 +72,14 @@
     </div>
 
     <div class="card">
-        <h5 class="card-header">{% trans "Ваши ближайшие тренеровки" %} <i class="fas fa-plus-square"></i></h5>
+        <h5 class="card-header">{% trans "Ваши тренеровки" %} <i class="fas fa-plus-square"></i></h5>
         <div class="card-body">
             <div class="row">
                 {% for train in user_training_schedule %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem;">
+                        <div class="card" style="width: 15rem; height: 270px">
                             <div class="card-body">
-                                <h5 class="card-title">{{ train.schedule_date }} {% trans "в" %} {{ train.gym_short }}</h5>
+                                <h5 class="card-title">{{ train.schedule_date }} {% trans "в" %} {{ train.gym_short }} [ДОЛЖНА БЫТЬ ССЫЛКА НА СТАРНИЦУ ЗАЛА С КАРТОЙ]<i class="fas fa-map-marker-alt"></i></h5>
                                 <h6 class="card-subtitle mb-2 text-muted">{{ train.schedule_train_type }}</h6>
 
                                 {% if train.schedule_exercise_set %}
@@ -88,7 +88,7 @@
 
                                 {% endif %}
 
-                                <p class="card-text">{% trans 'С' %} {{ train.schedule_train_start }} {% trans 'до' %} {{ train.schedule_train_end }}</p>
+                                <p class="card-text">{% trans 'С' %} {{ train.schedule_train_start }} {% trans 'до' %} {{ train.schedule_train_end }} <i class="fas fa-clock"></i></p>
 
                                 {% if train.get_all_tags %}
                                     <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ train.get_all_tags }}</h6>
@@ -104,6 +104,133 @@
             </div>
         </div>
     </div>
+
+
+    <div class="card">
+        <h5 class="card-header">{% trans "Ваши фотографии" %} <i class="fas fa-plus-square"></i></h5>
+        <div class="card-body">
+            <div class="row">
+                {% for photo in user_projection_photos %}
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card" style="width: 12rem; height: 360px">
+                            <img class="card-img-top" height="220px" width="100%" src="/media/{{ photo.projection_view_photo }}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ photo.get_projection_view_type_display }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ photo.projection_view_date }}</h6>
+
+
+                                <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% trans 'Нет фотографий, добавьте.' %} <i class="fas fa-plus-square"></i>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <h5 class="card-header"><i class="fas fa-notes-medical"></i> {% trans "Ваши записи" %} <i class="fas fa-plus-square"></i></h5>
+        <div class="card-body">
+            <div class="row">
+                {% for medical_note in user_medical_notes %}
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card" style="width: 15rem; height: 240px">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ medical_note.short_title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ medical_note.medical_note_datetime }}</h6>
+                            <p class="card-text">{{ medical_note.short_text }}</p>
+
+                              {% if medical_note.medical_note_tags %}
+                                    <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ medical_note.get_all_tags }}</h6>
+                              {% endif %}
+                            <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                          </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% trans 'Нет ваших записей, добавьте.' %} <i class="fas fa-plus-square"></i>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <h5 class="card-header"><i class="fas fa-book-open"></i> {% trans "Ваш дневник" %} <i class="fas fa-plus-square"></i></h5>
+        <div class="card-body">
+            <div class="row">
+                {% for usual_note in user_usual_notes %}
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card" style="width: 15rem; height: 240px">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ usual_note.short_title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ usual_note.diary_note_datetime }}</h6>
+                            <p class="card-text">{{ usual_note.short_text }}</p>
+
+                              {% if usual_note.diary_note_tags %}
+                                    <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ usual_note.get_all_tags }}</h6>
+                              {% endif %}
+
+                            <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                          </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% trans 'Нет ваших записей, добавьте.' %} <i class="fas fa-plus-square"></i>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if not fitness_trainer %}
+
+        <div class="card">
+            <h5 class="card-header">{% trans "Ваши контракты" %} <i class="fas fa-plus-square"></i></h5>
+            <div class="card-body">
+                <div class="row">
+                    {% for contract in user_train_contracts %}
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card"
+                                 style="width: 17rem;
+                                        height: 250px;
+                                        background-color:
+                                        {% if not contract.contract_trainer_start %}
+                                            #ff0000ad;
+                                        {% elif not contract.contract_ward_start %}
+                                             #ff0000ad;
+                                        {% elif not contract.contract_trainer_end and not contract.contract_ward_end %}
+                                             #008000c4;
+                                        {% else %}
+                                            #ff8f00a3;
+                                        {% endif %}
+
+
+                                         ">
+                                <div class="card-body">
+                                    <p class="card-text"><strong>{% trans 'Тренер' %}</strong>: {{ contract.contract_trainer_user.user.user.first_name }} {{ contract.contract_trainer_user.user.user.last_name }}</p>
+                                    <p class="card-text"><strong>{% trans 'Подопечный' %}</strong>: {{ contract.contract_ward_user.user.first_name }} {{ contract.contract_ward_user.user.last_name }}</p>
+
+                                    <p class="card-text"><strong>{% trans 'Цена' %}</strong>: {{ contract.contract_hour_price }} {{ contract.contract_currency }}</p>
+
+                                    <p class="card-text"><strong>{% trans 'Начало' %}</strong>: {{ contract.contract_create_datetime }}</p>
+
+                                    <p class="card-text"><strong>{% trans 'Окончание' %}</strong>: {{ contract.contract_expire_datetime }}</p>
+
+                                    <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        {% trans 'Нет контрактов, создайте.' %} <i class="fas fa-plus-square"></i>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
 
 
     {% if fitness_trainer %}
@@ -182,6 +309,52 @@
                 {% endif %}
             </div>
         </div>
+
+
+        <div class="card">
+            <h5 class="card-header">{% trans "Ваши контракты" %} <i class="fas fa-plus-square"></i></h5>
+            <div class="card-body">
+                <div class="row">
+                    {% for contract in fitness_trainer_contracts %}
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card"
+                                 style="width: 17rem;
+                                        height: 250px;
+                                        background-color:
+                                        {% if not contract.contract_trainer_start %}
+                                            #ff0000ad;
+                                        {% elif not contract.contract_ward_start %}
+                                             #ff0000ad;
+                                        {% elif not contract.contract_trainer_end and not contract.contract_ward_end %}
+                                             #008000c4;
+                                        {% else %}
+                                            #ff8f00a3;
+                                        {% endif %}
+
+
+                                         ">
+                                <div class="card-body">
+                                    <p class="card-text"><strong>{% trans 'Тренер' %}</strong>: {{ contract.contract_trainer_user.user.user.first_name }} {{ contract.contract_trainer_user.user.user.last_name }}</p>
+                                    <p class="card-text"><strong>{% trans 'Подопечный' %}</strong>: {{ contract.contract_ward_user.user.first_name }} {{ contract.contract_ward_user.user.last_name }}</p>
+
+                                    <p class="card-text"><strong>{% trans 'Цена' %}</strong>: {{ contract.contract_hour_price }} {{ contract.contract_currency }}</p>
+
+                                    <p class="card-text"><strong>{% trans 'Начало' %}</strong>: {{ contract.contract_create_datetime }}</p>
+
+                                    <p class="card-text"><strong>{% trans 'Окончание' %}</strong>: {{ contract.contract_expire_datetime }}</p>
+
+                                    <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        {% trans 'Нет контрактов, создайте.' %} <i class="fas fa-plus-square"></i>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
 
         {% if fitness_trainer_docs %}
 
