@@ -142,7 +142,6 @@ class ProfilePage(View):
         else:
             return redirect('/private/login/')
 
-
     def post(self, request, page):
         return redirect('/private/login/')
 

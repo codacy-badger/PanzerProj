@@ -25,13 +25,13 @@
             <br>
         </div>
         <div class="col-md-6 col-lg-6 col-sm-12" ><!--right col-->
-            <h3>{{ user.first_name }} {{ user.last_name }}  <i class="fas fa-edit"></i></h3>
+            <h3>{{ user.first_name }} {{ user.last_name }} </h3>
 
-            <p class="font-weight-light">via <strong>{{ user.username }}  <i class="fas fa-edit"></i></strong>
+            <p class="font-weight-light">via <strong>{{ user.username }}  </strong>
             <hr>
             <dl class="row">
-                <dt class="col-sm-4">{% trans "Дата рождения" %} <i class="fas fa-edit"></i></dt>
-                <dd class="col-sm-8">{{ fitness_user.fitness_user_bdate }}</dd>
+                <dt class="col-sm-4">{% trans "Дата рождения" %} </dt>
+                <dd class="col-sm-8">{{ fitness_user.fitness_user_bdate }}  <i class="fas fa-edit"></i></dd>
 
                 <dt class="col-sm-4">{% trans "Тип аккаунта" %}</dt>
                 <dd class="col-sm-8">{{ fitness_user.get_fitness_user_type_display }}</dd>
@@ -39,7 +39,7 @@
                 <dt class="col-sm-4">{% trans "Пол" %}</dt>
                 <dd class="col-sm-8">{{ fitness_user.get_fitness_user_gender_display }}</dd>
 
-                <dt class="col-sm-4">{% trans "Город" %} <i class="fas fa-edit"></i></dt>
+                <dt class="col-sm-4">{% trans "Город" %} </dt>
                 <dd class="col-sm-8">{{ fitness_user.fitness_user_destination_city }}</dd>
             </dl>
 
