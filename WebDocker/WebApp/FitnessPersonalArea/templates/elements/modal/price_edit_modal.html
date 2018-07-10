@@ -1,0 +1,47 @@
+{% block message %}
+{% load i18n %}
+    <!-- The Modal -->
+    <div class="modal fade" id="priceEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">{% trans "Расценки тренера" %}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form name="price_edit" method="post" action="" id="price_edit" enctype="multipart/form-data">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                            {% csrf_token %}
+                            <input hidden id="price_id_modal" type="number" name="price_id" required>
+                            <dl class="row">
+                                <dt class="col-sm-4">{% trans "Цена/час" %} </dt>
+                                <dd class="col-sm-8"><input type="text" required  id="price_modal"> </dd>
+
+                                <dt class="col-sm-4">{% trans "Коментарий" %}</dt>
+                                <dd class="col-sm-8"><input type="text" maxlength="100" required id="price_comment_modal"> </dd>
+
+                                <dt class="col-sm-4">{% trans "Валюта" %}</dt>
+                                <dd class="col-sm-8"><input type="text" maxlength="20" required id="price_currency_modal"> </dd>
+
+                                <dt class="col-sm-4">{% trans "Торг" %} </dt>
+                                <dd class="col-sm-8"><input type="checkbox" id="price_bargain_modal"></dd>
+
+                                <dt class="col-sm-4">{% trans "Актуальность" %} </dt>
+                                <dd class="col-sm-8"><input type="checkbox" id="price_actual_modal"></dd>
+                            </dl>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" data-dismiss="modal">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -259,29 +259,36 @@
 
 
         <div class="card">
-            <h5 class="card-header">{% trans "Расценки тренера" %} <i class="fas fa-plus-square "></i></h5>
+            <h5 class="card-header">{% trans "Расценки тренера" %}
+                <button type="button" class="btn btn-light" data-toggle="modal"
+                        data-target="#priceEdit">
+                    <i class="fas fa-plus-square "></i>
+                </button>
+            </h5>
             <div class="card-body">
                 {% if fitness_trainer_price %}
                     <div style="overflow-x:auto;">
-                        <table class="table  table-striped table-bordered">
+                        <table class="table  table-striped table-bordered" id="trainer_prices_table">
                             <thead class="thead-light">
                             <tr>
+                                <th scope="col">№</th>
                                 <th scope="col">{% trans "Цена/час" %}</th>
                                 <th scope="col">{% trans "Валюта" %}</th>
                                 <th scope="col">{% trans "Торг" %}</th>
                                 <th scope="col">{% trans "Актуальность" %}</th>
                                 <th scope="col">{% trans "Коментарий" %}</th>
-                                <th scope="col">{% trans "Редактировать" %}</th>
-                                <th scope="col">{% trans "Удалить" %}</th>
+                                <th scope="col">{% trans "Редактирование" %}</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for price in fitness_trainer_price %}
                                 <tr>
+                                    <td>{{ price.id }}</td>
                                     <td>{{ price.trainer_price_hour }}</td>
                                     <td>{{ price.trainer_price_currency }}</td>
                                     <td>
                                         {% if price.trainer_price_bargaining %}
+                                            <p hidden>True</p>
                                             <i class="fas fa-check-circle" style="color: green"></i>
                                         {% else %}
                                             <i class="fas fa-times-circle" style="color: red"></i>
@@ -289,14 +296,19 @@
                                     </td>
                                     <td>
                                         {% if price.trainer_price_actuality %}
+                                            <p hidden>True</p>
                                             <i class="fas fa-check-circle" style="color: green"></i>
                                         {% else %}
                                             <i class="fas fa-times-circle" style="color: red"></i>
                                         {% endif %}
                                     </td>
                                     <td>{{ price.trainer_price_comment }}</td>
-                                    <td><i class="fas fa-edit"></i></td>
-                                    <td><i class="fas fa-trash-alt"></i></td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-primary" id="price_edit_btn" data-toggle="modal"
+                                                data-target="#priceEdit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -307,6 +319,12 @@
                 {% endif %}
             </div>
         </div>
+
+        {% block price_edit %}
+
+            {% include 'elements/modal/price_edit_modal.html' %}
+
+        {% endblock %}
 
 
         <div class="card">
@@ -383,4 +401,33 @@
         {% endif %}
 
     {% endif %}
+
+    <script>
+        jQuery(document).ready(function(){
+             $("#trainer_prices_table").on('click','.btn.btn-outline-primary',function(){
+                var currentRow=$(this).closest("tr");
+                var userId=currentRow.find("td:eq(0)").text(); // get current row 1st TD value
+                var price=currentRow.find("td:eq(1)").text();
+                var currency=currentRow.find("td:eq(2)").text();
+                var bargain=currentRow.find("td:eq(3)").text();
+                var actual=currentRow.find("td:eq(4)").text();
+                var comment=currentRow.find("td:eq(5)").text();
+
+                $("#price_id_modal").val(userId);
+                $("#price_modal").val(price);
+                $("#price_comment_modal").val(comment);
+                $("#price_currency_modal").val(currency);
+
+                $("#price_bargain_modal").prop('checked', false);
+                $("#price_actual_modal").prop('checked', false);
+                if (bargain.includes('True')){
+                    $("#price_bargain_modal").prop('checked', true);
+                }
+                if(actual.includes('True')){
+                    $("#price_actual_modal").prop('checked', true);
+                }
+            });
+        });
+
+        </script>
 {% endblock %}
