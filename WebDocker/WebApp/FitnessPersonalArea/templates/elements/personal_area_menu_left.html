@@ -39,10 +39,19 @@
                         {% trans "Залы" %}
                     </a>
 
-                    <a class="list-group-item button" >
-                        <i class="fas fa-user-graduate"></i>
-                        {% trans "Тренер" %}
-                    </a>
+
+                    {% if fitness_trainer %}
+                        <a class="list-group-item button" href="{% url 'trainer_price' %}" >
+                            <i class="fas fa-dollar-sign"></i>
+                            {% trans "Расценки" %}
+                        </a>
+                    {% else %}
+                        <a class="list-group-item button" >
+                            <i class="fas fa-user-graduate"></i>
+                            {% trans "Тренер" %}
+                        </a>
+                    {% endif %}
+
 
                     <a class="list-group-item button" >
                         <i class="fas fa-eye"></i>

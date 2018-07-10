@@ -1,4 +1,5 @@
 {% block message %}
+{% load static %}
 {% load i18n %}
     <!-- The Modal -->
     <div class="modal fade" id="priceEdit">
@@ -58,7 +59,7 @@
     $("#price_edit").submit(function(e) {
         $.ajax({
             type: "POST",
-            url: "{% url 'trainer_price_edit' %}",
+            url: "{% url 'trainer_price' %}",
             data: $("#price_edit").serialize(), // serializes the form's elements.
             success: function(data)
             {

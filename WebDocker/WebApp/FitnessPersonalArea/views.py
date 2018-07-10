@@ -234,7 +234,24 @@ Edit view
 
 
 # edit TrainerPrice
-class TrainerPriceEditView(View):
+class TrainerPriceView(View):
+    """
+    TrainerPriceView отвечает за создание, редактирование и просмотр расценок тренера
+    """
+    content = {}
+    def get(self, request):
+        if request.user.is_authenticated:
+            self.content.update({
+                'doc': 'pages/personal_area.html',
+                'private_doc': 'pages/trainer_prices.html',
+                'fitness_trainer': True,
+                'fitness_user': FitnessUser.objects.get(user = request.user),
+                'fitness_trainer_price': TrainerPrice.objects.filter(user__user__user = request.user,
+                                                                     trainer_price_show = True).
+                                order_by('id')})
+
+            return render(request, 'base.html', self.content)
+
     def post(self, request):
         self.ajax_content = {'answer': False}
         # проверка реквеста и авторизироанности пользователя
