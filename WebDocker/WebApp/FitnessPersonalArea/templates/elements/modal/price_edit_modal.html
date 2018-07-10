@@ -53,9 +53,9 @@
             success: function(data)
             {
                 if (data.anser == 'true')
-                    alert(data.content);
+                    alert(data.success_answer);
                 else {
-                    alert(data.error)
+                    alert(data.error_answer)
                 }
             }
         });

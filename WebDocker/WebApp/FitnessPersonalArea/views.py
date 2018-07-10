@@ -259,11 +259,11 @@ class TrainerPriceEditView(View):
                     training_price.save()
 
                     self.content.update({'answer': True,
-                                         'content': _('Данные обновлены')})
+                                         'success_answer': _('Данные обновлены')})
 
             # TODO добавить логгирование ошибок
             except Exception:
-                pass
+                self.content.update({'error_answer': _('Произошла ошибка!')})
 
             return JsonResponse(self.content)
 
