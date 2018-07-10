@@ -40,14 +40,6 @@
 
     <hr>
 
-        {% if messages %}
-            {% block message %}
-
-                {% include 'elements/message.html' %}
-
-            {% endblock %}
-        {% endif %}
-
         <label for="inputLogin" class="sr-only">Логин</label>
         <input type="text" id="inputLogin" name="email_username" class="form-control"
                placeholder="E-mail или имя пользователя" required autofocus>
