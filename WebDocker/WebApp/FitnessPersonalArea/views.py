@@ -128,10 +128,10 @@ class ProfilePage(View):
             if fitness_user.fitness_user_type == FitnessUser.teacher_user:
                 self.content.update({'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
                                      'fitness_trainer_docs': TrainerDoc.objects.filter(
-                                                                user=FitnessTrainer.objects.get(user = fitness_user)),
-                                     'fitness_trainer_price': TrainerPrice.objects.filter(
-                                                                user=FitnessTrainer.objects.get(user = fitness_user),
-                                                                trainer_price_show = True).order_by('id'),
+                                                                user__user = fitness_user),
+                                     'fitness_trainer_price': TrainerPrice.objects.filter(user__user = fitness_user,
+                                                                                          trainer_price_show = True).
+                                                                                          order_by('id'),
                                      'fitness_trainer_contracts': TrainingContract.objects.filter(
                                              contract_trainer_user = FitnessTrainer.objects.get(user = fitness_user),
                                              contract_trainer_start = True,
