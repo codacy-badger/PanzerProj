@@ -15,7 +15,7 @@
                     <!-- Modal body -->
                     <div class="modal-body">
                             {% csrf_token %}
-                            <input hidden id="price_id_modal" type="number" name="price_id" required>
+                            <input hidden id="price_id_modal" type="number" name="price_id" value="0" required>
                             <dl class="row">
                                 <dt class="col-sm-4">{% trans "Цена/час" %} </dt>
                                 <dd class="col-sm-8"><input  type="number" step="0.01" required name="trainer_price_hour" id="price_modal"> </dd>
@@ -24,7 +24,17 @@
                                 <dd class="col-sm-8"><input type="text" name="trainer_price_comment"  maxlength="100" required id="price_comment_modal"> </dd>
 
                                 <dt class="col-sm-4">{% trans "Валюта" %}</dt>
-                                <dd class="col-sm-8"><input type="text" name="trainer_price_currency"  maxlength="20" required id="price_currency_modal"> </dd>
+                                <dd class="col-sm-8">
+
+                                    <select required name="trainer_price_currency" id="price_currency_modal" >
+                                        <option selected value="">{% trans "Выберите валюту" %}</option>
+                                        <option value="USD">America Dollars – USD</option>
+                                        <option value="EUR">Euro – EUR</option>
+                                        <option value="BYN">Belarus – BYN</option>
+                                        <option value="RUB">Russia Rubles – RUB</option>
+                                        <option value="UAH">Ukraine Hryvnia – UAH</option>
+                                    </select>
+                                </dd>
 
                                 <dt class="col-sm-4">{% trans "Торг" %} </dt>
                                 <dd class="col-sm-8"><input type="checkbox" name="trainer_price_bargaining"  id="price_bargain_modal"></dd>
@@ -52,8 +62,8 @@
             data: $("#price_edit").serialize(), // serializes the form's elements.
             success: function(data)
             {
-                if (data.anser == 'true')
-                    alert(data.success_answer);
+                if (data.answer === true)
+                    window.location.reload(true);
                 else {
                     alert(data.error_answer)
                 }

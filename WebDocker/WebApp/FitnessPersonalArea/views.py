@@ -236,36 +236,52 @@ Edit view
 # edit TrainerPrice
 class TrainerPriceEditView(View):
     def post(self, request):
-        self.content = {'answer': False}
+        self.ajax_content = {'answer': False}
         # проверка реквеста и авторизироанности пользователя
         if request.is_ajax() and request.user.is_authenticated:
             try:
-                # получение данной расценки из БД
-                training_price = TrainerPrice.objects.get(id=request.POST['price_id'])
-                # проверка пользователя на авторство данной цене
-                if training_price.user == FitnessTrainer.objects.get(user__user=request.user):
-                    # изменение расценки
-                    training_price.trainer_price_hour = request.POST['trainer_price_hour']
-                    training_price.trainer_price_comment = request.POST['trainer_price_comment']
-                    training_price.trainer_price_currency = request.POST['trainer_price_currency']
-                    if 'trainer_price_bargaining' in request.POST:
-                        training_price.trainer_price_bargaining = True
-                    else:
-                        training_price.trainer_price_bargaining = False
-                    if 'trainer_price_actuality' in request.POST:
-                        training_price.trainer_price_actuality = True
-                    else:
-                        training_price.trainer_price_actuality = False
-                    training_price.save()
+                # если id расценки -0, создаём новую
+                if request.POST['price_id'] == '0':
+                    # создаём новую расценку
+                    TrainerPrice.objects.create(user = FitnessTrainer.objects.get(user__user = request.user),
+                                                trainer_price_hour = request.POST['trainer_price_hour'],
+                                                trainer_price_comment = request.POST['trainer_price_comment'],
+                                                trainer_price_currency = request.POST['trainer_price_currency'],
+                                                trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False,
+                                                trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False)
 
-                    self.content.update({'answer': True,
-                                         'success_answer': _('Данные обновлены')})
+                    # обновляем данные для ответа сервера
+                    self.ajax_content.update({'answer': True})
+                    # добавляем сообщение пользователю
+                    messages.add_message(request, messages.SUCCESS, _('Расценка создана'))
+
+                else:
+                    # если изменяем расценку - получение данной расценки из БД
+                    training_price = TrainerPrice.objects.get(id=request.POST['price_id'])
+                    # проверка пользователя на авторство данной цене
+                    if training_price.user == FitnessTrainer.objects.get(user__user=request.user):
+                        # изменение расценки
+                        training_price.trainer_price_hour = request.POST['trainer_price_hour']
+                        training_price.trainer_price_comment = request.POST['trainer_price_comment']
+                        training_price.trainer_price_currency = request.POST['trainer_price_currency']
+
+                        training_price.trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False
+
+                        training_price.trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False
+
+                        # сохраняем новые данные расценки
+                        training_price.save()
+
+                        # обновляем данные для ответа сервера
+                        self.ajax_content.update({'answer': True})
+                        # добавляем сообщение пользователю
+                        messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
 
             # TODO добавить логгирование ошибок
-            except Exception:
-                self.content.update({'error_answer': _('Произошла ошибка!')})
+            except Exception as err:
+                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-            return JsonResponse(self.content)
+            return JsonResponse(self.ajax_content)
 
 
 
