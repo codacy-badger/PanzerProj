@@ -271,7 +271,7 @@
                         <table class="table  table-striped table-bordered" id="trainer_prices_table">
                             <thead class="thead-light">
                             <tr>
-                                <th scope="col">№</th>
+                                <th scope="col" hidden>№</th>
                                 <th scope="col">{% trans "Цена/час" %}</th>
                                 <th scope="col">{% trans "Валюта" %}</th>
                                 <th scope="col">{% trans "Торг" %}</th>
@@ -283,7 +283,7 @@
                             <tbody>
                             {% for price in fitness_trainer_price %}
                                 <tr>
-                                    <td>{{ price.id }}</td>
+                                    <td hidden>{{ price.id }}</td>
                                     <td>{{ price.trainer_price_hour }}</td>
                                     <td>{{ price.trainer_price_currency }}</td>
                                     <td>
@@ -413,8 +413,9 @@
                 var actual=currentRow.find("td:eq(4)").text();
                 var comment=currentRow.find("td:eq(5)").text();
 
+                alert(price);
                 $("#price_id_modal").val(userId);
-                $("#price_modal").val(price);
+                $("#price_modal").text(price);
                 $("#price_comment_modal").val(comment);
                 $("#price_currency_modal").val(currency);
 

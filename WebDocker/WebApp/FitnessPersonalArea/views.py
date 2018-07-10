@@ -131,7 +131,7 @@ class ProfilePage(View):
                                                                 user=FitnessTrainer.objects.get(user = fitness_user)),
                                      'fitness_trainer_price': TrainerPrice.objects.filter(
                                                                 user=FitnessTrainer.objects.get(user = fitness_user),
-                                                                trainer_price_show = True),
+                                                                trainer_price_show = True).order_by('id'),
                                      'fitness_trainer_contracts': TrainingContract.objects.filter(
                                              contract_trainer_user = FitnessTrainer.objects.get(user = fitness_user),
                                              contract_trainer_start = True,
@@ -227,6 +227,45 @@ class EmailCheckAjax(View):
 
             return JsonResponse(self.content)
 
+
+"""
+Edit view
+"""
+
+
+# edit TrainerPrice
+class TrainerPriceEditView(View):
+    def post(self, request):
+        self.content = {'answer': False}
+        # проверка реквеста и авторизироанности пользователя
+        if request.is_ajax() and request.user.is_authenticated:
+            try:
+                # получение данной расценки из БД
+                training_price = TrainerPrice.objects.get(id=request.POST['price_id'])
+                # проверка пользователя на авторство данной цене
+                if training_price.user == FitnessTrainer.objects.get(user__user=request.user):
+                    # изменение расценки
+                    training_price.trainer_price_hour = request.POST['trainer_price_hour']
+                    training_price.trainer_price_comment = request.POST['trainer_price_comment']
+                    training_price.trainer_price_currency = request.POST['trainer_price_currency']
+                    if 'trainer_price_bargaining' in request.POST:
+                        training_price.trainer_price_bargaining = True
+                    else:
+                        training_price.trainer_price_bargaining = False
+                    if 'trainer_price_actuality' in request.POST:
+                        training_price.trainer_price_actuality = True
+                    else:
+                        training_price.trainer_price_actuality = False
+                    training_price.save()
+
+                    self.content.update({'answer': True,
+                                         'content': _('Данные обновлены')})
+
+            # TODO добавить логгирование ошибок
+            except Exception:
+                pass
+
+            return JsonResponse(self.content)
 
 
 

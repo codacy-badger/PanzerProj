@@ -27,6 +27,8 @@ urlpatterns = [
     path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
     # проверка имени пользователя на занятость
     path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
+    # редактирование расценок тренера
+    path('trainer-price-edit/', views.TrainerPriceEditView.as_view(), name='trainer_price_edit'),
 ]
 
 if settings.DEBUG:
