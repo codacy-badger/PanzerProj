@@ -407,10 +407,10 @@ class UserDiary(models.Model):
     diary_note_tags = TaggableManager(blank=True)
 
     def short_title(self):
-        return self.diary_note_title if len(self.diary_note_title) < 50 else self.diary_note_title[:50]+' ...'
+        return self.diary_note_title if len(self.diary_note_title) < 30 else self.diary_note_title[:30]+' ...'
 
     def short_text(self):
-        return self.diary_note_text if len(self.diary_note_text) < 50 else self.diary_note_text[:50]+' ...'
+        return self.diary_note_text if len(self.diary_note_text) < 30 else self.diary_note_text[:30]+' ...'
 
     def get_all_tags(self):
         return [tag.name for tag in self.diary_note_tags.all()]
@@ -550,7 +550,7 @@ class BodyParameter(models.Model):
     body_datetime = models.DateTimeField(default = now)
 
     def title_short(self):
-        return self.body_title if len(self.body_title) < 50 else self.body_title[:50]+' ...'
+        return self.body_title if len(self.body_title) < 30 else self.body_title[:30]+' ...'
 
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
@@ -575,7 +575,7 @@ class TargetBodyParameter(models.Model):
     target_body_datetime = models.DateTimeField(default = now)
 
     def title_short(self):
-        return self.target_body_title if len(self.target_body_title) < 50 else self.target_body_title[:50]+' ...'
+        return self.target_body_title if len(self.target_body_title) < 30 else self.target_body_title[:30]+' ...'
 
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
@@ -634,7 +634,7 @@ class ChatMessage(models.Model):
                f'Message: {self.short_message()}'
 
     def short_message(self):
-        return self.message_text if len(self.message_text) < 50 else self.message_text[:50] + ' ...'
+        return self.message_text if len(self.message_text) < 30 else self.message_text[:30] + ' ...'
 
 
 """
@@ -670,10 +670,10 @@ class Feedback(models.Model):
         return f'Target: {self.target_user.user.username}; Rate: {self.feedback_rate}'
 
     def short_title(self):
-        return self.feedback_title if len(self.feedback_title) < 50 else self.feedback_title[:50]+' ...'
+        return self.feedback_title if len(self.feedback_title) < 30 else self.feedback_title[:30]+' ...'
 
     def short_text(self):
-        return self.feedback_text if len(self.feedback_text) < 50 else self.feedback_text[:50]+' ...'
+        return self.feedback_text if len(self.feedback_text) < 30 else self.feedback_text[:30]+' ...'
 
 
 """
@@ -694,10 +694,10 @@ class DefExerciseType(models.Model):
     type_description = models.TextField(max_length=5000)
 
     def short_title(self):
-        return self.type_title if len(self.type_title) < 50 else self.type_title[:50]+' ...'
+        return self.type_title if len(self.type_title) < 30 else self.type_title[:30]+' ...'
 
     def short_description(self):
-        return self.type_description if len(self.type_description) < 50 else self.type_description[:50]+' ...'
+        return self.type_description if len(self.type_description) < 30 else self.type_description[:30]+' ...'
 
     def __str__(self):
         return f'Title: {self.short_title()}'
@@ -717,8 +717,8 @@ class DefTypesBundle(models.Model):
     bundle_subtypes = models.ManyToManyField(DefExerciseType, blank = True, related_name = 'bundled_subtypes')
 
     def short_type(self):
-        return self.bundle_type.type_title if len(self.bundle_type.type_title) < 50 \
-                                           else self.bundle_type.type_title[:50]+' ...'
+        return self.bundle_type.type_title if len(self.bundle_type.type_title) < 30 \
+                                           else self.bundle_type.type_title[:30]+' ...'
 
     def get_bundled_types(self):
         return [type_title.short_title() for type_title in self.bundle_subtypes.all()]

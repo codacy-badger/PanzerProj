@@ -116,12 +116,12 @@ class ProfilePage(View):
                 'user_training_schedule': TrainingSchedule.objects.filter(
                                                     Q(target_user = fitness_user) | Q(author_user = fitness_user)).
                                                     filter(schedule_date__gte = now()).order_by('schedule_date')[:6],
-                'user_projection_photos': ProjectionPhoto.objects.filter(user = fitness_user).order_by('id')[:6],
+                'user_projection_photos': ProjectionPhoto.objects.filter(user = fitness_user).order_by('id')[:4],
                 'user_train_contracts': TrainingContract.objects.filter(contract_ward_user = fitness_user,
                                                                         contract_trainer_start = True,
                                                                         contract_trainer_end = False),
-                'user_medical_notes': MedicalNote.objects.filter(user = fitness_user).order_by('id')[:6],
-                'user_usual_notes': UserDiary.objects.filter(user = fitness_user).order_by('id')[:6]
+                'user_medical_notes': MedicalNote.objects.filter(user = fitness_user).order_by('-id')[:4],
+                'user_usual_notes': UserDiary.objects.filter(user = fitness_user).order_by('-id')[:4]
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте и документах
