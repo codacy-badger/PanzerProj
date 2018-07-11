@@ -60,12 +60,11 @@
                             <h6 class="card-subtitle mb-2 text-muted">{{ gym.gym_destination }}</h6>
                             <p class="card-text">{{ gym.gym_short_description }}</p>
 
-                            <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
                           </div>
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших залов, добавьте.' %} <i class="fas fa-plus-square"></i>
+                    {% trans 'Нет ваших залов, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
@@ -94,12 +93,11 @@
                                     <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ train.get_all_tags }}</h6>
                                 {% endif %}
 
-                                <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
                             </div>
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет тренеровок в расписании, добавьте.' %} <i class="fas fa-plus-square"></i>
+                    {% trans 'Нет тренеровок в расписании, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
@@ -119,12 +117,11 @@
                                 <h6 class="card-subtitle mb-2 text-muted">{{ photo.projection_view_date }}</h6>
 
 
-                                <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
                             </div>
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет фотографий, добавьте.' %} <i class="fas fa-plus-square"></i>
+                    {% trans 'Нет фотографий, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
@@ -146,20 +143,33 @@
                               {% if medical_note.medical_note_tags %}
                                     <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ medical_note.get_all_tags }}</h6>
                               {% endif %}
-                            <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
                           </div>
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших записей, добавьте.' %} <i class="fas fa-plus-square"></i>
+                    {% trans 'Нет ваших записей, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
     </div>
 
 
+    {% block medical_note %}
+
+        {% include 'elements/modal/medical_note_modal.html' %}
+
+    {% endblock %}
+
     <div class="card">
-        <h5 class="card-header"><i class="fas fa-book-open"></i> {% trans "Ваш дневник" %} <i class="fas fa-plus-square"></i></h5>
+        <h5 class="card-header">
+            <i class="fas fa-book-open"></i>
+            {% trans "Ваш дневник" %}
+
+            <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
+                    data-target="#newDiaryNote">
+                <i class="fas fa-plus-square "></i>
+            </button>
+        </h5>
         <div class="card-body">
             <div class="row">
                 {% for usual_note in user_usual_notes %}
@@ -174,16 +184,24 @@
                                     <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ usual_note.get_all_tags }}</h6>
                               {% endif %}
 
-                            <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
                           </div>
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших записей, добавьте.' %} <i class="fas fa-plus-square"></i>
+                    {% trans 'Нет ваших записей, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
     </div>
+
+
+
+    {% block diary_note %}
+
+        {% include 'elements/modal/diary_note_modal.html' %}
+
+    {% endblock %}
+
 
     {% if not fitness_trainer %}
 
@@ -219,7 +237,7 @@
 
                                     <p class="card-text"><strong>{% trans 'Окончание' %}</strong>: {{ contract.contract_expire_datetime }}</p>
 
-                                    <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
+
                                 </div>
                             </div>
                         </div>
@@ -264,7 +282,7 @@
 
         {% block description_edit %}
 
-            {% include 'elements/modal/trainer_description_edit_modal.html' %}
+            {% include 'elements/modal/price_edit_modal.html' %}
 
         {% endblock %}
 
@@ -330,7 +348,7 @@
                         </table>
                     </div>
                 {% else %}
-                    {% trans 'Нет активных расценок, добавьте.' %} <i class="fas fa-plus-square"></i>
+                    {% trans 'Нет активных расценок, добавьте.' %}
                 {% endif %}
             </div>
         </div>
@@ -374,7 +392,6 @@
 
                                     <p class="card-text"><strong>{% trans 'Окончание' %}</strong>: {{ contract.contract_expire_datetime }}</p>
 
-                                    <a href="#" class="card-link">{% trans 'Подробнее' %}</a>
                                 </div>
                             </div>
                         </div>

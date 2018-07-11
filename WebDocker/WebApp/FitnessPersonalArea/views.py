@@ -144,8 +144,9 @@ class ProfilePage(View):
 
     def post(self, request):
         if request.is_ajax() and request.user.is_authenticated:
-            ajax_answer = {'answer': False}
             print(request.POST)
+            ajax_answer = {'answer': False}
+            # вносим изменения в описание тренера
             if 'trainer_description' in request.POST:
                 try:
                     edited_description = FitnessTrainer.objects.get(user__user = request.user)
@@ -156,6 +157,22 @@ class ProfilePage(View):
                     ajax_answer.update({'answer': True})
 
                     messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    ajax_answer.update({'error_answer': _('Произошла ошибка!')})
+
+            # создаём новую запись в дневнике
+            if 'diary_note_text' in request.POST:
+                try:
+                    new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
+                                                              diary_note_title = request.POST['diary_note_title'],
+                                                              diary_note_text = request.POST['diary_note_text'])
+                    new_diary_note.diary_note_tags.add(request.POST['diary_note_tags'])
+
+                    ajax_answer.update({'answer': True})
+
+                    messages.add_message(request, messages.SUCCESS, _('Запись создана'))
                 # TODO добавить логгирование ошибок
                 except Exception as err:
                     print(err)
