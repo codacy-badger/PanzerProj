@@ -142,9 +142,26 @@ class ProfilePage(View):
         else:
             return redirect('/private/login/')
 
-    def post(self, request, page):
-        return redirect('/private/login/')
+    def post(self, request):
+        if request.is_ajax() and request.user.is_authenticated:
+            ajax_answer = {'answer': False}
+            print(request.POST)
+            if 'trainer_description' in request.POST:
+                try:
+                    edited_description = FitnessTrainer.objects.get(user__user = request.user)
+                    edited_description.trainer_employment_status = True if 'trainer_employment_status' in request.POST else False
+                    edited_description.trainer_description = request.POST['trainer_description']
+                    edited_description.save()
 
+                    ajax_answer.update({'answer': True})
+
+                    messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    ajax_answer.update({'error_answer': _('Произошла ошибка!')})
+
+            return JsonResponse(ajax_answer)
 
 # registration
 class SuccessLogin(View):

@@ -112,7 +112,7 @@ class FitnessTrainer(models.Model):
     # busy status
     trainer_employment_status = models.BooleanField(default=False)
     # personal description
-    trainer_description = models.TextField(max_length=5000)
+    trainer_description = models.TextField(max_length=5000, default = 'Description')
 
     def __str__(self):
         return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
