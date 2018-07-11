@@ -90,7 +90,7 @@
                 var comment=currentRow.find("td:eq(5)").text();
 
                 $("#price_id_modal").val(userId);
-                $("#price_modal").val(parseFloat(price));
+                $("#price_modal").val(parseFloat(price.replace(',','.')));
                 $("#price_comment_modal").val(comment);
                 $("#price_currency_modal").val(currency);
 
