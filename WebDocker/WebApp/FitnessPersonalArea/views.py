@@ -124,14 +124,15 @@ class ProfilePage(View):
                 'user_usual_notes': UserDiary.objects.filter(user = fitness_user).order_by('-id')[:4]
             })
 
-            # если пользовтель тренер - добавляем данные об аккаунте и документах
+            # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
+            # контрактах в которых пользователь - тренер
             if fitness_user.fitness_user_type == FitnessUser.teacher_user:
                 self.content.update({'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
                                      'fitness_trainer_docs': TrainerDoc.objects.filter(
                                                                 user__user = fitness_user),
                                      'fitness_trainer_price': TrainerPrice.objects.filter(user__user = fitness_user,
                                                                                           trainer_price_show = True).
-                                                                                          order_by('id'),
+                                                                                    order_by('trainer_price_currency'),
                                      'fitness_trainer_contracts': TrainingContract.objects.filter(
                                              contract_trainer_user = FitnessTrainer.objects.get(user = fitness_user),
                                              contract_trainer_start = True,
@@ -144,7 +145,6 @@ class ProfilePage(View):
 
     def post(self, request):
         if request.is_ajax() and request.user.is_authenticated:
-            print(request.POST)
             ajax_answer = {'answer': False}
             # вносим изменения в описание тренера
             if 'trainer_description' in request.POST:
@@ -179,7 +179,25 @@ class ProfilePage(View):
                     print(err)
                     ajax_answer.update({'error_answer': _('Произошла ошибка!')})
 
+            # создаём новую медицинскую запись запись в дневнике
+            if 'medical_note_text' in request.POST:
+                try:
+                    new_medical_note = MedicalNote.objects.create(user = FitnessUser.objects.get(user = request.user),
+                                                                medical_note_title = request.POST['medical_note_title'],
+                                                                medical_note_text = request.POST['medical_note_text'])
+                    new_medical_note.medical_note_tags.add(request.POST['medical_note_tags'])
+                    new_medical_note.save()
+
+                    ajax_answer.update({'answer': True})
+
+                    messages.add_message(request, messages.SUCCESS, _('Запись создана'))
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    ajax_answer.update({'error_answer': _('Произошла ошибка!')})
+
             return JsonResponse(ajax_answer)
+
 
 # registration
 class SuccessLogin(View):

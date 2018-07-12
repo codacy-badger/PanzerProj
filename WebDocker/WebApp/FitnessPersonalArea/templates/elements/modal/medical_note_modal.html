@@ -2,15 +2,15 @@
 {% load static %}
 {% load i18n %}
     <!-- The Modal -->
-    <div class="modal fade" id="newDiaryNote">
+    <div class="modal fade" id="newMedicalNote">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h4 class="modal-title">
-                        <i class="fas fa-book-open"></i>
-                        {% trans "Ваш дневник" %}</h4>
+                        <i class="fas fa-notes-medical"></i>
+                        {% trans "Ваши записи" %}</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
@@ -20,13 +20,13 @@
                     <div class="modal-body">
                         <dl class="row">
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название записи"%}</dt>
-                            <dd class="col-sm-8"><input type="text" required name="diary_note_title" maxlength="100"></dd>
+                            <dd class="col-sm-8"><input type="text" required name="medical_note_title" maxlength="100"></dd>
 
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Текст записи"%}</dt>
-                            <dd class="col-sm-8"><textarea type="text" name="diary_note_text"  maxlength="4000" required></textarea></dd>
+                            <dd class="col-sm-8"><textarea type="text" name="medical_note_text"  maxlength="4000" required></textarea></dd>
 
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Теги записи, через запятую"%}</dt>
-                            <dd class="col-sm-8"><input type="text" required name="diary_note_tags" maxlength="20"></dd>
+                            <dd class="col-sm-8"><input type="text" required name="medical_note_tags" maxlength="20"></dd>
                         </dl>
                     </div>
 
