@@ -14,7 +14,7 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
-                <form name="new_diary_note" method="post" action="" id="new_diary_note" enctype="multipart/form-data">
+                <form name="new_medical_note" method="post" action="" id="new_medical_note" enctype="multipart/form-data">
                     {% csrf_token %}
                     <!-- Modal body -->
                     <div class="modal-body">
@@ -32,7 +32,7 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success" name="new_diary_note_btn">{% trans "Сохранить" %}</button>
+                        <button type="submit" class="btn btn-success" name="new_medical_note_btn">{% trans "Сохранить" %}</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
                     </div>
                 </form>
@@ -41,11 +41,11 @@
         </div>
     </div>
     <script>
-    $("#new_diary_note").submit(function(e) {
+    $("#new_medical_note").submit(function(e) {
         $.ajax({
             type: "POST",
             url: "{% url 'personal_profile' %}",
-            data: $("#new_diary_note").serialize(), // serializes the form's elements.
+            data: $("#new_medical_note").serialize(), // serializes the form's elements.
             success: function(data)
             {
                 if (data.answer === true)

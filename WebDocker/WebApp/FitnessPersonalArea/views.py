@@ -169,6 +169,7 @@ class ProfilePage(View):
                                                               diary_note_title = request.POST['diary_note_title'],
                                                               diary_note_text = request.POST['diary_note_text'])
                     new_diary_note.diary_note_tags.add(request.POST['diary_note_tags'])
+                    new_diary_note.save()
 
                     ajax_answer.update({'answer': True})
 
