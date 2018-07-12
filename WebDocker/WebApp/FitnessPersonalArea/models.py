@@ -362,6 +362,7 @@ class MedicalNote(models.Model):
     medical_note_text - текст записи
     medical_note_datetime - дата и время создания записи
     medical_note_tags - теги для медицинской записи
+    medical_note_show - скрыть запись, если пользователь удалил её
     """
     user = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
     # note title
@@ -372,6 +373,8 @@ class MedicalNote(models.Model):
     medical_note_datetime = models.DateTimeField(default=now)
     # medical tags
     medical_note_tags = TaggableManager(blank=True)
+    # show/hide if user delete diary note
+    medical_note_show = models.BooleanField(default = True)
 
     def short_title(self):
         return self.medical_note_title if len(self.medical_note_title) < 50 else self.medical_note_title[:50]+' ...'

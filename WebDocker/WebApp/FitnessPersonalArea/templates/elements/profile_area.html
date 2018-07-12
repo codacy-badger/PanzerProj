@@ -130,7 +130,7 @@
 
     <div class="card">
         <h5 class="card-header">
-            <button type="button" class="btn btn-info" onclick="location.href='{% url 'user_medical' %}';">
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_medical' %}';">
                 <i class="fas fa-notes-medical"></i>
                 {% trans "Ваши записи" %}
             </button>
@@ -149,7 +149,15 @@
                             <p class="card-text">{{ medical_note.short_text }}</p>
 
                               {% if medical_note.medical_note_tags %}
-                                    <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ medical_note.get_all_tags }}</h6>
+                                    <h6 class="card-subtitle mb-2 text-muted"><strong>
+                                        {% trans 'Теги' %}</strong>:
+
+                                          {% for tag in  medical_note.get_all_tags %}
+
+                                              <a href="{% url 'user_medical' tag %}" class="badge badge-pill badge-info">#{{ tag }}</a>
+
+                                          {% endfor %}
+                                    </h6>
                               {% endif %}
                           </div>
                         </div>

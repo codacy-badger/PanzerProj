@@ -167,7 +167,7 @@ class ExtendedMedicalNote(admin.ModelAdmin):
     # поля для поиска
     search_fields = ('id', 'user__user__id', 'user__user__username')
     # поля для фильтрации
-    list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined', 'medical_note_datetime')
+    list_filter = ('user__user__last_login', 'user__user__date_joined', 'medical_note_datetime', 'medical_note_show')
 
     def user_short(self, obj):
         return obj.user.user.username
@@ -182,7 +182,7 @@ class ExtendedUserDiary(admin.ModelAdmin):
     # поля для поиска
     search_fields = ('id', 'user__user__id', 'user__user__username')
     # поля для фильтрации
-    list_filter = ('user__user__is_active', 'user__user__last_login', 'user__user__date_joined', 'diary_note_datetime')
+    list_filter = ('diary_note_show', 'user__user__last_login', 'user__user__date_joined', 'diary_note_datetime')
 
     def user_short(self, obj):
         return obj.user.user.username

@@ -1,81 +1,73 @@
-{% block personal_area_profile %}
+{% block medical_notes %}
 {% load static %}
 {% load i18n %}
     <div class="page-header">
-        <h2>{% trans 'Ваши расценки' %}</h2>
+    <h2>
+    <i class="fas fa-notes-medical"></i>
+
+        {% trans "Ваши записи" %}
+        <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
+                data-target="#newMedicalNote">
+            <i class="fas fa-plus-square "></i>
+        </button></h2>
+
     </div>
     <hr>
     <div class="row" style="padding-bottom: 20px">
         <div class="col-12">
 
-            <div class="card">
-                <h5 class="card-header">{% trans "Расценки тренера" %}
-                    <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
-                            data-target="#priceEdit">
-                        <i class="fas fa-plus-square "></i>
-                    </button>
+        {% for note in user_medical_notes %}
+
+            <div class="card text-center">
+              <div class="card-header">
+                  <div style="float: left">
+                      {{ note.medical_note_datetime }}
+                  </div>
+                  <div style="float: right">
+                      {% for tag in  note.get_all_tags %}
+
+                          <a href="{% url 'user_medical' tag %}" class="badge badge-pill badge-info">#{{ tag }}</a>
+
+                      {% endfor %}
+                  </div>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">
+                    {{ note.medical_note_title }}
                 </h5>
-                <div class="card-body">
-                    {% if fitness_trainer_price %}
-                        <div style="overflow-x:auto;">
-                            <table class="table  table-striped table-bordered" id="trainer_prices_table">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th scope="col" hidden>№</th>
-                                    <th scope="col">{% trans "Цена/час" %}</th>
-                                    <th scope="col">{% trans "Валюта" %}</th>
-                                    <th scope="col">{% trans "Торг" %}</th>
-                                    <th scope="col">{% trans "Актуальность" %}</th>
-                                    <th scope="col">{% trans "Коментарий" %}</th>
-                                    <th scope="col">{% trans "Редактирование" %}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for price in fitness_trainer_price %}
-                                    <tr>
-                                        <td hidden>{{ price.id }}</td>
-                                        <td>{{ price.trainer_price_hour }}</td>
-                                        <td>{{ price.trainer_price_currency }}</td>
-                                        <td>
-                                            {% if price.trainer_price_bargaining %}
-                                                <p hidden>True</p>
-                                                <i class="fas fa-check-circle" style="color: green"></i>
-                                            {% else %}
-                                                <i class="fas fa-times-circle" style="color: red"></i>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if price.trainer_price_actuality %}
-                                                <p hidden>True</p>
-                                                <i class="fas fa-check-circle" style="color: green"></i>
-                                            {% else %}
-                                                <i class="fas fa-times-circle" style="color: red"></i>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ price.trainer_price_comment }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-outline-primary" id="price_edit_btn" data-toggle="modal"
-                                                    data-target="#priceEdit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        {% trans 'Нет активных расценок, добавьте.' %} <i class="fas fa-plus-square"></i>
-                    {% endif %}
-                </div>
+                <p class="card-text text-justify">{{ note.medical_note_text }}</p>
+
+              </div>
+              <div class="card-footer text-muted">
+                  <div style="float: left; margin-bottom: 0px" class="row">
+                          <button type="button" class="btn btn-secondary">
+                              <i class="fas fa-edit"></i>
+                              {% trans "Редактировать" %}
+                          </button>
+                  </div>
+
+                  <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input hidden name="medical_note_delete_id" value="{{ note.id }}">
+                      <button type="submit" class="btn btn-danger">
+                          <i class="fas fa-trash"></i>
+                          {% trans "Удалить" %}
+                      </button>
+                  </form>
+              </div>
             </div>
+
+        {% empty %}
+            {% trans 'Нет активных записей, добавьте.' %} <i class="fas fa-plus-square"></i>
+        {% endfor %}
+
         </div>
     </div>
-
         {% block price_edit %}
 
             {% include 'elements/modal/medical_note_modal.html' %}
 
         {% endblock %}
+
 
 {% endblock %}

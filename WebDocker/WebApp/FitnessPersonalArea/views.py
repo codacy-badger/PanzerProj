@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Count, Q
 from django.utils.timezone import now
+from django.http import HttpResponseRedirect
 
 from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, \
     ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
@@ -119,8 +120,11 @@ class ProfilePage(View):
                 'user_projection_photos': ProjectionPhoto.objects.filter(user = fitness_user).order_by('id')[:4],
                 'user_train_contracts': TrainingContract.objects.filter(contract_ward_user = fitness_user,
                                                                         contract_trainer_start = True),
-                'user_medical_notes': MedicalNote.objects.filter(user = fitness_user).order_by('-id')[:4],
-                'user_usual_notes': UserDiary.objects.filter(user = fitness_user).order_by('-id')[:4]
+
+                'user_medical_notes': MedicalNote.objects.filter(user = fitness_user,
+                                                                 medical_note_show = True).order_by('-id')[:4],
+                'user_usual_notes': UserDiary.objects.filter(user = fitness_user,
+                                                             diary_note_show = True).order_by('-id')[:4]
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
@@ -215,21 +219,48 @@ class UserMedicalView(View):
     UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей в дневник пользователя
     """
     content = {}
-    def get(self, request):
+    def get(self, request, tag = None):
         if request.user.is_authenticated:
             self.content.update({
                 'doc': 'pages/personal_area.html',
-                'private_doc': 'pages/trainer_prices.html',
+                'private_doc': 'pages/medical_notes.html',
                 'fitness_trainer': True,
-                'fitness_user': FitnessUser.objects.get(user = request.user),
-                'fitness_trainer_price': TrainerPrice.objects.filter(user__user__user = request.user,
-                                                                     trainer_price_show = True).
-                                order_by('id')})
+                'fitness_user': FitnessUser.objects.get(user = request.user)})
+
+            # ели был передан тег - выбираем записи с ним
+            if tag:
+                self.content.update({'user_medical_notes': MedicalNote.objects.filter(user__user = request.user,
+                                                                                      medical_note_show = True,
+                                                                                      medical_note_tags__name__in = [tag]).
+                                                                                      order_by('-id')})
+            # иначе все записи по порядку
+            else:
+                self.content.update({'user_medical_notes': MedicalNote.objects.filter(user__user = request.user,
+                                                                                      medical_note_show = True).
+                                                                                      order_by('-id')})
 
             return render(request, 'base.html', self.content)
 
-    def post(self, request):
+    def post(self, request, tag = None):
         self.ajax_content = {'answer': False}
+        # если пользователь хочет удалить пост
+        if 'medical_note_delete_id' in request.POST:
+            deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])
+            # проверяем, является ли удаляющий автором поста
+            if request.user == deleted_post.user.user:
+                # делаем пост невидимым для пользователя-автора
+                deleted_post.medical_note_show = False
+                deleted_post.save()
+
+                messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
+            else:
+                messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
+
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        """
+        Ajax запросы
+        """
         # проверка реквеста и авторизироанности пользователя
         if request.is_ajax() and request.user.is_authenticated:
             try:
@@ -240,7 +271,10 @@ class UserMedicalView(View):
                             user = FitnessUser.objects.get(user = request.user),
                             medical_note_title = request.POST['medical_note_title'],
                             medical_note_text = request.POST['medical_note_text'])
-                        new_medical_note.medical_note_tags.add(request.POST['medical_note_tags'])
+
+                        # добавляем теги к медицинской записи
+                        for tag in request.POST['medical_note_tags'].split(','):
+                            new_medical_note.medical_note_tags.add(tag.lower().strip())
                         new_medical_note.save()
 
                         self.ajax_content.update({'answer': True})
