@@ -118,8 +118,7 @@ class ProfilePage(View):
                                                     filter(schedule_date__gte = now()).order_by('schedule_date')[:6],
                 'user_projection_photos': ProjectionPhoto.objects.filter(user = fitness_user).order_by('id')[:4],
                 'user_train_contracts': TrainingContract.objects.filter(contract_ward_user = fitness_user,
-                                                                        contract_trainer_start = True,
-                                                                        contract_trainer_end = False),
+                                                                        contract_trainer_start = True),
                 'user_medical_notes': MedicalNote.objects.filter(user = fitness_user).order_by('-id')[:4],
                 'user_usual_notes': UserDiary.objects.filter(user = fitness_user).order_by('-id')[:4]
             })
@@ -131,12 +130,12 @@ class ProfilePage(View):
                                      'fitness_trainer_docs': TrainerDoc.objects.filter(
                                                                 user__user = fitness_user),
                                      'fitness_trainer_price': TrainerPrice.objects.filter(user__user = fitness_user,
-                                                                                          trainer_price_show = True).
+                                                                                          trainer_price_show = True,
+                                                                                          trainer_price_actuality = True).
                                                                                     order_by('trainer_price_currency'),
                                      'fitness_trainer_contracts': TrainingContract.objects.filter(
                                              contract_trainer_user = FitnessTrainer.objects.get(user = fitness_user),
-                                             contract_trainer_start = True,
-                                             contract_ward_end = False)
+                                             contract_trainer_start = True)
                                      })
 
             return render(request, 'base.html', self.content)
@@ -162,41 +161,100 @@ class ProfilePage(View):
                     print(err)
                     ajax_answer.update({'error_answer': _('Произошла ошибка!')})
 
-            # создаём новую запись в дневнике
-            if 'diary_note_text' in request.POST:
-                try:
-                    new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
-                                                              diary_note_title = request.POST['diary_note_title'],
-                                                              diary_note_text = request.POST['diary_note_text'])
-                    new_diary_note.diary_note_tags.add(request.POST['diary_note_tags'])
-                    new_diary_note.save()
-
-                    ajax_answer.update({'answer': True})
-
-                    messages.add_message(request, messages.SUCCESS, _('Запись создана'))
-                # TODO добавить логгирование ошибок
-                except Exception as err:
-                    print(err)
-                    ajax_answer.update({'error_answer': _('Произошла ошибка!')})
-
-            # создаём новую медицинскую запись запись в дневнике
-            if 'medical_note_text' in request.POST:
-                try:
-                    new_medical_note = MedicalNote.objects.create(user = FitnessUser.objects.get(user = request.user),
-                                                                medical_note_title = request.POST['medical_note_title'],
-                                                                medical_note_text = request.POST['medical_note_text'])
-                    new_medical_note.medical_note_tags.add(request.POST['medical_note_tags'])
-                    new_medical_note.save()
-
-                    ajax_answer.update({'answer': True})
-
-                    messages.add_message(request, messages.SUCCESS, _('Запись создана'))
-                # TODO добавить логгирование ошибок
-                except Exception as err:
-                    print(err)
-                    ajax_answer.update({'error_answer': _('Произошла ошибка!')})
-
             return JsonResponse(ajax_answer)
+
+
+# diary notes
+class UserDiaryView(View):
+    """
+    UserDiaryView отвечает за создание, редактирование и просмотр записей в дневник пользователя
+    """
+    content = {}
+    def get(self, request):
+        if request.user.is_authenticated:
+            self.content.update({
+                'doc': 'pages/personal_area.html',
+                'private_doc': 'pages/diary_notes.html',
+                'fitness_user': FitnessUser.objects.get(user = request.user),
+                'user_usual_notes': UserDiary.objects.filter(user__user = request.user).order_by('-id')})
+
+            return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        self.ajax_content = {'answer': False}
+        # проверка реквеста и авторизироанности пользователя
+        if request.is_ajax() and request.user.is_authenticated:
+            try:
+                # создаём новую запись в дневнике
+                if 'diary_note_text' in request.POST:
+                    try:
+                        new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
+                                                                  diary_note_title = request.POST['diary_note_title'],
+                                                                  diary_note_text = request.POST['diary_note_text'])
+                        new_diary_note.diary_note_tags.add(request.POST['diary_note_tags'])
+                        new_diary_note.save()
+
+                        self.ajax_content.update({'answer': True})
+
+                        messages.add_message(request, messages.SUCCESS, _('Запись создана'))
+                    # TODO добавить логгирование ошибок
+                    except Exception as err:
+                        print(err)
+                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+            # TODO добавить логгирование ошибок
+            except Exception as err:
+                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+            return JsonResponse(self.ajax_content)
+
+
+# medical notes
+class UserMedicalView(View):
+    """
+    UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей в дневник пользователя
+    """
+    content = {}
+    def get(self, request):
+        if request.user.is_authenticated:
+            self.content.update({
+                'doc': 'pages/personal_area.html',
+                'private_doc': 'pages/trainer_prices.html',
+                'fitness_trainer': True,
+                'fitness_user': FitnessUser.objects.get(user = request.user),
+                'fitness_trainer_price': TrainerPrice.objects.filter(user__user__user = request.user,
+                                                                     trainer_price_show = True).
+                                order_by('id')})
+
+            return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        self.ajax_content = {'answer': False}
+        # проверка реквеста и авторизироанности пользователя
+        if request.is_ajax() and request.user.is_authenticated:
+            try:
+                # создаём новую медицинскую запись запись в дневнике
+                if 'medical_note_text' in request.POST:
+                    try:
+                        new_medical_note = MedicalNote.objects.create(
+                            user = FitnessUser.objects.get(user = request.user),
+                            medical_note_title = request.POST['medical_note_title'],
+                            medical_note_text = request.POST['medical_note_text'])
+                        new_medical_note.medical_note_tags.add(request.POST['medical_note_tags'])
+                        new_medical_note.save()
+
+                        self.ajax_content.update({'answer': True})
+
+                        messages.add_message(request, messages.SUCCESS, _('Запись создана'))
+                    # TODO добавить логгирование ошибок
+                    except Exception as err:
+                        print(err)
+                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+            # TODO добавить логгирование ошибок
+            except Exception as err:
+                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+            return JsonResponse(self.ajax_content)
 
 
 # registration

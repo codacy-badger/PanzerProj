@@ -129,9 +129,11 @@
 
 
     <div class="card">
-        <h5 class="card-header"><i class="fas fa-notes-medical"></i>
-            {% trans "Ваши записи" %}
-
+        <h5 class="card-header">
+            <button type="button" class="btn btn-info" onclick="location.href='{% url 'user_medical' %}';">
+                <i class="fas fa-notes-medical"></i>
+                {% trans "Ваши записи" %}
+            </button>
             <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
                     data-target="#newMedicalNote">
                 <i class="fas fa-plus-square "></i>
@@ -168,9 +170,10 @@
 
     <div class="card">
         <h5 class="card-header">
-            <i class="fas fa-book-open"></i>
-            {% trans "Ваш дневник" %}
-
+            <button type="button" class="btn btn-info" onclick="location.href='{% url 'user_diary' %}';">
+                <i class="fas fa-book-open"></i>
+                {% trans "Ваш дневник" %}
+            </button>
             <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
                     data-target="#newDiaryNote">
                 <i class="fas fa-plus-square "></i>
@@ -217,22 +220,21 @@
                 <div class="row">
                     {% for contract in user_train_contracts %}
                         <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card"
-                                 style="width: 17rem;
-                                        height: 250px;
-                                        background-color:
+                            <div class="card
                                         {% if not contract.contract_trainer_start %}
-                                            #ff0000ad;
+                                            bg-danger"
                                         {% elif not contract.contract_ward_start %}
-                                             #ff0000ad;
+                                             bg-danger"
                                         {% elif not contract.contract_trainer_end and not contract.contract_ward_end %}
-                                             #008000c4;
+                                             bg-success"
+                                        {% elif contract.contract_ward_end and not contract.contract_trainer_end %}
+                                              bg-info"
                                         {% else %}
-                                            #ff8f00a3;
+                                            bg-warning"
                                         {% endif %}
 
 
-                                         ">
+                                 style="width: 17rem; height: 250px;">
                                 <div class="card-body">
                                     <p class="card-text"><strong>{% trans 'Тренер' %}</strong>: {{ contract.contract_trainer_user.user.user.first_name }} {{ contract.contract_trainer_user.user.user.last_name }}</p>
                                     <p class="card-text"><strong>{% trans 'Подопечный' %}</strong>: {{ contract.contract_ward_user.user.first_name }} {{ contract.contract_ward_user.user.last_name }}</p>
@@ -372,22 +374,22 @@
                 <div class="row">
                     {% for contract in fitness_trainer_contracts %}
                         <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card"
-                                 style="width: 17rem;
-                                        height: 250px;
-                                        background-color:
+                            <div class="card
                                         {% if not contract.contract_trainer_start %}
-                                            #ff0000ad;
+                                            bg-danger"
                                         {% elif not contract.contract_ward_start %}
-                                             #ff0000ad;
+                                             bg-danger"
                                         {% elif not contract.contract_trainer_end and not contract.contract_ward_end %}
-                                             #008000c4;
+                                             bg-success"
+                                        {% elif contract.contract_ward_end and not contract.contract_trainer_end %}
+                                              bg-info"
                                         {% else %}
-                                            #ff8f00a3;
+                                            bg-warning"
                                         {% endif %}
 
 
-                                         ">
+                                    style="width: 17rem;
+                                        height: 250px;">
                                 <div class="card-body">
                                     <p class="card-text"><strong>{% trans 'Тренер' %}</strong>: {{ contract.contract_trainer_user.user.user.first_name }} {{ contract.contract_trainer_user.user.user.last_name }}</p>
                                     <p class="card-text"><strong>{% trans 'Подопечный' %}</strong>: {{ contract.contract_ward_user.user.first_name }} {{ contract.contract_ward_user.user.last_name }}</p>

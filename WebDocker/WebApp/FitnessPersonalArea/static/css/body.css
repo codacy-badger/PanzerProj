@@ -9,3 +9,6 @@ body{
 a.social_button{
   text-decoration: none
 }
+.card{
+    margin-bottom: 10px;
+}

@@ -15,6 +15,12 @@ urlpatterns = [
     # личный кабинет
     path('personal/', views.ProfilePage.as_view(), name='personal_area'),
     path('personal/profile/', views.ProfilePage.as_view(), name='personal_profile'),
+    # редактирование, создание и просмотр расценок тренера
+    path('trainer-price/', views.TrainerPriceView.as_view(), name='trainer_price'),
+    # редактирование, создание и просмотр записей в дневнике пользователя
+    path('diary-notes/', views.UserDiaryView.as_view(), name='user_diary'),
+    # редактирование, создание и просмотр медицинских записей в дневнике пользователя
+    path('medical-notes/', views.UserMedicalView.as_view(), name='user_medical'),
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),
     # смена языка
@@ -27,8 +33,6 @@ urlpatterns = [
     path('username-check/', views.UsernameCheckAjax.as_view(), name='username_check'),
     # проверка имени пользователя на занятость
     path('email-check/', views.EmailCheckAjax.as_view(), name='email_check'),
-    # редактирование расценок тренера
-    path('trainer-price/', views.TrainerPriceView.as_view(), name='trainer_price'),
 ]
 
 if settings.DEBUG:

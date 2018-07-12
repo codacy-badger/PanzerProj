@@ -2,8 +2,8 @@
 {% load static %}
 {% load i18n %}
     <!-- The Modal -->
-    <div class="modal fade" id="descriptionEdit">
-        <div class="modal-dialog">
+    <div class="modal fade bd-example-modal-lg" id="descriptionEdit">
+        <div class="modal-dialog   modal-lg">
             <div class="modal-content">
 
                 <!-- Modal Header -->
@@ -30,7 +30,7 @@
                             <li class="list-group-item small_text">
                                 <strong>
                                     {% trans "Описание тренера"%}
-                                </strong>: <textarea type="text" name="trainer_description"  maxlength="5000" required> {{ fitness_trainer.trainer_description }} </textarea></li>
+                                </strong>: <textarea class="form-control" type="text" name="trainer_description"  maxlength="5000" required> {{ fitness_trainer.trainer_description }} </textarea></li>
                         </ul>
                     </div>
 

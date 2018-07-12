@@ -1,0 +1,46 @@
+{% block personal_area_profile %}
+{% load static %}
+{% load i18n %}
+    <div class="page-header">
+        <h2>{% trans "Ваш дневник" %}
+        <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
+                data-target="#newDiaryNote">
+            <i class="fas fa-plus-square "></i>
+        </button></h2>
+    </div>
+    <hr>
+    <div class="row" style="padding-bottom: 20px">
+        <div class="col-12">
+
+        {% for note in user_usual_notes %}
+
+            <div class="card text-center">
+              <div class="card-header">
+                {{ note.get_all_tags }}
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">
+                    {{ note.diary_note_title }}
+                </h5>
+                <p class="card-text text-justify">{{ note.diary_note_text }}</p>
+
+              </div>
+              <div class="card-footer text-muted">
+                {{ note.diary_note_datetime }}
+              </div>
+            </div>
+
+        {% empty %}
+            {% trans 'Нет активных расценок, добавьте.' %} <i class="fas fa-plus-square"></i>
+        {% endfor %}
+
+        </div>
+    </div>
+        {% block price_edit %}
+
+            {% include 'elements/modal/diary_note_modal.html' %}
+
+        {% endblock %}
+
+
+{% endblock %}

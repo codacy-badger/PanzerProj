@@ -2,8 +2,8 @@
 {% load static %}
 {% load i18n %}
     <!-- The Modal -->
-    <div class="modal fade" id="newDiaryNote">
-        <div class="modal-dialog">
+    <div class="modal fade bd-example-modal-lg" id="newDiaryNote">
+        <div class="modal-dialog  modal-lg">
             <div class="modal-content">
 
                 <!-- Modal Header -->
@@ -23,7 +23,7 @@
                             <dd class="col-sm-8"><input type="text" required name="diary_note_title" maxlength="100"></dd>
 
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Текст записи"%}</dt>
-                            <dd class="col-sm-8"><textarea type="text" name="diary_note_text"  maxlength="4000" required></textarea></dd>
+                            <dd class="col-sm-8"><textarea class="form-control" type="text" name="diary_note_text"  maxlength="4000" required></textarea></dd>
 
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Теги записи, через запятую"%}</dt>
                             <dd class="col-sm-8"><input type="text" required name="diary_note_tags" maxlength="20"></dd>
@@ -44,7 +44,7 @@
     $("#new_diary_note").submit(function(e) {
         $.ajax({
             type: "POST",
-            url: "{% url 'personal_profile' %}",
+            url: "{% url 'user_diary' %}",
             data: $("#new_diary_note").serialize(), // serializes the form's elements.
             success: function(data)
             {

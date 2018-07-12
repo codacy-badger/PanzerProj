@@ -23,11 +23,11 @@
                         {% trans "Записи" %}
                     </a>
                     <div class="collapse" id="menuNotes" data-parent="#menuProfile">
-                        <a href="" class="list-group-item button">
+                        <a href="{% url 'user_medical' %}" class="list-group-item button">
                             <i class="fas fa-notes-medical"></i>
                             {% trans "Медицинские" %}
                         </a>
-                        <a href="" class="list-group-item button" >
+                        <a href="{% url 'user_diary' %}" class="list-group-item button" >
                             <i class="fas fa-book-open"></i>
                             {% trans "Дневник" %}
                         </a>
@@ -40,7 +40,7 @@
                     </a>
 
 
-                    {% if fitness_trainer %}
+                    {% if fitness_user.fitness_user_type == 'TRN' %}
                         <a class="list-group-item button" href="{% url 'trainer_price' %}" >
                             <i class="fas fa-dollar-sign"></i>
                             {% trans "Расценки" %}
