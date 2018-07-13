@@ -5,7 +5,7 @@
         <h2>
             <i class="fas fa-book-open"></i>
             {% trans "Ваш дневник" %}
-        <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
+        <button type="button" class="btn btn-light" id="new_diary_note" data-toggle="modal"
                 data-target="#newDiaryNote">
             <i class="fas fa-plus-square "></i>
         </button></h2>
@@ -18,10 +18,10 @@
 
             <div class="card text-center">
               <div class="card-header">
-                  <div style="float: left">
+                  <div style="float: left" class="datetime">
                       {{ note.diary_note_datetime }}
                   </div>
-                  <div style="float: right">
+                  <div style="float: right" class="tags">
                       {% for tag in  note.get_all_tags %}
 
                           <a href="{% url 'user_diary' tag %}" class="badge badge-pill badge-info">#{{ tag }}</a>
@@ -42,12 +42,13 @@
                       <form style="margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
                           {% csrf_token %}
                           <input hidden name="diary_note_share_id" value="{{ note.id }}">
-                          <button type="button" disabled class="btn btn-primary" name="edit_post">
+                          <button type="button" disabled class="btn btn-primary" name="share_post">
                               <i class="fas fa-bullhorn"></i>
                               {% trans "Расшарить" %}
                           </button>
                       </form>
-                          <button type="button" class="btn btn-secondary">
+                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
+                                  data-target="#newDiaryNote">
                               <i class="fas fa-edit"></i>
                               {% trans "Редактировать" %}
                           </button>
@@ -75,6 +76,31 @@
             {% include 'elements/modal/diary_note_modal.html' %}
 
         {% endblock %}
+
+    <script>
+        jQuery(document).ready(function(){
+            $( "button.btn.btn-secondary.edit" ).click(function() {
+                var diary_dom = $(this).closest("div.card.text-center");
+
+                var diary_tags = diary_dom.find('.card-header').find('.tags');
+
+                var diary_title = diary_dom.find('.card-body').find('.card-title');
+                var diary_text = diary_dom.find('.card-body').find('.card-text.text-justify');
+
+                $("#diary_note_tags_id").val($.trim(diary_tags.text()).replace(/ +(?= )/g,'').replace(/[#]/g, '').replace(/\s+/g, ', '));
+                $("#diary_note_title_id").val($.trim(diary_title.text()));
+                $("#diary_note_text_id").val(diary_text.text());
+            });
+
+            $("#new_diary_note").click(function(){
+
+                $("#diary_note_tags_id").val("");
+                $("#diary_note_title_id").val("");
+                $("#diary_note_text_id").val("");
+
+            });
+        });
+    </script>
 
 
 {% endblock %}
