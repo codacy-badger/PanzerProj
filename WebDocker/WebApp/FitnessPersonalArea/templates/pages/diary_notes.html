@@ -1,8 +1,10 @@
-{% block personal_area_profile %}
+{% block medical_notes %}
 {% load static %}
 {% load i18n %}
     <div class="page-header">
-        <h2>{% trans "Ваш дневник" %}
+        <h2>
+            <i class="fas fa-book-open"></i>
+            {% trans "Ваш дневник" %}
         <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
                 data-target="#newDiaryNote">
             <i class="fas fa-plus-square "></i>
@@ -16,7 +18,16 @@
 
             <div class="card text-center">
               <div class="card-header">
-                {{ note.get_all_tags }}
+                  <div style="float: left">
+                      {{ note.diary_note_datetime }}
+                  </div>
+                  <div style="float: right">
+                      {% for tag in  note.get_all_tags %}
+
+                          <a href="{% url 'user_diary' tag %}" class="badge badge-pill badge-info">#{{ tag }}</a>
+
+                      {% endfor %}
+                  </div>
               </div>
               <div class="card-body">
                 <h5 class="card-title">
@@ -26,7 +37,30 @@
 
               </div>
               <div class="card-footer text-muted">
-                {{ note.diary_note_datetime }}
+                  <div style="float: left; margin-bottom: 0px" class="row">
+
+                      <form style="margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <input hidden name="diary_note_share_id" value="{{ note.id }}">
+                          <button type="button" disabled class="btn btn-primary" name="edit_post">
+                              <i class="fas fa-bullhorn"></i>
+                              {% trans "Расшарить" %}
+                          </button>
+                      </form>
+                          <button type="button" class="btn btn-secondary">
+                              <i class="fas fa-edit"></i>
+                              {% trans "Редактировать" %}
+                          </button>
+                  </div>
+
+                  <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input hidden name="diary_note_delete_id" value="{{ note.id }}">
+                      <button type="submit" class="btn btn-danger">
+                          <i class="fas fa-trash"></i>
+                          {% trans "Удалить" %}
+                      </button>
+                  </form>
               </div>
             </div>
 

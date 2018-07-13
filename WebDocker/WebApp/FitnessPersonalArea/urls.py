@@ -20,6 +20,9 @@ urlpatterns = [
 
     # редактирование, создание и просмотр записей в дневнике пользователя
     path('diary-notes/', views.UserDiaryView.as_view(), name='user_diary'),
+    # просмотр записей в дневнике по определённому тегу
+    path('diary-notes/tag-<str:tag>', views.UserDiaryView.as_view(), name='user_diary'),
+
     # редактирование, создание и просмотр медицинских записей в дневнике пользователя
     path('medical-notes/', views.UserMedicalView.as_view(), name='user_medical'),
     # просмотр медицинских записей в дневнике по определённому тегу

@@ -174,18 +174,48 @@ class UserDiaryView(View):
     UserDiaryView отвечает за создание, редактирование и просмотр записей в дневник пользователя
     """
     content = {}
-    def get(self, request):
+    def get(self, request, tag = None):
         if request.user.is_authenticated:
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/diary_notes.html',
-                'fitness_user': FitnessUser.objects.get(user = request.user),
-                'user_usual_notes': UserDiary.objects.filter(user__user = request.user).order_by('-id')})
+                'fitness_user': FitnessUser.objects.get(user = request.user)})
+
+            # ели был передан тег - выбираем записи с ним
+            if tag:
+                self.content.update({'user_usual_notes': UserDiary.objects.filter(user__user = request.user,
+                                                                                  diary_note_show = True,
+                                                                                  diary_note_tags__name__in = [tag]).
+                                                                                  order_by('-id')})
+            # иначе все записи по порядку
+            else:
+                self.content.update({'user_usual_notes': UserDiary.objects.filter(user__user = request.user,
+                                                                                  diary_note_show = True).
+                                                                                  order_by('-id')})
 
             return render(request, 'base.html', self.content)
 
-    def post(self, request):
+    def post(self, request, tag = None):
         self.ajax_content = {'answer': False}
+        # если пользователь хочет удалить пост
+        if 'diary_note_delete_id' in request.POST:
+            deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
+            # проверяем, является ли удаляющий автором поста
+            if request.user == deleted_post.user.user:
+                # делаем пост невидимым для пользователя-автора
+                deleted_post.diary_note_show = False
+                deleted_post.save()
+
+                messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
+            else:
+                messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
+
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+        """
+        Ajax запросы
+        """
         # проверка реквеста и авторизироанности пользователя
         if request.is_ajax() and request.user.is_authenticated:
             try:
@@ -195,7 +225,9 @@ class UserDiaryView(View):
                         new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
                                                                   diary_note_title = request.POST['diary_note_title'],
                                                                   diary_note_text = request.POST['diary_note_text'])
-                        new_diary_note.diary_note_tags.add(request.POST['diary_note_tags'])
+                        # добавляем теги к записи в дневнике
+                        for tag in request.POST['diary_note_tags'].split(','):
+                            new_diary_note.diary_note_tags.add(tag.lower().strip())
                         new_diary_note.save()
 
                         self.ajax_content.update({'answer': True})

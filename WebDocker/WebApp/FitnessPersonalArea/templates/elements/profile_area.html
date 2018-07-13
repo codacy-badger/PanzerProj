@@ -90,7 +90,16 @@
                                 <p class="card-text">{% trans 'С' %} {{ train.schedule_train_start }} {% trans 'до' %} {{ train.schedule_train_end }} <i class="fas fa-clock"></i></p>
 
                                 {% if train.get_all_tags %}
-                                    <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ train.get_all_tags }}</h6>
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        <strong>{% trans 'Теги' %}</strong>:
+
+                                          {% for tag in  train.get_all_tags %}
+
+                                              <a href="#" class="badge badge-pill badge-info">#{{ tag }}</a>
+
+                                          {% endfor %}
+
+                                    </h6>
                                 {% endif %}
 
                             </div>
@@ -178,7 +187,7 @@
 
     <div class="card">
         <h5 class="card-header">
-            <button type="button" class="btn btn-info" onclick="location.href='{% url 'user_diary' %}';">
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_diary' %}';">
                 <i class="fas fa-book-open"></i>
                 {% trans "Ваш дневник" %}
             </button>
@@ -198,7 +207,15 @@
                             <p class="card-text">{{ usual_note.short_text }}</p>
 
                               {% if usual_note.diary_note_tags %}
-                                    <h6 class="card-subtitle mb-2 text-muted"><strong>{% trans 'Теги' %}</strong>: {{ usual_note.get_all_tags }}</h6>
+                                    <h6 class="card-subtitle mb-2 text-muted"><strong>
+                                        {% trans 'Теги' %}</strong>:
+
+                                          {% for tag in  usual_note.get_all_tags %}
+
+                                              <a href="{% url 'user_diary' tag %}" class="badge badge-pill badge-info">#{{ tag }}</a>
+
+                                          {% endfor %}
+                                    </h6>
                               {% endif %}
 
                           </div>
@@ -306,7 +323,7 @@
 
         <div class="card">
             <h5 class="card-header">
-                    <button type="button" class="btn btn-info" onclick="location.href='{% url 'trainer_price' %}';">
+                    <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_price' %}';">
                         {% trans "Расценки тренера" %}
                     </button>
                 <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"

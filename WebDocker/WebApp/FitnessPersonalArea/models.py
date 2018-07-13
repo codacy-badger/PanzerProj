@@ -398,6 +398,7 @@ class UserDiary(models.Model):
     diary_note_text - текст записи
     diary_note_datetime - дата и время создания записи
     diary_note_tags - теги для записи
+    diary_note_show - скрыть запись, если пользователь удалил её
     """
     user = models.ForeignKey(FitnessUser, on_delete=models.CASCADE)
     # note title
@@ -408,6 +409,8 @@ class UserDiary(models.Model):
     diary_note_datetime = models.DateTimeField(default=now)
     # medical tags
     diary_note_tags = TaggableManager(blank=True)
+    # show/hide if user delete diary note
+    diary_note_show = models.BooleanField(default = True)
 
     def short_title(self):
         return self.diary_note_title if len(self.diary_note_title) < 30 else self.diary_note_title[:30]+' ...'
