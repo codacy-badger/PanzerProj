@@ -2,7 +2,14 @@
 {% load static %}
 {% load i18n %}
     <div class="page-header">
-        <h2>{% trans 'Ваши расценки' %}</h2>
+        <h2>
+            <i class="fas fa-dollar-sign"></i>
+            {% trans 'Ваши расценки' %}
+                    <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
+                            data-target="#priceEdit">
+                        <i class="fas fa-plus-square "></i>
+                    </button>
+        </h2>
     </div>
     <hr>
     <div class="row" style="padding-bottom: 20px">
