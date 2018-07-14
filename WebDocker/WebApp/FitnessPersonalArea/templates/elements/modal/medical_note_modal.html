@@ -3,7 +3,7 @@
 {% load i18n %}
     <!-- The Modal -->
     <div class="modal fade  bd-example-modal-lg" id="newMedicalNote">
-        <div class="modal-dialog   modal-lg"">
+        <div class="modal-dialog   modal-lg">
             <div class="modal-content">
 
                 <!-- Modal Header -->
@@ -20,13 +20,13 @@
                     <div class="modal-body">
                         <dl class="row">
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название записи"%}</dt>
-                            <dd class="col-sm-8"><input type="text" required name="medical_note_title" maxlength="100"></dd>
+                            <dd class="col-sm-8"><input type="text" required id="medical_note_title_id" name="medical_note_title" maxlength="100"></dd>
 
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Текст записи"%}</dt>
-                            <dd class="col-sm-8"><textarea class="form-control" type="text" name="medical_note_text"  maxlength="4000" required></textarea></dd>
+                            <dd class="col-sm-8"><textarea class="form-control" id="medical_note_text_id" type="text" name="medical_note_text"  maxlength="4000" required></textarea></dd>
 
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Теги записи, через запятую"%}</dt>
-                            <dd class="col-sm-8"><input type="text" required name="medical_note_tags" maxlength="50"></dd>
+                            <dd class="col-sm-8"><input type="text" required id="medical_note_tags_id" name="medical_note_tags" maxlength="50"></dd>
                         </dl>
                     </div>
 

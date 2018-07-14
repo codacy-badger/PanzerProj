@@ -175,6 +175,7 @@ class UserDiaryView(View):
     """
     content = {}
     def get(self, request, tag = None):
+        print(request.GET)
         if request.user.is_authenticated:
             self.content.update({
                 'doc': 'pages/personal_area.html',
@@ -195,7 +196,10 @@ class UserDiaryView(View):
 
             return render(request, 'base.html', self.content)
 
+
     def post(self, request, tag = None):
+        print(request.POST)
+        print(request.is_ajax())
         self.ajax_content = {'answer': False}
         # если пользователь хочет удалить пост
         if 'diary_note_delete_id' in request.POST:
@@ -274,6 +278,7 @@ class UserMedicalView(View):
             return render(request, 'base.html', self.content)
 
     def post(self, request, tag = None):
+        print(request.POST)
         self.ajax_content = {'answer': False}
         # если пользователь хочет удалить пост
         if 'medical_note_delete_id' in request.POST:

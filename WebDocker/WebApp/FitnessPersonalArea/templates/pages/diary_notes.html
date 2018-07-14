@@ -5,7 +5,7 @@
         <h2>
             <i class="fas fa-book-open"></i>
             {% trans "Ваш дневник" %}
-        <button type="button" class="btn btn-light" id="new_diary_note" data-toggle="modal"
+        <button type="button" class="btn btn-light" id="create_diary_note" data-toggle="modal"
                 data-target="#newDiaryNote">
             <i class="fas fa-plus-square "></i>
         </button></h2>
@@ -92,7 +92,7 @@
                 $("#diary_note_text_id").val(diary_text.text());
             });
 
-            $("#new_diary_note").click(function(){
+            $("#create_diary_note").click(function(){
 
                 $("#diary_note_tags_id").val("");
                 $("#diary_note_title_id").val("");
