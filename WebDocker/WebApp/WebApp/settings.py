@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     # social
     'social_django',
     # tags
-    'taggit'
+    'taggit',
+    # geolocation
+    'django.contrib.gis',
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -102,13 +104,13 @@ WSGI_APPLICATION = 'WebApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'fitness_db',
         'USER': 'fitness_admin',
         'PASSWORD': 'veryhardpass',
         'HOST': '127.0.0.1',
         'PORT': '5432',
-    }
+    },
 }
 
 

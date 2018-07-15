@@ -1,8 +1,7 @@
 import os
 
 from django.contrib.auth.models import Group, User, BaseUserManager, AbstractBaseUser
-from django.contrib.postgres.fields import JSONField
-from django.db import models
+from django.contrib.gis.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
@@ -188,8 +187,8 @@ class TrainGym(models.Model):
     gym_name - название зала
     gym_description - описание зала
     gym_destination - место расположения зала (страна/город/улица)
-    gym_geolocation - точка на карте(json с ключами: latitude/longitude) на которой находится зал
-                      (выбирается на гугл-карте, автоматически заполняется `gym_destination` и `gym_name`)
+    gym_geo - точка на карте(latitude/longitude) на которой находится зал
+                      (выбирается на карте, автоматически заполняется `gym_destination` и `gym_name`)
     """
     user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
     # gym name
@@ -198,8 +197,8 @@ class TrainGym(models.Model):
     gym_description = models.TextField(max_length=1000)
     # gym destination
     gym_destination = models.CharField(max_length=100)
-    # gym geolocation (latitude/longitude)
-    gym_geolocation = JSONField(db_index=True, default={'latitude': float(), 'longitude': float()})
+    # gym geo (latitude/longitude)
+    gym_geo = models.PointField(geography=True, blank=True, null=True)
 
     def __str__(self):
         return f'User: {self.user.user.username}; Gym: {self.gym_short_name()}'
