@@ -12,9 +12,12 @@ from django.db.models import Count, Q
 from django.utils.timezone import now
 from django.http import HttpResponseRedirect
 
+from geopy.geocoders import GoogleV3
+
 from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, \
     ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
 
+from .forms import NewGym
 
 # log in
 class LoginPage(View):
@@ -166,6 +169,30 @@ class ProfilePage(View):
                     ajax_answer.update({'error_answer': _('Произошла ошибка!')})
 
             return JsonResponse(ajax_answer)
+
+
+# gym destinations
+class GymView(View):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        # TODO добавить задание всех полей для создания зала
+        new_gym_form = NewGym()
+        if new_gym_form.is_valid():
+            new_gym = TrainGym()
+            # если заполнен адрес - получаем точку размещения данного места
+            if 'gym_destination' in new_gym_form:
+                # адрес в локацию (долготу/широту)
+                new_gym_location = GoogleV3().geocode(new_gym_form.cleaned_data['gym_destination'])
+                new_gym.gym_geo = new_gym_location
+                new_gym.save()
+            elif 'gym_geo' in new_gym_form:
+                # локацию (долготу/широту) в адрес
+                new_gym_destination = GoogleV3().reverse(new_gym_form.cleaned_data['gym_destination'])
+                new_gym.gym_destination = new_gym_destination
+                new_gym.save()
+
 
 
 # diary notes
