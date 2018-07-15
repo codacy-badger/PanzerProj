@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib.gis import admin
 from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
@@ -79,9 +79,9 @@ class ExtendedTrainerPrice(admin.ModelAdmin):
 
 
 #  класс для кастомизации модели ExtendedTrainGym (раширения модели для описания зала)
-class ExtendedTrainGym(admin.ModelAdmin):
+class ExtendedTrainGym(admin.OSMGeoAdmin):
     # поля, отображаемые в модели
-    list_display = ('user_short', 'gym_short_name', 'gym_short_description', 'gym_destination')
+    list_display = ('user_short', 'gym_short_name', 'gym_short_description', 'gym_destination', 'gym_geo')
     # поля для поиска
     search_fields = ('id', 'user__user__id', 'user__user__username', 'gym_name', 'gym_description', 'gym_destination')
     # поля для фильтрации
