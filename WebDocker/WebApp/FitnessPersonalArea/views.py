@@ -212,15 +212,22 @@ class UserDiaryView(View):
 
             # ели был передан тег - выбираем записи с ним
             if tag:
-                self.content.update({'user_usual_notes': UserDiary.objects.filter(user__user = request.user,
-                                                                                  diary_note_show = True,
-                                                                                  diary_note_tags__name__in = [tag]).
-                                                                                  order_by('-id')})
-            # иначе все записи по порядку
+                # пагинация по 5 записей c выбранным тегом на страницу и с минимумом на последней - 2
+                paginate_view = Paginator(UserDiary.objects.filter(user__user = request.user,
+                                                                   diary_note_show = True,
+                                                                   diary_note_tags__name__in = [tag]).order_by('-id'),
+                                          5, orphans = 2)
+
             else:
-                self.content.update({'user_usual_notes': UserDiary.objects.filter(user__user = request.user,
-                                                                                  diary_note_show = True).
-                                                                                  order_by('-id')})
+                # пагинация по 5 записей на страницу и с минимумом на последней - 2
+                paginate_view = Paginator(UserDiary.objects.filter(user__user = request.user,
+                                                                   diary_note_show = True).order_by('-id'),
+                                          5, orphans = 2)
+
+            # получаем номер страницы для отображения
+            page = request.GET.get('page')
+            # получаем набор данных для данной страницы
+            self.content.update({'user_usual_notes': paginate_view.get_page(page)})
 
             return render(request, 'base.html', self.content)
 
