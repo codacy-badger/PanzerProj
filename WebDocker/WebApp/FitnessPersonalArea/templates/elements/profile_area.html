@@ -508,4 +508,64 @@
         });
 
         </script>
+
+        <script type="text/python">
+            from browser import document as doc, alert, ajax, window, html
+            import json
+            import urllib
+        
+            csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+        
+            # fill modal window data
+            def fill_diary_modal(response):
+                # clean inputs
+                doc["diary_note_modal_title"].text = ''
+                doc["diary_note_modal_text"].text = ''
+                doc["diary_note_modal_datetime"].text = ''
+                doc["diary_note_modal_tags"].text = ''
+
+                # insert new data
+                doc['diary_note_modal_title'] <= response['diary_note_title']
+                doc['diary_note_modal_text'] <= response['diary_note_text']
+                doc['diary_note_modal_datetime'] <= response['diary_note_datetime']
+                for tag in response['diary_note_tags']:
+                    # crete new <a> element and set class (for tags)
+                    link = html.A(Class = "badge badge-pill badge-info")
+                    # add href fro tags
+                    link.href = "{% url 'user_diary' %}tag-"+tag
+                    # add text to <a>
+                    link <= "#"+tag
+
+                    # add <a> to HTML element
+                    doc['diary_note_modal_tags'] <= link
+
+            def on_complete(req):
+                json_response = json.loads(req.text)
+                # if NOT success geting data
+                if req.status!=200 and json_response['answer']!=True:
+                    alert(json_response['error_answer'])
+                else:
+                    fill_diary_modal(json_response['diary_note'])
+                        
+            def get_data(ev):
+                # get diary note ID and set to GET request param
+                qs = "diary_note_id="+ev.currentTarget.value
+
+                req = ajax.ajax()
+                req.bind('complete',on_complete)
+                # send a POST request to the url
+                req.open("GET","{% url 'user_diary' %}"+"?"+qs,True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+
+                req.send()
+        
+            # bind all objects to func
+            for element in doc.select('.btn.btn-link.view_diary'):
+                element.bind("click", get_data)
+        
+        </script>
 {% endblock %}

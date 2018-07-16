@@ -12,6 +12,7 @@ from django.db.models import Count, Q
 from django.utils.timezone import now
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
+from django.core.serializers import serialize
 
 
 from geopy.geocoders import GoogleV3
@@ -202,9 +203,31 @@ class UserDiaryView(View):
     UserDiaryView отвечает за создание, редактирование и просмотр записей в дневник пользователя
     """
     content = {}
+    ajax_content = {'answer': False}
 
     def get(self, request, tag = None):
         if request.user.is_authenticated:
+            # если ajax запрос на получение полной информации о записи в дневнике
+            if request.is_ajax() and request.GET['diary_note_id']:
+                try:
+                    diary_note = UserDiary.objects.get(id = request.GET['diary_note_id'])
+
+                    self.ajax_content.update({'answer': True})
+                    self.ajax_content['diary_note'] = {
+                                                        'diary_note_tags': diary_note.get_all_tags(),
+                                                        'diary_note_text': diary_note.diary_note_text,
+                                                        'diary_note_title': diary_note.diary_note_title,
+                                                        'diary_note_datetime': diary_note.diary_note_datetime.strftime("%d %B %Y %H:%M"),
+                                                      }
+
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                finally:
+                    return JsonResponse(self.ajax_content)
+
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/diary_notes.html',
@@ -233,7 +256,6 @@ class UserDiaryView(View):
 
     def post(self, request, tag = None):
         if request.user.is_authenticated:
-            self.ajax_content = {'answer': False}
             # если пользователь хочет удалить пост
             if 'diary_note_delete_id' in request.POST:
                 deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
@@ -306,7 +328,8 @@ class UserDiaryView(View):
                     print(err)
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-                return JsonResponse(self.ajax_content)
+                finally:
+                    return JsonResponse(self.ajax_content)
 
 
 # medical notes
