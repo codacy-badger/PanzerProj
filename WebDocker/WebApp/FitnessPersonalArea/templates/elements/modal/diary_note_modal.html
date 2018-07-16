@@ -2,40 +2,6 @@
 {% load static %}
 {% load i18n %}
 
-<script type="text/python">
-    from browser import document as doc, alert, ajax
-
-    csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
-    print(csrf_token)
-
-    def on_complete(req):
-        if req.status==200 or req.status==0:
-            doc["result"].html = req.text
-        else:
-            doc["result"].html = "error "+req.text
-
-
-    def post_request(url="{% url 'user_diary' %}", method="POST"):
-        req = ajax.ajax()
-        req.bind('complete',on_complete)
-        # send a POST request to the url
-        req.open(method,url,True)
-        # set headers
-        req.set_header('content-type','application/x-www-form-urlencoded')
-        req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
-        req.set_header('X-Requested-With', 'XMLHttpRequest')
-
-        # get form data
-        diary_note_title = doc['diary_note_title_id'].text
-        diary_note_text = doc['diary_note_text_id'].text
-        diary_note_tags = doc['diary_note_tags_id'].text
-
-        # send data as a dictionary
-        req.send({'csrfmiddlewaretoken':csrf_token, 'diary_note_title': diary_note_title, 'diary_note_text': diary_note_text, 'diary_note_tags': diary_note_tags })
-
-    doc["new_diary_note_btn"].bind("click", post_request)
-
-</script>
     <!-- The Modal -->
     <div class="modal fade bd-example-modal-lg" id="newDiaryNote">
         <div class="modal-dialog  modal-lg">
@@ -49,7 +15,7 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
-                <form name="new_diary_note" method="post" action="" id="new_diary_note" enctype="multipart/form-data">
+                <form name="new_diary_note_form" method="post" action="" id="new_diary_note_form_id" enctype="multipart/form-data">
                     {% csrf_token %}
                     <!-- Modal body -->
                     <div class="modal-body">
@@ -67,7 +33,7 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" id="new_diary_note_btn" name="new_diary_note_btn">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-success" id="new_diary_note_btn_id" name="new_diary_note_btn">{% trans "Сохранить" %}</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
                     </div>
                 </form>
@@ -75,28 +41,60 @@
             </div>
         </div>
     </div>
+
     <script>
-    $("#new_diary_note").submit(function(e) {
-        $.ajax({
-            type: "POST",
-            url: "{% url 'user_diary' %}",
-            data: $("#new_diary_note").serialize(), // serializes the form's elements.
-            success: function(data)
-            {
-                if (data.answer === true)
-                    window.location.reload(true);
-                else {
-                    alert(data.error_answer)
-                }
-            }
-        });
-
-        e.preventDefault(); // avoid to execute the actual submit of the form.
-    });
+            function officer () {
+                location.reload(true)
+              }         
     </script>
+<script type="text/python">
+    from browser import document as doc, alert, ajax, window
+    import json
+    import urllib
+
+    csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+
+    def on_complete(req):
+        json_response = json.loads(req.text)
+        # if success creation
+        if req.status==200 and json_response['answer']==True:
+            # reload page from JS
+            window.officer()
+        # if error - show message
+        else:
+            alert(json_response['error_answer'])
+
+    def post_request(ev):
+        req = ajax.ajax()
+        req.bind('complete',on_complete)
+        # send a POST request to the url
+        req.open("POST","{% url 'user_diary' %}",True)
+        # set headers
+        req.set_header('content-type','application/x-www-form-urlencoded')
+        req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+        # set header for Django .is_ajax() method
+        req.set_header('X-Requested-With','XMLHttpRequest')
+
+        # get inserted form data
+        diary_note_title = doc['diary_note_title_id'].value
+        diary_note_text = doc['diary_note_text_id'].value
+        diary_note_tags = doc['diary_note_tags_id'].value
+
+        # check inputs 
+        if diary_note_title and diary_note_text and diary_note_tags:
+            # send data as a dictionary
+            req.send({
+                        'csrfmiddlewaretoken':csrf_token, 
+                        'diary_note_title': diary_note_title, 
+                        'diary_note_text': diary_note_text, 
+                        'diary_note_tags': diary_note_tags, 
+                        'new_diary_note_btn':True 
+                    })
+        else:
+            alert('Заполните все поля.')
 
 
+    doc["new_diary_note_btn_id"].bind("click", post_request)
 
-
-
+</script>
 {% endblock %}

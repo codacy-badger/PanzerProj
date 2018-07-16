@@ -202,7 +202,6 @@ class UserDiaryView(View):
     """
     content = {}
     def get(self, request, tag = None):
-        print(request.GET)
         if request.user.is_authenticated:
             self.content.update({
                 'doc': 'pages/personal_area.html',
@@ -225,55 +224,56 @@ class UserDiaryView(View):
 
 
     def post(self, request, tag = None):
-        print(request.POST)
-        print(request.is_ajax())
-        self.ajax_content = {'answer': False}
-        # если пользователь хочет удалить пост
-        if 'diary_note_delete_id' in request.POST:
-            deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
-            # проверяем, является ли удаляющий автором поста
-            if request.user == deleted_post.user.user:
-                # делаем пост невидимым для пользователя-автора
-                deleted_post.diary_note_show = False
-                deleted_post.save()
+        if request.user.is_authenticated:
+            print(request.POST)
+            print(request.is_ajax())
+            self.ajax_content = {'answer': False}
+            # если пользователь хочет удалить пост
+            if 'diary_note_delete_id' in request.POST:
+                deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
+                # проверяем, является ли удаляющий автором поста
+                if request.user == deleted_post.user.user:
+                    # делаем пост невидимым для пользователя-автора
+                    deleted_post.diary_note_show = False
+                    deleted_post.save()
 
-                messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
-            else:
-                messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
+                    messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
+                else:
+                    messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
 
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                # возвращаем пользователя назад на ту же страницу
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        """
-        Ajax запросы
-        """
-        # проверка реквеста и авторизироанности пользователя
-        if request.is_ajax() and request.user.is_authenticated:
-            try:
-                # создаём новую запись в дневнике
-                if 'diary_note_text' in request.POST:
-                    try:
-                        new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
-                                                                  diary_note_title = request.POST['diary_note_title'],
-                                                                  diary_note_text = request.POST['diary_note_text'])
-                        # добавляем теги к записи в дневнике
-                        for tag in request.POST['diary_note_tags'].split(','):
-                            new_diary_note.diary_note_tags.add(tag.lower().strip())
-                        new_diary_note.save()
+            """
+            Ajax запросы
+            """
+            # проверка реквеста и авторизироанности пользователя
+            if request.is_ajax():
+                try:
+                    # создаём новую запись в дневнике
+                    if 'new_diary_note_btn' in request.POST:
+                        try:
+                            new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
+                                                                      diary_note_title = request.POST['diary_note_title'],
+                                                                      diary_note_text = request.POST['diary_note_text'])
+                            # добавляем теги к записи в дневнике
+                            for tag in request.POST['diary_note_tags'].split(','):
+                                new_diary_note.diary_note_tags.add(tag.lower().strip())
+                            new_diary_note.save()
 
-                        self.ajax_content.update({'answer': True})
+                            self.ajax_content.update({'answer': True})
 
-                        messages.add_message(request, messages.SUCCESS, _('Запись создана'))
-                    # TODO добавить логгирование ошибок
-                    except Exception as err:
-                        print(err)
-                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                            messages.add_message(request, messages.SUCCESS, _('Запись создана'))
+                        # TODO добавить логгирование ошибок
+                        except Exception as err:
+                            print(err)
+                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-            # TODO добавить логгирование ошибок
-            except Exception as err:
-                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-            return JsonResponse(self.ajax_content)
+                return JsonResponse(self.ajax_content)
 
 
 # medical notes
