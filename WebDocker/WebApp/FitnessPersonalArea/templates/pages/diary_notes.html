@@ -14,6 +14,37 @@
         </h2>
     </div>
     <hr>
+   
+    {% if user_usual_notes %}
+        <div class="paginattion">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if user_usual_notes.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">{% trans 'Первая' %}</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_usual_notes.previous_page_number }}">{% trans 'Предыдущая' %}</a>
+                        </li>
+                    {% endif %}
+                        
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ user_usual_notes.number }}<span class="sr-only">(current)</span></a>
+                    </li>
+                        
+                    {% if user_usual_notes.has_next %}                       
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_usual_notes.next_page_number }}">{% trans 'Следующая' %}</a>
+                        </li>                       
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_usual_notes.paginator.num_pages }}">{% trans 'Последняя' %}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+    
     <div class="row" style="padding-bottom: 20px">
         <div class="col-12">
 
@@ -70,13 +101,14 @@
             </div>
 
         {% empty %}
-            {% trans 'Нет активных расценок, добавьте.' %} <i class="fas fa-plus-square"></i>
+            {% trans 'Нет записей, добавьте.' %}
         {% endfor %}
 
         </div>
+    </div>
 
-
-        <div class="paginattion" style="padding-left: 15px;">
+    {% if user_usual_notes %}
+        <div class="paginattion">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
                     {% if user_usual_notes.has_previous %}
@@ -103,12 +135,10 @@
                 </ul>
             </nav>
         </div>
+    {%endif%}
+        {% block diary_note_modal %}
 
-
-    </div>
-        {% block price_edit %}
-
-            {% include 'elements/modal/diary_note_modal.html' %}
+            {% include 'elements/modal_edit/diary_note_modal.html' %}
 
         {% endblock %}
 

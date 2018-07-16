@@ -181,7 +181,7 @@
 
     {% block medical_note %}
 
-        {% include 'elements/modal/medical_note_modal.html' %}
+        {% include 'elements/modal_edit/medical_note_modal.html' %}
 
     {% endblock %}
 
@@ -202,7 +202,11 @@
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="card" style="width: 15rem; height: 250px">
                           <div class="card-body">
-                            <h5 class="card-title">{{ usual_note.short_title }}</h5>
+                            <h5 class="card-title">
+                                <button type="button" value="{{usual_note.id}}" class="btn btn-link view_diary" data-toggle="modal" data-target="#viewDiaryNote">
+                                    {{ usual_note.short_title }}
+                                </button>
+                            </h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ usual_note.diary_note_datetime }}</h6>
                             <p class="card-text">{{ usual_note.short_text }}</p>
 
@@ -228,11 +232,10 @@
         </div>
     </div>
 
-
-
     {% block diary_note %}
 
-        {% include 'elements/modal/diary_note_modal.html' %}
+        {% include 'elements/modal_edit/diary_note_modal.html' %}
+        {% include 'elements/modal_view/diary_note_modal.html' %}
 
     {% endblock %}
 
@@ -315,7 +318,7 @@
 
         {% block description_edit %}
 
-            {% include 'elements/modal/trainer_description_edit_modal.html' %}
+            {% include 'elements/modal_edit/trainer_description_edit_modal.html' %}
 
         {% endblock %}
 
@@ -388,7 +391,7 @@
 
         {% block price_edit %}
 
-            {% include 'elements/modal/price_edit_modal.html' %}
+            {% include 'elements/modal_edit/price_edit_modal.html' %}
 
         {% endblock %}
 

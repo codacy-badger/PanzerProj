@@ -1,0 +1,44 @@
+{% block diary_note %}
+{% load static %}
+{% load i18n %}
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="viewDiaryNote">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-book-open"></i>
+                        {% trans "Запись в дневнике" %}
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                        <div style="float: left" class="datetime"  id="diary_note_modal_datetime">
+                                
+                        </div>
+                        <div style="float: right" class="tags" id="diary_note_modal_tags">
+          
+                            
+          
+                        </div>
+                        <div>
+                                <p class="text-center" id="diary_note_modal_title"></p>
+                                <p class="card-text text-justify" id="diary_note_modal_text"></p>
+
+                        </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+{% endblock %}
