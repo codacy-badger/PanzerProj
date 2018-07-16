@@ -17,6 +17,7 @@
 
                 <form name="new_diary_note_form" method="post" action="" id="new_diary_note_form_id" enctype="multipart/form-data">
                     {% csrf_token %}
+                    <input hidden name="diary_note_edit" value="-1" id="diary_note_edit">
                     <!-- Modal body -->
                     <div class="modal-body">
                         <dl class="row">
@@ -82,14 +83,23 @@
 
         # check inputs 
         if diary_note_title and diary_note_text and diary_note_tags:
+            # prepare request dictionary
+            request_body = {
+                            'csrfmiddlewaretoken':csrf_token, 
+                            'diary_note_title': diary_note_title, 
+                            'diary_note_text': diary_note_text, 
+                            'diary_note_tags': diary_note_tags
+                            }
+            # if edit old note, set note id
+            if doc['diary_note_edit'].value != '-1':
+                request_body.update({'diary_note_edit': doc['diary_note_edit'].value})
+            # if create new note
+            else:
+                request_body.update({'new_diary_note_btn': True})   
+
+            print(request_body)
             # send data as a dictionary
-            req.send({
-                        'csrfmiddlewaretoken':csrf_token, 
-                        'diary_note_title': diary_note_title, 
-                        'diary_note_text': diary_note_text, 
-                        'diary_note_tags': diary_note_tags, 
-                        'new_diary_note_btn':True 
-                    })
+            req.send(request_body)
         else:
             alert('Заполните все поля.')
 

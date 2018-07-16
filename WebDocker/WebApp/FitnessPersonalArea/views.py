@@ -11,6 +11,8 @@ from django.http import JsonResponse
 from django.db.models import Count, Q
 from django.utils.timezone import now
 from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
+
 
 from geopy.geocoders import GoogleV3
 
@@ -194,13 +196,13 @@ class GymView(View):
                 new_gym.save()
 
 
-
 # diary notes
 class UserDiaryView(View):
     """
     UserDiaryView отвечает за создание, редактирование и просмотр записей в дневник пользователя
     """
     content = {}
+
     def get(self, request, tag = None):
         if request.user.is_authenticated:
             self.content.update({
@@ -222,11 +224,8 @@ class UserDiaryView(View):
 
             return render(request, 'base.html', self.content)
 
-
     def post(self, request, tag = None):
         if request.user.is_authenticated:
-            print(request.POST)
-            print(request.is_ajax())
             self.ajax_content = {'answer': False}
             # если пользователь хочет удалить пост
             if 'diary_note_delete_id' in request.POST:
@@ -269,8 +268,35 @@ class UserDiaryView(View):
                             print(err)
                             self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
+                    # редакитурем старую запись в дневнике
+                    if 'diary_note_edit' in request.POST:
+                        try:
+                            # получаем запись из БД по id
+                            diary_note = UserDiary.objects.get(id = request.POST['diary_note_edit'])
+                            # проверка соответсвия хозяина заметки и пользователя пытающегося изменить запись
+                            if diary_note.user.user == request.user:
+                                # вносим изменённые данные в модель записи
+                                diary_note.diary_note_title = request.POST['diary_note_title']
+                                diary_note.diary_note_text = request.POST['diary_note_text']
+                                # обновляем дату записи
+                                diary_note.diary_note_datetime = now()
+
+                                # добавляем теги к записи в дневнике
+                                for tag in request.POST['diary_note_tags'].split(','):
+                                    diary_note.diary_note_tags.add(tag.lower().strip())
+                                diary_note.save()
+
+                                self.ajax_content.update({'answer': True})
+
+                                messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
+                        # TODO добавить логгирование ошибок
+                        except Exception as err:
+                            print(err)
+                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
                 # TODO добавить логгирование ошибок
                 except Exception as err:
+                    print(err)
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 return JsonResponse(self.ajax_content)
