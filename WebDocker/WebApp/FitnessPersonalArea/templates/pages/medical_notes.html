@@ -6,7 +6,7 @@
     <i class="fas fa-notes-medical"></i>
 
         {% trans "Ваши записи" %}
-        <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
+        <button type="button" class="btn btn-light" id="create_medical_note" data-toggle="modal"
                 data-target="#newMedicalNote">
             <i class="fas fa-plus-square "></i>
         </button></h2>
@@ -23,7 +23,7 @@
                   <div style="float: left">
                       {{ note.medical_note_datetime }}
                   </div>
-                  <div style="float: right">
+                  <div style="float: right" class="tags">
                       {% for tag in  note.get_all_tags %}
 
                           <a href="{% url 'user_medical' tag %}" class="badge badge-pill badge-info">#{{ tag }}</a>
@@ -40,7 +40,8 @@
               </div>
               <div class="card-footer text-muted">
                   <div style="float: left; margin-bottom: 0px" class="row">
-                          <button type="button" class="btn btn-secondary">
+                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
+                          data-target="#newMedicalNote">
                               <i class="fas fa-edit"></i>
                               {% trans "Редактировать" %}
                           </button>
@@ -69,5 +70,31 @@
 
         {% endblock %}
 
-
+        <script>
+            jQuery(document).ready(function(){
+                $( "button.btn.btn-secondary.edit" ).click(function() {
+                    var diary_dom = $(this).closest("div.card.text-center");
+    
+                    var diary_tags = diary_dom.find('.card-header').find('.tags');
+    
+                    var diary_title = diary_dom.find('.card-body').find('.card-title');
+                    var diary_text = diary_dom.find('.card-body').find('.card-text.text-justify');
+    
+                    $("#medical_note_tags_id").val($.trim(diary_tags.text()).replace(/ +(?= )/g,'').replace(/[#]/g, '').replace(/\s+/g, ', '));
+                    $("#medical_note_title_id").val($.trim(diary_title.text()));
+                    $("#medical_note_text_id").val(diary_text.text());
+                });
+            });
+        </script>
+        <script type="text/python">
+            from browser import document as doc, alert, ajax, window
+        
+            def clear_inputs(ev):
+                doc["medical_note_tags_id"].val = ''
+                doc["medical_note_title_id"].val = ''
+                doc["medical_note_text_id"].val = ''    
+        
+            doc["create_medical_note"].bind("click", clear_inputs)
+        
+        </script> 
 {% endblock %}
