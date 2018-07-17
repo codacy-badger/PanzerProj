@@ -358,17 +358,26 @@ class UserMedicalView(View):
                 'fitness_trainer': True,
                 'fitness_user': FitnessUser.objects.get(user = request.user)})
 
+
             # ели был передан тег - выбираем записи с ним
             if tag:
-                self.content.update({'user_medical_notes': MedicalNote.objects.filter(user__user = request.user,
-                                                                                      medical_note_show = True,
-                                                                                      medical_note_tags__name__in = [tag]).
-                                                                                      order_by('-id')})
-            # иначе все записи по порядку
+                # пагинация по 5 записей c выбранным тегом на страницу и с минимумом на последней - 2
+                paginate_view = Paginator(MedicalNote.objects.filter(user__user = request.user,
+                                                                     medical_note_show = True,
+                                                                     medical_note_tags__name__in = [tag]).
+                                                                    order_by('-id'),
+                                          5, orphans = 2)
+
             else:
-                self.content.update({'user_medical_notes': MedicalNote.objects.filter(user__user = request.user,
-                                                                                      medical_note_show = True).
-                                                                                      order_by('-id')})
+                # пагинация по 5 записей на страницу и с минимумом на последней - 2
+                paginate_view = Paginator(MedicalNote.objects.filter(user__user = request.user,
+                                                                     medical_note_show = True).order_by('-id'),
+                                          5, orphans = 2)
+
+            # получаем номер страницы для отображения
+            page = request.GET.get('page')
+            # получаем набор данных для данной страницы
+            self.content.update({'user_medical_notes': paginate_view.get_page(page)})
 
             return render(request, 'base.html', self.content)
 
