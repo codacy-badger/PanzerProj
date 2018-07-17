@@ -420,6 +420,25 @@ class UserDiary(models.Model):
     def get_all_tags(self):
         return [tag.name for tag in self.diary_note_tags.all()]
 
+    # get note main data in JSON format
+    def get_note_json(self):
+        """
+        Получение основной информации о записи и представление её в формате JSON
+        diary_note_author - username автора записи
+        diary_note_tags - список тегов записи
+        diary_note_text - текст записи
+        diary_note_title - название записи
+        diary_note_datetime - дата/время создания записи
+        :return: JSON  с информацией о записи
+        """
+        return {
+                'diary_note_author': self.user.user.username,
+                'diary_note_tags': self.get_all_tags(),
+                'diary_note_text': self.diary_note_text,
+                'diary_note_title': self.diary_note_title,
+                'diary_note_datetime': self.diary_note_datetime.strftime("%d %B %Y %H:%M"),
+                }
+
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title()}...;'
 

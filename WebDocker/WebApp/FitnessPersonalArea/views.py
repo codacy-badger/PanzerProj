@@ -213,12 +213,7 @@ class UserDiaryView(View):
                     diary_note = UserDiary.objects.get(id = request.GET['diary_note_id'])
 
                     self.ajax_content.update({'answer': True})
-                    self.ajax_content['diary_note'] = {
-                                                        'diary_note_tags': diary_note.get_all_tags(),
-                                                        'diary_note_text': diary_note.diary_note_text,
-                                                        'diary_note_title': diary_note.diary_note_title,
-                                                        'diary_note_datetime': diary_note.diary_note_datetime.strftime("%d %B %Y %H:%M"),
-                                                      }
+                    self.ajax_content['diary_note'] = diary_note.get_note_json()
 
                 # TODO добавить логгирование ошибок
                 except Exception as err:
