@@ -16,6 +16,7 @@
 
                 <form name="new_medical_note" method="post" action="" id="new_medical_note" enctype="multipart/form-data">
                     {% csrf_token %}
+                    <input hidden name="medical_note_edit" value="-1" id="medical_note_edit">
                     <!-- Modal body -->
                     <div class="modal-body">
                         <dl class="row">
@@ -32,7 +33,7 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success" name="new_medical_note_btn">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-success" id="new_medical_note_btn_id" name="new_medical_note_btn">{% trans "Сохранить" %}</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
                     </div>
                 </form>
@@ -41,22 +42,67 @@
         </div>
     </div>
     <script>
-    $("#new_medical_note").submit(function(e) {
-        $.ajax({
-            type: "POST",
-            url: "{% url 'user_medical' %}",
-            data: $("#new_medical_note").serialize(), // serializes the form's elements.
-            success: function(data)
-            {
-                if (data.answer === true)
-                    window.location.reload(true);
-                else {
-                    alert(data.error_answer)
-                }
-            }
-        });
-
-        e.preventDefault(); // avoid to execute the actual submit of the form.
-    });
+            function reloader () {
+                location.reload(true)
+              }         
     </script>
+<script type="text/python">
+    from browser import document as doc, alert, ajax, window
+    import json
+    import urllib
+
+    csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+
+    def on_complete(req):
+        json_response = json.loads(req.text)
+        # if success creation
+        if req.status==200 and json_response['answer']==True:
+            # reload page from JS
+            window.reloader()
+        # if error - show message
+        else:
+            alert(json_response['error_answer'])
+
+    def post_request(ev):
+        req = ajax.ajax()
+        req.bind('complete',on_complete)
+        # send a POST request to the url
+        req.open("POST","{% url 'user_medical' %}",True)
+        # set headers
+        req.set_header('content-type','application/x-www-form-urlencoded')
+        req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+        # set header for Django .is_ajax() method
+        req.set_header('X-Requested-With','XMLHttpRequest')
+
+        # get inserted form data
+        medical_note_title = doc['medical_note_title_id'].value
+        medical_note_text = doc['medical_note_text_id'].value
+        medical_note_tags = doc['medical_note_tags_id'].value
+
+        # check inputs 
+        if medical_note_title and medical_note_text and medical_note_tags:
+            # prepare request dictionary
+            request_body = {
+                            'csrfmiddlewaretoken':csrf_token, 
+                            'medical_note_title': medical_note_title, 
+                            'medical_note_text': medical_note_text, 
+                            'medical_note_tags': medical_note_tags
+                            }
+            # if edit old note, set note id
+            if doc['medical_note_edit'].value != '-1':
+                request_body.update({'medical_note_edit': doc['medical_note_edit'].value})
+            # if create new note
+            else:
+                request_body.update({'new_medical_note_btn': True})   
+
+            print(request_body)
+            # send data as a dictionary
+            req.send(request_body)
+        else:
+            alert('Заполните все поля.')
+
+
+    doc["new_medical_note_btn_id"].bind("click", post_request)
+
+</script>
 {% endblock %}

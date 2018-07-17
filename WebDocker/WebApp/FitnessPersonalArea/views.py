@@ -293,7 +293,7 @@ class UserDiaryView(View):
                             self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                     # редакитурем старую запись в дневнике
-                    if 'diary_note_edit' in request.POST:
+                    elif 'diary_note_edit' in request.POST:
                         try:
                             # получаем запись из БД по id
                             diary_note = UserDiary.objects.get(id = request.POST['diary_note_edit'])
@@ -403,8 +403,9 @@ class UserMedicalView(View):
         # проверка реквеста и авторизироанности пользователя
         if request.is_ajax() and request.user.is_authenticated:
             try:
+                print(request.POST)
                 # создаём новую медицинскую запись запись в дневнике
-                if 'medical_note_text' in request.POST:
+                if 'new_medical_note_btn' in request.POST:
                     try:
                         new_medical_note = MedicalNote.objects.create(
                             user = FitnessUser.objects.get(user = request.user),
@@ -419,6 +420,32 @@ class UserMedicalView(View):
                         self.ajax_content.update({'answer': True})
 
                         messages.add_message(request, messages.SUCCESS, _('Запись создана'))
+                    # TODO добавить логгирование ошибок
+                    except Exception as err:
+                        print(err)
+                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                # редакитурем старую мед. запись
+                elif 'medical_note_edit' in request.POST:
+                    try:
+                        # получаем запись из БД по id
+                        medical_note = MedicalNote.objects.get(id = request.POST['medical_note_edit'])
+                        # проверка соответсвия хозяина мед.заметки и пользователя пытающегося изменить запись
+                        if medical_note.user.user == request.user:
+                            # вносим изменённые данные в модель записи
+                            medical_note.medical_note_title = request.POST['medical_note_title']
+                            medical_note.medical_note_text = request.POST['medical_note_text']
+                            # обновляем дату записи
+                            medical_note.medical_note_datetime = now()
+
+                            # добавляем теги к записи в дневнике
+                            for tag in request.POST['medical_note_tags'].split(','):
+                                medical_note.medical_note_tags.add(tag.lower().strip())
+                            medical_note.save()
+
+                            self.ajax_content.update({'answer': True})
+
+                            messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
                     # TODO добавить логгирование ошибок
                     except Exception as err:
                         print(err)
