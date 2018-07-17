@@ -64,9 +64,9 @@
                   </div>
               </div>
               <div class="card-body">
+                <p hidden class="diary_note_id" >{{ note.id }}</p>
                 <h5 class="card-title">
                     {{ note.diary_note_title }}
-                    <p hidden class="diary_note_id" >{{ note.id }}</p>
                 </h5>
                 <p class="card-text text-justify">{{ note.diary_note_text }}</p>
 
@@ -149,7 +149,7 @@
 
                 var diary_tags = diary_dom.find('.card-header').find('.tags');
 
-                var diary_note_id = diary_dom.find('.card-body').find('.card-title').find('.diary_note_id');
+                var diary_note_id = diary_dom.find('.card-body').find('.diary_note_id');
 
                 var diary_title = diary_dom.find('.card-body').find('.card-title');
                 var diary_text = diary_dom.find('.card-body').find('.card-text.text-justify');

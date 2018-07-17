@@ -3,9 +3,12 @@
 {% load i18n %}
     <div class="page-header">
     <h2>
-    <i class="fas fa-notes-medical"></i>
 
-        {% trans "Ваши записи" %}
+    <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_medical' %}';">
+            
+    <i class="fas fa-notes-medical"></i>
+            {% trans "Ваши записи" %}
+        </button>
         <button type="button" class="btn btn-light" id="create_medical_note" data-toggle="modal"
                 data-target="#newMedicalNote">
             <i class="fas fa-plus-square "></i>

@@ -44,7 +44,7 @@
     </div>
 
     <script>
-            function officer () {
+            function reloader () {
                 location.reload(true)
               }         
     </script>
@@ -60,7 +60,7 @@
         # if success creation
         if req.status==200 and json_response['answer']==True:
             # reload page from JS
-            window.officer()
+            window.reloader()
         # if error - show message
         else:
             alert(json_response['error_answer'])
