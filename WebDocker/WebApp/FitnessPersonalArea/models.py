@@ -384,6 +384,25 @@ class MedicalNote(models.Model):
     def get_all_tags(self):
         return [tag.name for tag in self.medical_note_tags.all()]
 
+    # get note main data in JSON format
+    def get_note_json(self):
+        """
+        Получение основной информации о записи и представление её в формате JSON
+        diary_note_author - username автора записи
+        diary_note_tags - список тегов записи
+        diary_note_text - текст записи
+        diary_note_title - название записи
+        diary_note_datetime - дата/время создания записи
+        :return: JSON  с информацией о записи
+        """
+        return {
+                'medical_note_author': self.user.user.username,
+                'medical_note_tags': self.get_all_tags(),
+                'medical_note_text': self.medical_note_text,
+                'medical_note_title': self.medical_note_title,
+                'medical_note_datetime': self.medical_note_datetime.strftime("%d %B %Y %H:%M"),
+                }
+
     def __str__(self):
         return f'User: {self.user.user.username}; Title: {self.short_title};'
 

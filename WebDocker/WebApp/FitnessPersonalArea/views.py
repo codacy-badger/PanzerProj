@@ -333,8 +333,25 @@ class UserMedicalView(View):
     UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей в дневник пользователя
     """
     content = {}
+    ajax_content = {'answer': False}
+
     def get(self, request, tag = None):
         if request.user.is_authenticated:
+            # если ajax запрос на получение полной информации о записи в дневнике
+            if request.is_ajax() and request.GET['medical_note_id']:
+                try:
+                    medical_note = MedicalNote.objects.get(id = request.GET['medical_note_id'])
+
+                    self.ajax_content.update({'answer': True})
+                    self.ajax_content['medical_note'] = medical_note.get_note_json()
+
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                finally:
+                    return JsonResponse(self.ajax_content)
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/medical_notes.html',
@@ -356,8 +373,6 @@ class UserMedicalView(View):
             return render(request, 'base.html', self.content)
 
     def post(self, request, tag = None):
-        print(request.POST)
-        self.ajax_content = {'answer': False}
         # если пользователь хочет удалить пост
         if 'medical_note_delete_id' in request.POST:
             deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])

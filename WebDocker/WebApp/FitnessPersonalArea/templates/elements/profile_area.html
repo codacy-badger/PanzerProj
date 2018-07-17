@@ -151,7 +151,7 @@
             <div class="row">
                 {% for medical_note in user_medical_notes %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 250px">
+                        <div class="card" style="width: 15rem; height: 280px">
                           <div class="card-body">
                             <h5 class="card-title">{{ medical_note.short_title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ medical_note.medical_note_datetime }}</h6>
@@ -168,6 +168,9 @@
                                           {% endfor %}
                                     </h6>
                               {% endif %}
+                              <button type="button" value="{{medical_note.id}}" class="btn btn-link view_medical" data-toggle="modal" data-target="#viewMedicalNote">
+                                  {% trans "Детали" %}
+                                </button>
                           </div>
                         </div>
                     </div>
@@ -182,8 +185,69 @@
     {% block medical_note %}
 
         {% include 'elements/modal_edit/medical_note_modal.html' %}
+        {% include 'elements/modal_view/medical_note_modal.html' %}
 
     {% endblock %}
+
+    <script type="text/python">
+        from browser import document as doc, alert, ajax, window, html
+        import json
+        import urllib
+    
+        csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+    
+        # fill modal window data
+        def fill_medical_modal(response):
+            # clean inputs
+            doc["medical_note_modal_title"].text = ''
+            doc["medical_note_modal_text"].text = ''
+            doc["medical_note_modal_datetime"].text = ''
+            doc["medical_note_modal_tags"].text = ''
+
+            # insert new data
+            doc['medical_note_modal_title'] <= response['medical_note_title']
+            doc['medical_note_modal_text'] <= response['medical_note_text']
+            doc['medical_note_modal_datetime'] <= response['medical_note_datetime']
+            for tag in response['medical_note_tags']:
+                # crete new <a> element and set class (for tags)
+                link = html.A(Class = "badge badge-pill badge-info")
+                # add href fro tags
+                link.href = "{% url 'user_medical' %}tag-"+tag
+                # add text to <a>
+                link <= "#"+tag
+
+                # add <a> to HTML element
+                doc['medical_note_modal_tags'] <= link
+
+        def on_complete(req):
+            json_response = json.loads(req.text)
+            # if NOT success geting data
+            if req.status!=200 and json_response['answer']!=True:
+                alert(json_response['error_answer'])
+            else:
+                fill_medical_modal(json_response['medical_note'])
+                    
+        def get_data(ev):
+            # get medical note ID and set to GET request param
+            qs = "medical_note_id="+ev.currentTarget.value
+
+            req = ajax.ajax()
+            req.bind('complete',on_complete)
+            # send a POST request to the url
+            req.open("GET","{% url 'user_medical' %}"+"?"+qs,True)
+            # set headers
+            req.set_header('content-type','application/x-www-form-urlencoded')
+            req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+            # set header for Django .is_ajax() method
+            req.set_header('X-Requested-With','XMLHttpRequest')
+
+            req.send()
+    
+        # bind all objects to func
+        for element in doc.select('.btn.btn-link.view_medical'):
+            element.bind("click", get_data)
+    
+    </script>
 
     <div class="card">
         <h5 class="card-header">
@@ -200,12 +264,10 @@
             <div class="row">
                 {% for usual_note in user_usual_notes %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 250px">
+                        <div class="card" style="width: 15rem; height: 280px">
                           <div class="card-body">
                             <h5 class="card-title">
-                                <button type="button" value="{{usual_note.id}}" class="btn btn-link view_diary" data-toggle="modal" data-target="#viewDiaryNote">
                                     {{ usual_note.short_title }}
-                                </button>
                             </h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ usual_note.diary_note_datetime }}</h6>
                             <p class="card-text">{{ usual_note.short_text }}</p>
@@ -221,7 +283,9 @@
                                           {% endfor %}
                                     </h6>
                               {% endif %}
-
+                              <button type="button" value="{{usual_note.id}}" class="btn btn-link view_diary" data-toggle="modal" data-target="#viewDiaryNote">
+                                  {% trans "Детали" %}
+                                </button>
                           </div>
                         </div>
                     </div>
@@ -568,4 +632,5 @@
                 element.bind("click", get_data)
         
         </script>
+
 {% endblock %}
