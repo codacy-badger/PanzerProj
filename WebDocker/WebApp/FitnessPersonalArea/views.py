@@ -22,10 +22,12 @@ from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice,
 
 from .forms import NewGym
 
+
 # log in
 class LoginPage(View):
     """
     Класс отвечает за страницу логина
+    Пользователь ввод логин или e-mail и пароль, затем логинится POST-запросом
     """
     content = {}
 
@@ -36,22 +38,35 @@ class LoginPage(View):
         return render(request, 'base.html', self.content)
 
     def post(self, request):
+        # получаем из формы поля с логином/e-mail`ом и паролем
         email_username = request.POST['email_username']
         password = request.POST['password']
         try:
+            # если передан e-mail
             if '@' in email_username:
                 username = User.objects.get(email = email_username).username
+            # если передан логин
             else:
                 username = email_username
+            # пробуем пройти аутентификацию с введёнными данными
             user = authenticate(request, password = password, username = username)
+            # при успешной аутентификации
             if user is not None:
+                # логиним пользователя
                 login(request, user)
                 messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
-                return redirect('/private/personal/')
+                # перенаправляем в личный кабинет
+                return redirect('personal_profile')
+            # при ошибке в введённых данных для входа
             else:
                 messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
-        except:
+
+        except User.DoesNotExist:
             messages.add_message(request, messages.ERROR, _('Такой E-mail не существует'))
+
+        except Exception as err:
+            print(err)
+            messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
 
         return redirect('/private/login/')
 
