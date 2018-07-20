@@ -123,7 +123,7 @@ class RegistrationPage(View):
 # personal area
 class ProfilePage(View):
     """
-    Класс отвечает за страницу логина
+    Класс отвечает за личиную страницу
     """
     content = {}
 
@@ -135,15 +135,19 @@ class ProfilePage(View):
                 'private_doc': 'elements/profile_area.html',
                 'fitness_user': fitness_user,
                 'user_gyms': TrainGym.objects.filter(user = fitness_user),
+
                 'user_training_schedule': TrainingSchedule.objects.filter(
                                                     Q(target_user = fitness_user) | Q(author_user = fitness_user)).
                                                     filter(schedule_date__gte = now()).order_by('schedule_date')[:6],
+
                 'user_projection_photos': ProjectionPhoto.objects.filter(user = fitness_user).order_by('id')[:4],
+
                 'user_train_contracts': TrainingContract.objects.filter(contract_ward_user = fitness_user,
                                                                         contract_trainer_start = True),
 
                 'user_medical_notes': MedicalNote.objects.filter(user = fitness_user,
                                                                  medical_note_show = True).order_by('-id')[:4],
+
                 'user_usual_notes': UserDiary.objects.filter(user = fitness_user,
                                                              diary_note_show = True).order_by('-id')[:4]
             })
@@ -191,6 +195,9 @@ class ProfilePage(View):
 
 # gym destinations
 class GymView(View):
+    """
+    Класс отвечает за страницу с залами пользователя
+    """
     def get(self, request):
         pass
 
@@ -345,7 +352,7 @@ class UserDiaryView(View):
 # medical notes
 class UserMedicalView(View):
     """
-    UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей в дневник пользователя
+    UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей пользователя
     """
     content = {}
     ajax_content = {'answer': False}
@@ -472,99 +479,14 @@ class UserMedicalView(View):
             return JsonResponse(self.ajax_content)
 
 
-# registration
-class SuccessLogin(View):
-    """
-    Класс отвечает за страницу регистрации
-    """
-    content = {}
-
-    def get(self, request):
-        messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
-        return redirect('/private/personal/')
-
-    def post(self, request):
-        messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
-        return redirect('/private/personal/')
-
-
-# change language
-class ChangeLanguage(View):
-    """
-    Класс отвечает за смену языка интерфейса
-    """
-    def get(self, request, language):
-        """
-        Метод отвечает за принятие GET запроса с новым языком интерфейса
-        :param request:
-        :param language: Выбранный язык
-        :return: Перенаправляет на главную страницу и задаёт новый язык
-        """
-
-        translation.activate(language)
-        request.session[translation.LANGUAGE_SESSION_KEY] = language
-
-        return redirect('home')
-
-
-# logout
-class LogOutPage(View):
-    # get request
-    def get(self, request):
-
-        logout(request)
-
-        return redirect('/')
-
-
-"""
-Ajax views
-"""
-
-
-# check username in use
-class UsernameCheckAjax(View):
-    def get(self, request):
-        self.content = {'answer': False}
-        if request.is_ajax():
-            # выбираем переданное имя пользователя
-            username = request.GET['username']
-            # ищем пользователя с таким же ником в БД
-            user = User.objects.filter(username = username)
-            if user:
-                # если пользователь найден - возвращаем True, иначе False остаётся
-                self.content.update({'answer': True})
-
-            return JsonResponse(self.content)
-
-
-# check email in use
-class EmailCheckAjax(View):
-    def get(self, request):
-        self.content = {'answer': False}
-        if request.is_ajax():
-            # выбираем переданное email
-            email = request.GET['email']
-            # ищем пользователя с таким же email в БД
-            user = User.objects.filter(email = email)
-            if user:
-                # если пользователь найден - возвращаем True, иначе False остаётся
-                self.content.update({'answer': True})
-
-            return JsonResponse(self.content)
-
-
-"""
-Edit view
-"""
-
-
 # edit TrainerPrice
 class TrainerPriceView(View):
     """
-    TrainerPriceView отвечает за создание, редактирование и просмотр расценок тренера
+    TrainerPriceView отвечает за страницу с расценками тренера,
+        а так же создание, редактирование и просмотр расценок тренера
     """
     content = {}
+
     def get(self, request):
         if request.user.is_authenticated:
             self.content.update({
@@ -627,28 +549,80 @@ class TrainerPriceView(View):
             return JsonResponse(self.ajax_content)
 
 
+# change language
+class ChangeLanguage(View):
+    """
+    Класс отвечает за смену языка интерфейса
+    """
+    def get(self, request, language):
+        """
+        Метод отвечает за принятие GET запроса с новым языком интерфейса
+        :param request:
+        :param language: Выбранный язык
+        :return: Перенаправляет на главную страницу и задаёт новый язык
+        """
+
+        translation.activate(language)
+        request.session[translation.LANGUAGE_SESSION_KEY] = language
+
+        return redirect('home')
 
 
+# logout
+class LogOutPage(View):
+    """
+    Класс отвечает за выход из сервиса
+    """
+    # get request
+    def get(self, request):
+
+        logout(request)
+
+        return redirect('/')
 
 
+"""
+Ajax views
+"""
 
 
+# check username in use
+class UsernameCheckAjax(View):
+    """
+    Класс отвечает за проверку наличия имени пользователя в сервисе
+    Пользователь присылает GET-Ajax запрос и получает форматированный JSON-ответ.
+    {'answer': False(пользователя с таким ником нет)/True(пользователь с таким нимком есть)}
+    """
+    def get(self, request):
+        self.content = {'answer': False}
+        if request.is_ajax():
+            # выбираем переданное имя пользователя
+            username = request.GET['username']
+            # ищем пользователя с таким же ником в БД
+            user = User.objects.filter(username = username)
+            if user:
+                # если пользователь найден - возвращаем True, иначе False остаётся
+                self.content.update({'answer': True})
+
+            return JsonResponse(self.content)
 
 
+# check email in use
+class EmailCheckAjax(View):
+    """
+    Класс отвечает за проверку наличия e-mail`а в сервисе
+    Пользователь присылает GET-Ajax запрос и получает форматированный JSON-ответ.
+    {'answer': False(e-mail`а в сервисе нет)/True(e-mail в сервисе есть)}
+    """
+    def get(self, request):
+        self.content = {'answer': False}
+        if request.is_ajax():
+            # выбираем переданное email
+            email = request.GET['email']
+            # ищем пользователя с таким же email в БД
+            user = User.objects.filter(email = email)
+            if user:
+                # если пользователь найден - возвращаем True, иначе False остаётся
+                self.content.update({'answer': True})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            return JsonResponse(self.content)
