@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.views import View
 from django.shortcuts import redirect
@@ -13,6 +15,7 @@ from django.utils.timezone import now
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 from geopy.geocoders import GoogleV3
@@ -377,7 +380,6 @@ class UserMedicalView(View):
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/medical_notes.html',
-                'fitness_trainer': True,
                 'fitness_user': FitnessUser.objects.get(user = request.user)})
 
 
@@ -479,7 +481,82 @@ class UserMedicalView(View):
             return JsonResponse(self.ajax_content)
 
 
-# edit TrainerPrice
+# user gym`s
+class UserGymsView(View):
+    """
+    UserGymsView отвечает за страницу с тренажёрными залами пользователя,
+        а так же создание, редактирование и просмотр всех залов
+    """
+    content = {}
+    from django.core.serializers import serialize
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            # получаем данные пользователя
+            fitness_user = FitnessUser.objects.get(user = request.user)
+            # проверяем тип пользователя, должен быть тренером
+            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+                self.content.update({
+                    'doc': 'pages/personal_area.html',
+                    'private_doc': 'pages/gyms.html',
+                    'fitness_user': fitness_user,
+                    'fitness_user_gyms': TrainGym.objects.filter(user = fitness_user).order_by('id'),
+                    'fitness_user_gyms_json': serialize('geojson', TrainGym.objects.filter(user = fitness_user),
+                                                  geometry_field='gym_geo',
+                                                  fields=('gym_geo','gym_destination', 'gym_description','gym_name'))})
+
+                return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        self.ajax_content = {'answer': False}
+        # проверка реквеста и авторизироанности пользователя
+        if request.is_ajax() and request.user.is_authenticated:
+            try:
+                # если id расценки -0, создаём новую
+                if request.POST['price_id'] == '0':
+                    # создаём новую расценку
+                    TrainerPrice.objects.create(user = FitnessTrainer.objects.get(user__user = request.user),
+                                                trainer_price_hour = request.POST['trainer_price_hour'],
+                                                trainer_price_comment = request.POST['trainer_price_comment'],
+                                                trainer_price_currency = request.POST['trainer_price_currency'],
+                                                trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False,
+                                                trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False)
+
+                    # обновляем данные для ответа сервера
+                    self.ajax_content.update({'answer': True})
+                    # добавляем сообщение пользователю
+                    messages.add_message(request, messages.SUCCESS, _('Расценка создана'))
+
+                else:
+                    # если изменяем расценку - получение данной расценки из БД
+                    training_price = TrainerPrice.objects.get(id=request.POST['price_id'])
+                    # проверка пользователя на авторство данной цене
+                    if training_price.user == FitnessTrainer.objects.get(user__user=request.user):
+                        # изменение расценки
+                        training_price.trainer_price_hour = request.POST['trainer_price_hour']
+                        training_price.trainer_price_comment = request.POST['trainer_price_comment']
+                        training_price.trainer_price_currency = request.POST['trainer_price_currency']
+
+                        training_price.trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False
+
+                        training_price.trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False
+
+                        # сохраняем новые данные расценки
+                        training_price.save()
+
+                        # обновляем данные для ответа сервера
+                        self.ajax_content.update({'answer': True})
+                        # добавляем сообщение пользователю
+                        messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
+
+            # TODO добавить логгирование ошибок
+            except Exception as err:
+                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+            return JsonResponse(self.ajax_content)
+
+
+# trainer price page
 class TrainerPriceView(View):
     """
     TrainerPriceView отвечает за страницу с расценками тренера,
@@ -492,7 +569,6 @@ class TrainerPriceView(View):
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/trainer_prices.html',
-                'fitness_trainer': True,
                 'fitness_user': FitnessUser.objects.get(user = request.user),
                 'fitness_trainer_price': TrainerPrice.objects.filter(user__user__user = request.user,
                                                                      trainer_price_show = True).
@@ -579,6 +655,22 @@ class LogOutPage(View):
         logout(request)
 
         return redirect('/')
+
+
+# success login
+class SuccessLogin(View):
+    """	
+    SuccessLogin отвечает за redirect после логина через соц.сети	
+    """
+    content = {}
+
+    def get(self, request):
+        messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
+        return redirect('/private/personal/')
+
+    def post(self, request):
+        messages.add_message(request, messages.SUCCESS, _('Успешно вошли'))
+        return redirect('/private/personal/')
 
 
 """

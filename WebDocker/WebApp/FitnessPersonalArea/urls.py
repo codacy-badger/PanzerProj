@@ -15,8 +15,6 @@ urlpatterns = [
     # личный кабинет
     path('personal/', views.ProfilePage.as_view(), name='personal_area'),
     path('personal/profile/', views.ProfilePage.as_view(), name='personal_profile'),
-    # редактирование, создание и просмотр расценок тренера
-    path('trainer-price/', views.TrainerPriceView.as_view(), name='trainer_price'),
 
     # редактирование, создание и просмотр записей в дневнике пользователя
     path('diary-notes/', views.UserDiaryView.as_view(), name='user_diary'),
@@ -27,6 +25,11 @@ urlpatterns = [
     path('medical-notes/', views.UserMedicalView.as_view(), name='user_medical'),
     # просмотр медицинских записей в дневнике по определённому тегу
     path('medical-notes/tag-<str:tag>', views.UserMedicalView.as_view(), name='user_medical'),
+
+    # редактирование, создание и просмотр расценок тренера
+    path('user-gyms/', views.UserGymsView.as_view(), name = 'user_gyms'),
+    # редактирование, создание и просмотр расценок тренера
+    path('trainer-price/', views.TrainerPriceView.as_view(), name = 'trainer_price'),
 
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),

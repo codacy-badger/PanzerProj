@@ -34,13 +34,13 @@
                     </div>
 
 
-                    <a class="list-group-item button" >
+                    <a class="list-group-item button" href="{% url 'user_gyms' %}">
                         <i class="fas fa-map-marked-alt"></i>
                         {% trans "Залы" %}
                     </a>
 
 
-                    {% if fitness_user.fitness_user_type == 'TRN' %}
+                    {% if fitness_user.fitness_user_type == fitness_user.teacher_user %}
                         <a class="list-group-item button" href="{% url 'trainer_price' %}" >
                             <i class="fas fa-dollar-sign"></i>
                             {% trans "Расценки" %}

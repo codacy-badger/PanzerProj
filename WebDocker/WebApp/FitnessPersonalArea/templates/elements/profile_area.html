@@ -151,7 +151,7 @@
             <div class="row">
                 {% for medical_note in user_medical_notes %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 280px">
+                        <div class="card" style="width: 15rem; height: 300px">
                           <div class="card-body">
                             <h5 class="card-title">{{ medical_note.short_title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ medical_note.medical_note_datetime }}</h6>
@@ -168,10 +168,12 @@
                                           {% endfor %}
                                     </h6>
                               {% endif %}
-                              <button type="button" value="{{medical_note.id}}" class="btn btn-link view_medical" data-toggle="modal" data-target="#viewMedicalNote">
-                                  {% trans "Детали" %}
-                                </button>
                           </div>
+                            <div class="card-footer text-muted">
+                                <button type="button" value="{{medical_note.id}}" class="btn btn-link view_medical" data-toggle="modal" data-target="#viewMedicalNote">
+                                    {% trans "Детали" %}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 {% empty %}
@@ -264,7 +266,7 @@
             <div class="row">
                 {% for usual_note in user_usual_notes %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 280px">
+                        <div class="card" style="width: 15rem; height: 300px">
                           <div class="card-body">
                             <h5 class="card-title">
                                     {{ usual_note.short_title }}
@@ -283,10 +285,12 @@
                                           {% endfor %}
                                     </h6>
                               {% endif %}
-                              <button type="button" value="{{usual_note.id}}" class="btn btn-link view_diary" data-toggle="modal" data-target="#viewDiaryNote">
-                                  {% trans "Детали" %}
-                                </button>
                           </div>
+                            <div class="card-footer">
+                                <button type="button" value="{{usual_note.id}}" class="btn btn-link view_diary" data-toggle="modal" data-target="#viewDiaryNote">
+                                    {% trans "Детали" %}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 {% empty %}
@@ -351,7 +355,7 @@
     {% endif %}
 
 
-    {% if fitness_trainer %}
+    {% if fitness_user.fitness_user_type == fitness_user.teacher_user %}
 
         <div class="card">
             <h5 class="card-header">{% trans "Данные тренера" %}
@@ -391,6 +395,7 @@
         <div class="card">
             <h5 class="card-header">
                     <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_price' %}';">
+                            <i class="fas fa-dollar-sign"></i>
                         {% trans "Расценки тренера" %}
                     </button>
                 <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"

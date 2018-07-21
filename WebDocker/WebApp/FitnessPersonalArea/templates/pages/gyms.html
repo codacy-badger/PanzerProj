@@ -1,0 +1,190 @@
+{% block gyms %}
+{% load static %}
+{% load i18n %}
+    <div class="page-header">
+        <h2>
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_gyms' %}';">
+                <i class="fas fa-map-marked-alt"></i>
+                {% trans "Ваши залы" %}
+            </button>
+            <button type="button" class="btn btn-light" id="create_diary_note" data-toggle="modal"
+                    data-target="#newGymDestination">
+                <i class="fas fa-plus-square "></i>
+            </button>
+        </h2>
+    </div>
+    <hr>
+    
+    <div class="row" style="padding-bottom: 20px">
+            <div class="col-12">
+    
+                <div class="card">
+                    <h5 class="card-header">{% trans "Залы" %}
+                    </h5>
+                    <div class="card-body">
+                        {% if fitness_user_gyms %}
+                            <div style="overflow-x:auto;">
+                                <table class="table  table-striped table-bordered" id="trainer_prices_table">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col" hidden>№</th>
+                                        <th scope="col">{% trans "Название" %}</th>
+                                        <th scope="col">{% trans "Описание" %}</th>
+                                        <th scope="col">{% trans "Адрес" %}</th>
+                                        <th scope="col">{% trans "Карта" %}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for gym in fitness_user_gyms %}
+                                        <tr>
+                                            <td hidden>{{ gym.id }}</td>
+                                            <td>{{ gym.gym_short_name }}</td>
+                                            <td>{{ gym.gym_short_description }}</td>
+                                            <td>{{ gym.gym_destination }}</td>
+                                            
+                                            <td>
+                                                <button type="button" class="btn btn-outline-primary" id="price_edit_btn" data-toggle="modal"
+                                                        data-target="#priceEdit">
+                                                        <i class="fas fa-map-marker"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            {% trans 'Нет залов, добавьте.' %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="map" style="height:30%"></div>
+
+
+        {% block diary_note_modal %}
+
+            {% include 'elements/modal_edit/diary_note_modal.html' %}
+
+        {% endblock %}
+
+    <script>
+        jQuery(document).ready(function(){
+            $( "button.btn.btn-secondary.edit" ).click(function() {
+                var diary_dom = $(this).closest("div.card.text-center");
+
+                var diary_tags = diary_dom.find('.card-header').find('.tags');
+
+                var diary_note_id = diary_dom.find('.card-body').find('.diary_note_id');
+
+                var diary_title = diary_dom.find('.card-body').find('.card-title');
+                var diary_text = diary_dom.find('.card-body').find('.card-text.text-justify');
+
+                $("#diary_note_tags_id").val($.trim(diary_tags.text()).replace(/ +(?= )/g,'').replace(/[#]/g, '').replace(/\s+/g, ', '));
+                $("#diary_note_title_id").val($.trim(diary_title.text()));
+                $("#diary_note_text_id").val(diary_text.text());
+                $("#diary_note_edit").val(diary_note_id.text());
+            });
+        });
+    </script>
+    <script type="text/python">
+        from browser import document as doc, alert, ajax, window
+    
+        def clear_inputs(ev):
+            doc["diary_note_tags_id"].val = ''
+            doc["diary_note_title_id"].val = ''
+            doc["diary_note_text_id"].val = ''   
+            doc["diary_note_edit"].val = -1 
+    
+        doc["create_diary_note"].bind("click", clear_inputs)
+    
+    </script>  
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtuyDtkP7A4TZPmpRySQHb4hv7hW6h0T0"></script>
+    <script>
+            // In the following example, markers appear when the user clicks on the map.
+            // Each marker is labeled with a single alphabetical character.
+            var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            var labelIndex = 0;
+        
+            var infoWindow, map, marker;
+        
+            function initialize() {
+                infoWindow = new google.maps.InfoWindow;
+        
+                map = new google.maps.Map(document.getElementById('map'), {
+                                                                            center: {lat: 52.52000659999999, lng: 13.404954},
+                                                                            zoom: 13
+                                                                        });
+                // если переданы залы с координатами                                                        
+                {% if fitness_user_gyms_json %}
+                AddMarkers()
+                {% endif %}
+            }
+        
+        
+            google.maps.event.addDomListener(window, 'load', initialize);
+        
+            // получаем данные местоположения пользователя
+            function CurrentLocation(){
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                        };
+                    // выводим информационное табло
+                    infoWindow.setPosition(pos);
+                    infoWindow.setContent('Вы тут');
+                    infoWindow.open(map);
+                    // центрируем карту на точке положения
+                    map.setCenter(pos);
+                                   
+                });
+            }
+        
+            // получаем данные местоположения пользователя
+            function AddMarkers(){
+                var i;
+                var shape = {
+                    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                    type: 'poly'
+                  };
+
+                  // список точек для вывода на карте
+                var gym_points = unescape("{{fitness_user_gyms_json | escapejs}}");
+                // преобразуем список в JSON
+                var json_gym_points = JSON.parse(gym_points);
+
+        
+                // задание центрирования карты
+                map.setCenter({lat:json_gym_points['features'][0]['geometry']['coordinates'][1], lng: json_gym_points['features'][0]['geometry']['coordinates'][0]});
+        
+                // обход всех точек и прорисовка на карте с сообщением
+                for (var i = 0; i < json_gym_points['features'].length; i++) {
+                    var marker = new google.maps.Marker({
+                      position: {lng: json_gym_points['features'][i]['geometry']['coordinates'][0], lat: json_gym_points['features'][i]['geometry']['coordinates'][1]},
+                      map: map,
+                      shape: shape,
+                      label:'G',
+                      title: json_gym_points['features'][i]['properties']['gym_name'],
+                    });
+                    attachSecretMessage(marker, json_gym_points['features'][i]['properties']['gym_name']);
+                  
+                }
+            }
+            // добавляем сообщение к маркеру
+              function attachSecretMessage(marker, secretMessage) {
+                var infowindow = new google.maps.InfoWindow({
+                  content: secretMessage
+                });
+        
+                marker.addListener('click', function() {
+                  infowindow.open(marker.get('map'), marker);
+                });
+            }
+            </script>
+
+{% endblock %}
