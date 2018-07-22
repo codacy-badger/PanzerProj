@@ -1,0 +1,110 @@
+{% block diary_note %}
+{% load static %}
+{% load i18n %}
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="newDiaryNote">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-book-open"></i>
+                        {% trans "Ваш дневник" %}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form name="new_diary_note_form" method="post" action="" id="new_diary_note_form_id" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input hidden name="diary_note_edit" value="-1" id="diary_note_edit">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название записи"%}</dt>
+                            <dd class="col-sm-8"><input type="text" id="diary_note_title_id" required name="diary_note_title" maxlength="100"></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Текст записи"%}</dt>
+                            <dd class="col-sm-8"><textarea class="form-control" id="diary_note_text_id"  type="text" name="diary_note_text"  maxlength="4000" required></textarea></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Теги записи, через запятую"%}</dt>
+                            <dd class="col-sm-8"><input type="text" id="diary_note_tags_id" required name="diary_note_tags" maxlength="50"></dd>
+                        </dl>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="new_diary_note_btn_id" name="new_diary_note_btn">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+            function reloader () {
+                location.reload(true)
+              }         
+    </script>
+<script type="text/python">
+    from browser import document as doc, alert, ajax, window
+    import json
+    import urllib
+
+    csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+
+    def on_complete(req):
+        json_response = json.loads(req.text)
+        # if success creation
+        if req.status==200 and json_response['answer']==True:
+            # reload page from JS
+            window.reloader()
+        # if error - show message
+        else:
+            alert(json_response['error_answer'])
+
+    def post_request(ev):
+        req = ajax.ajax()
+        req.bind('complete',on_complete)
+        # send a POST request to the url
+        req.open("POST","{% url 'user_diary' %}",True)
+        # set headers
+        req.set_header('content-type','application/x-www-form-urlencoded')
+        req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+        # set header for Django .is_ajax() method
+        req.set_header('X-Requested-With','XMLHttpRequest')
+
+        # get inserted form data
+        diary_note_title = doc['diary_note_title_id'].value
+        diary_note_text = doc['diary_note_text_id'].value
+        diary_note_tags = doc['diary_note_tags_id'].value
+
+        # check inputs 
+        if diary_note_title and diary_note_text and diary_note_tags:
+            # prepare request dictionary
+            request_body = {
+                            'csrfmiddlewaretoken':csrf_token, 
+                            'diary_note_title': diary_note_title, 
+                            'diary_note_text': diary_note_text, 
+                            'diary_note_tags': diary_note_tags
+                            }
+            # if edit old note, set note id
+            if doc['diary_note_edit'].value != '-1':
+                request_body.update({'diary_note_edit': doc['diary_note_edit'].value})
+            # if create new note
+            else:
+                request_body.update({'new_diary_note_btn': True})   
+
+            print(request_body)
+            # send data as a dictionary
+            req.send(request_body)
+        else:
+            alert('Заполните все поля.')
+
+
+    doc["new_diary_note_btn_id"].bind("click", post_request)
+
+</script>
+{% endblock %}

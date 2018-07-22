@@ -1,0 +1,140 @@
+{% block gym_modal %}
+{% load static %}
+{% load i18n %}
+
+<link href="{% static "/css/gym.css" %}" rel="stylesheet">
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="newGymDestination">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-map-marked-alt"></i>
+                        {% trans "Ваши залы" %}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form name="new_gym_form" method="post" action="" id="new_gym_id" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input hidden name="gym_edit" value="-1" id="gym_edit">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название зала"%}</dt>
+                            <dd class="col-sm-8"><input type="text" id="gym_title_id" required name="gym_title" maxlength="100"></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Описание зала"%}</dt>
+                            <dd class="col-sm-8"><textarea type="text" class="form-control" id="gym_description_id" required name="gym_description" maxlength="1000"></textarea></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Адрес зала"%}</dt>
+                            <dd class="col-sm-8"><input type="text" id="gym_adress_id" required name="gym_adress" maxlength="100"></dd>
+                        </dl>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="new_gym_btn_id" name="new_gym_btn">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+        
+    
+   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtuyDtkP7A4TZPmpRySQHb4hv7hW6h0T0&libraries=places"></script>
+  
+    <script>
+        // In the following example, markers appear when the user clicks on the map.
+        // Each marker is labeled with a single alphabetical character.
+        
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var labelIndex = 0;
+    
+        var infoWindow, map, marker;
+    
+        function initialize() {
+            infoWindow = new google.maps.InfoWindow;
+    
+            map = new google.maps.Map(document.getElementById('map'), {
+                                                                        center: {lat: 52.52000659999999, lng: 13.404954},
+                                                                        zoom: 13
+                                                                    });
+
+            // автозаполнение поля с введённым адресом зала
+            var current_location = (document.getElementById('gym_adress_id'));
+            var gym_location_place = new google.maps.places.Autocomplete(current_location);   
+
+            // если переданы залы с координатами                                                        
+            {% if fitness_user_gyms_json %}
+            AddMarkers()
+            {% endif %}
+        }
+    
+    
+        google.maps.event.addDomListener(window, 'load', initialize);
+    
+        // получаем данные местоположения пользователя
+        function CurrentLocation(){
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                    };
+                // выводим информационное табло
+                infoWindow.setPosition(pos);
+                infoWindow.setContent('Вы тут');
+                infoWindow.open(map);
+                // центрируем карту на точке положения
+                map.setCenter(pos);
+                               
+            });
+        }
+    
+        // получаем данные местоположения пользователя
+        function AddMarkers(){
+            var i;
+            var shape = {
+                coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                type: 'poly'
+              };
+
+              // список точек для вывода на карте
+            var gym_points = unescape("{{fitness_user_gyms_json | escapejs}}");
+            // преобразуем список в JSON
+            var json_gym_points = JSON.parse(gym_points);
+
+    
+            // задание центрирования карты
+            map.setCenter({lat:json_gym_points['features'][0]['geometry']['coordinates'][1], lng: json_gym_points['features'][0]['geometry']['coordinates'][0]});
+    
+            // обход всех точек и прорисовка на карте с сообщением
+            for (var i = 0; i < json_gym_points['features'].length; i++) {
+                var marker = new google.maps.Marker({
+                  position: {lng: json_gym_points['features'][i]['geometry']['coordinates'][0], lat: json_gym_points['features'][i]['geometry']['coordinates'][1]},
+                  map: map,
+                  shape: shape,
+                  label:'G',
+                  title: json_gym_points['features'][i]['properties']['gym_name'],
+                });
+                attachSecretMessage(marker, json_gym_points['features'][i]['properties']['gym_name']);
+              
+            }
+        }
+        // добавляем сообщение к маркеру
+          function attachSecretMessage(marker, secretMessage) {
+            var infowindow = new google.maps.InfoWindow({
+              content: secretMessage
+            });
+    
+            marker.addListener('click', function() {
+              infowindow.open(marker.get('map'), marker);
+            });
+        }
+        </script>
+
+  
+{% endblock %}
