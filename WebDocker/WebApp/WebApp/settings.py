@@ -174,8 +174,8 @@ LOGIN_REDIRECT_URL = 'success_login'
 SOCIAL_AUTH_VK_OAUTH2_KEY = '6605485'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = 'f0Njvt28fiKeo3nwXK4r'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '429925075232-9tdk0pts8mfu1m3q3iofe0h8u1605h5n.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'zmNvKL8TNo77X__Qv4CCcSG1'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '216912188262-du2kqhcj8tka42uckpnp1co7p750cnsg.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'EFwrdXHSBVcBOWQxFEBTXzIs'
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
