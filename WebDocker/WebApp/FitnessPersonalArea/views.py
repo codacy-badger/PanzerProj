@@ -380,79 +380,79 @@ class UserMedicalView(View):
             return render(request, 'base.html', self.content)
 
     def post(self, request, tag = None):
-        # если пользователь хочет удалить пост
-        if 'medical_note_delete_id' in request.POST:
-            deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])
-            # проверяем, является ли удаляющий автором поста
-            if request.user == deleted_post.user.user:
-                # делаем пост невидимым для пользователя-автора
-                deleted_post.medical_note_show = False
-                deleted_post.save()
+        if request.user.is_authenticated:
+            # если пользователь хочет удалить пост
+            if 'medical_note_delete_id' in request.POST:
+                deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])
+                # проверяем, является ли удаляющий автором поста
+                if request.user == deleted_post.user.user:
+                    # делаем пост невидимым для пользователя-автора
+                    deleted_post.medical_note_show = False
+                    deleted_post.save()
 
-                messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
-            else:
-                messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
+                    messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
+                else:
+                    messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
 
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-        """
-        Ajax запросы
-        """
-        # проверка реквеста и авторизироанности пользователя
-        if request.is_ajax() and request.user.is_authenticated:
-            try:
-                print(request.POST)
-                # создаём новую медицинскую запись запись в дневнике
-                if 'new_medical_note_btn' in request.POST:
-                    try:
-                        new_medical_note = MedicalNote.objects.create(
-                            user = FitnessUser.objects.get(user = request.user),
-                            medical_note_title = request.POST['medical_note_title'],
-                            medical_note_text = request.POST['medical_note_text'])
+                # возвращаем пользователя назад на ту же страницу
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            """
+            Ajax запросы
+            """
+            # проверка реквеста и авторизироанности пользователя
+            if request.is_ajax():
+                try:
+                    # создаём новую медицинскую запись запись в дневнике
+                    if 'new_medical_note_btn' in request.POST:
+                        try:
+                            new_medical_note = MedicalNote.objects.create(
+                                user = FitnessUser.objects.get(user = request.user),
+                                medical_note_title = request.POST['medical_note_title'],
+                                medical_note_text = request.POST['medical_note_text'])
 
-                        # добавляем теги к медицинской записи
-                        for tag in request.POST['medical_note_tags'].split(','):
-                            new_medical_note.medical_note_tags.add(tag.lower().strip())
-                        new_medical_note.save()
-
-                        self.ajax_content.update({'answer': True})
-
-                        messages.add_message(request, messages.SUCCESS, _('Запись создана'))
-                    # TODO добавить логгирование ошибок
-                    except Exception as err:
-                        print(err)
-                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
-
-                # редакитурем старую мед. запись
-                elif 'medical_note_edit' in request.POST:
-                    try:
-                        # получаем запись из БД по id
-                        medical_note = MedicalNote.objects.get(id = request.POST['medical_note_edit'])
-                        # проверка соответсвия хозяина мед.заметки и пользователя пытающегося изменить запись
-                        if medical_note.user.user == request.user:
-                            # вносим изменённые данные в модель записи
-                            medical_note.medical_note_title = request.POST['medical_note_title']
-                            medical_note.medical_note_text = request.POST['medical_note_text']
-                            # обновляем дату записи
-                            medical_note.medical_note_datetime = now()
-
-                            # добавляем теги к записи в дневнике
+                            # добавляем теги к медицинской записи
                             for tag in request.POST['medical_note_tags'].split(','):
-                                medical_note.medical_note_tags.add(tag.lower().strip())
-                            medical_note.save()
+                                new_medical_note.medical_note_tags.add(tag.lower().strip())
+                            new_medical_note.save()
 
                             self.ajax_content.update({'answer': True})
 
-                            messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
-                    # TODO добавить логгирование ошибок
-                    except Exception as err:
-                        print(err)
-                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
-            # TODO добавить логгирование ошибок
-            except Exception as err:
-                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                            messages.add_message(request, messages.SUCCESS, _('Запись создана'))
+                        # TODO добавить логгирование ошибок
+                        except Exception as err:
+                            print(err)
+                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-            return JsonResponse(self.ajax_content)
+                    # редакитурем старую мед. запись
+                    elif 'medical_note_edit' in request.POST:
+                        try:
+                            # получаем запись из БД по id
+                            medical_note = MedicalNote.objects.get(id = request.POST['medical_note_edit'])
+                            # проверка соответсвия хозяина мед.заметки и пользователя пытающегося изменить запись
+                            if medical_note.user.user == request.user:
+                                # вносим изменённые данные в модель записи
+                                medical_note.medical_note_title = request.POST['medical_note_title']
+                                medical_note.medical_note_text = request.POST['medical_note_text']
+                                # обновляем дату записи
+                                medical_note.medical_note_datetime = now()
+
+                                # добавляем теги к записи в дневнике
+                                for tag in request.POST['medical_note_tags'].split(','):
+                                    medical_note.medical_note_tags.add(tag.lower().strip())
+                                medical_note.save()
+
+                                self.ajax_content.update({'answer': True})
+
+                                messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
+                        # TODO добавить логгирование ошибок
+                        except Exception as err:
+                            print(err)
+                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+        return JsonResponse(self.ajax_content)
 
 
 # user gym`s
