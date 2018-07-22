@@ -18,7 +18,7 @@
 
                 <form name="new_gym_form" method="post" action="" id="new_gym_id" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <input hidden name="gym_edit" value="-1" id="gym_edit">
+                    <input hidden name="gym_edit" value="-1" id="gym_edit_id">
                     <!-- Modal body -->
                     <div class="modal-body">
                         <dl class="row">
@@ -135,6 +135,69 @@
             });
         }
         </script>
+        <script>
+            function reloader () {
+                location.reload(true)
+              }         
+    </script>
+<script type="text/python">
+    from browser import document as doc, alert, ajax, window
+    import json
+    import urllib
 
+    csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+
+    def on_complete(req):
+        json_response = json.loads(req.text)
+        # if success creation
+        if req.status==200 and json_response['answer']==True:
+            # reload page from JS
+            window.reloader()
+        # if error - show message
+        else:
+            alert(json_response['error_answer'])
+
+    def post_request(ev):
+        req = ajax.ajax()
+        req.bind('complete',on_complete)
+        # send a POST request to the url
+        req.open("POST","{% url 'user_gyms' %}",True)
+        # set headers
+        req.set_header('content-type','application/x-www-form-urlencoded')
+        req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+        # set header for Django .is_ajax() method
+        req.set_header('X-Requested-With','XMLHttpRequest')
+
+        # get inserted form data
+        gym_title = doc['gym_title_id'].value
+        gym_description = doc['gym_description_id'].value
+        gym_adress = doc['gym_adress_id'].value
+
+        # check inputs 
+        if gym_title and gym_description and gym_adress:
+            # prepare request dictionary
+            request_body = {
+                            'csrfmiddlewaretoken':csrf_token, 
+                            'gym_title': gym_title, 
+                            'gym_description': gym_description, 
+                            'gym_adress': gym_adress
+                            }
+            # if edit old note, set note id
+            if doc['gym_edit_id'].value != '-1':
+                request_body.update({'gym_edit': doc['gym_edit_id'].value})
+            # if create new note
+            else:
+                request_body.update({'new_gym_btn_id': True})   
+
+            print(request_body)
+            # send data as a dictionary
+            req.send(request_body)
+        else:
+            alert('Заполните все поля.')
+
+
+    doc["new_gym_btn_id"].bind("click", post_request)
+
+</script>
   
 {% endblock %}

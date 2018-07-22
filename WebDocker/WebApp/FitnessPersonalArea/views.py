@@ -16,9 +16,9 @@ from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.gis.geos import Point
 
-
-from geopy.geocoders import GoogleV3
+from geopy.geocoders import Nominatim
 
 from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, \
     ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
@@ -194,32 +194,6 @@ class ProfilePage(View):
                     ajax_answer.update({'error_answer': _('Произошла ошибка!')})
 
             return JsonResponse(ajax_answer)
-
-
-# gym destinations
-class GymView(View):
-    """
-    Класс отвечает за страницу с залами пользователя
-    """
-    def get(self, request):
-        pass
-
-    def post(self, request):
-        # TODO добавить задание всех полей для создания зала
-        new_gym_form = NewGym()
-        if new_gym_form.is_valid():
-            new_gym = TrainGym()
-            # если заполнен адрес - получаем точку размещения данного места
-            if 'gym_destination' in new_gym_form:
-                # адрес в локацию (долготу/широту)
-                new_gym_location = GoogleV3().geocode(new_gym_form.cleaned_data['gym_destination'])
-                new_gym.gym_geo = new_gym_location
-                new_gym.save()
-            elif 'gym_geo' in new_gym_form:
-                # локацию (долготу/широту) в адрес
-                new_gym_destination = GoogleV3().reverse(new_gym_form.cleaned_data['gym_destination'])
-                new_gym.gym_destination = new_gym_destination
-                new_gym.save()
 
 
 # diary notes
@@ -488,7 +462,6 @@ class UserGymsView(View):
         а так же создание, редактирование и просмотр всех залов
     """
     content = {}
-    from django.core.serializers import serialize
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -509,51 +482,47 @@ class UserGymsView(View):
 
     def post(self, request):
         self.ajax_content = {'answer': False}
-        # проверка реквеста и авторизироанности пользователя
-        if request.is_ajax() and request.user.is_authenticated:
-            try:
-                # если id расценки -0, создаём новую
-                if request.POST['price_id'] == '0':
-                    # создаём новую расценку
-                    TrainerPrice.objects.create(user = FitnessTrainer.objects.get(user__user = request.user),
-                                                trainer_price_hour = request.POST['trainer_price_hour'],
-                                                trainer_price_comment = request.POST['trainer_price_comment'],
-                                                trainer_price_currency = request.POST['trainer_price_currency'],
-                                                trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False,
-                                                trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False)
+        # проверка аторизованности пользователя
+        if request.user.is_authenticated:
+            fitness_user = FitnessUser.objects.get(user = request.user)
+            # если отправлен AJAX запрос
+            if request.is_ajax():
+                print(request.POST)
+                try:
+                    if request.POST.get('new_gym_btn_id'):
+                        gym_position = Nominatim().geocode(request.POST['gym_adress'])
+                        if gym_position:
+                            # создаём новый зал
+                            TrainGym.objects.create(user = fitness_user,
+                                                    gym_name = request.POST['gym_title'],
+                                                    gym_description = request.POST['gym_description'],
+                                                    gym_destination = request.POST['gym_adress'],
+                                                    # получаем точку размещения данного адреса
+                                                    gym_geo = Point(gym_position.longitude, gym_position.latitude,
+                                                                    srid = gym_position.raw['place_id']))
 
-                    # обновляем данные для ответа сервера
-                    self.ajax_content.update({'answer': True})
-                    # добавляем сообщение пользователю
-                    messages.add_message(request, messages.SUCCESS, _('Расценка создана'))
+                            messages.add_message(request, messages.SUCCESS, _('Зал сохранён'))
+                            # обновляем ответ на AJAX-запрос, об успешном создании зала
+                            self.ajax_content.update({'answer': True})
+                        else:
+                            # обновляем ответ на AJAX-запрос, об ошибке при декодировании адреса в местоположение
+                            self.ajax_content.update({'error_answer': _('Данный адрес не найден')})
+                        '''
+                        # локацию (долготу/широту) в адрес
+                        new_gym_destination = Nominatim().reverse(new_gym_form.cleaned_data['gym_destination'])
+                        new_gym.gym_destination = new_gym_destination
+                        new_gym.save()
+                        '''
+                    elif request.POST.get('gym_edit'):
+                        print('Edit old GYM')
 
-                else:
-                    # если изменяем расценку - получение данной расценки из БД
-                    training_price = TrainerPrice.objects.get(id=request.POST['price_id'])
-                    # проверка пользователя на авторство данной цене
-                    if training_price.user == FitnessTrainer.objects.get(user__user=request.user):
-                        # изменение расценки
-                        training_price.trainer_price_hour = request.POST['trainer_price_hour']
-                        training_price.trainer_price_comment = request.POST['trainer_price_comment']
-                        training_price.trainer_price_currency = request.POST['trainer_price_currency']
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-                        training_price.trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False
-
-                        training_price.trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False
-
-                        # сохраняем новые данные расценки
-                        training_price.save()
-
-                        # обновляем данные для ответа сервера
-                        self.ajax_content.update({'answer': True})
-                        # добавляем сообщение пользователю
-                        messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
-
-            # TODO добавить логгирование ошибок
-            except Exception as err:
-                self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
-
-            return JsonResponse(self.ajax_content)
+                finally:
+                    return JsonResponse(self.ajax_content)
 
 
 # trainer price page
@@ -622,7 +591,8 @@ class TrainerPriceView(View):
             except Exception as err:
                 self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-            return JsonResponse(self.ajax_content)
+            finally:
+                return JsonResponse(self.ajax_content)
 
 
 # change language
