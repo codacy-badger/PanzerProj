@@ -1,4 +1,4 @@
-{% block gym_modal %}
+{% block gym_modal_edit %}
 {% load static %}
 {% load i18n %}
 
@@ -43,7 +43,6 @@
             </div>
         </div>
     </div>
-        
     
    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtuyDtkP7A4TZPmpRySQHb4hv7hW6h0T0&libraries=places"></script>
   
@@ -54,16 +53,23 @@
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         var labelIndex = 0;
     
-        var infoWindow, map, marker;
+        var infoWindow, map, marker, map_detail;
     
         function initialize() {
             infoWindow = new google.maps.InfoWindow;
+
+            var mapOptions = {
+                center: {lat: 52.52000659999999, lng: 13.404954},
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
     
             map = new google.maps.Map(document.getElementById('map'), {
                                                                         center: {lat: 52.52000659999999, lng: 13.404954},
                                                                         zoom: 13
                                                                     });
-
+            // добавление новой карты во всплывающее окно при ПРОСМОТРЕ созданного зала
+            map_detail = new google.maps.Map(document.getElementById("map_detail"), mapOptions);
             // автозаполнение поля с введённым адресом зала
             var current_location = (document.getElementById('gym_adress_id'));
             var gym_location_place = new google.maps.places.Autocomplete(current_location);   
@@ -124,7 +130,7 @@
               
             }
         }
-        // добавляем сообщение к маркеру
+        // добавляем сообщение к маркеру на главной карте
           function attachSecretMessage(marker, secretMessage) {
             var infowindow = new google.maps.InfoWindow({
               content: secretMessage
@@ -134,6 +140,7 @@
               infowindow.open(marker.get('map'), marker);
             });
         }
+
         </script>
         <script>
             function reloader () {

@@ -137,7 +137,7 @@ class ProfilePage(View):
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'elements/profile_area.html',
                 'fitness_user': fitness_user,
-                'user_gyms': TrainGym.objects.filter(user = fitness_user),
+                'user_gyms': TrainGym.objects.filter(user = fitness_user).order_by('-id')[:4],
 
                 'user_training_schedule': TrainingSchedule.objects.filter(
                                                     Q(target_user = fitness_user) | Q(author_user = fitness_user)).
