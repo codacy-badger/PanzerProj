@@ -2,7 +2,6 @@
 {% load static %}
 {% load i18n %}
 
-<link href="{% static "/css/gym.css" %}" rel="stylesheet">
     <!-- The Modal -->
     <div class="modal fade bd-example-modal-lg" id="newGymDestination">
         <div class="modal-dialog  modal-lg">
@@ -49,25 +48,19 @@
     <script>
         // In the following example, markers appear when the user clicks on the map.
         // Each marker is labeled with a single alphabetical character.
-        
-        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        var labelIndex = 0;
-    
+
         var infoWindow, map, marker, map_detail;
     
         function initialize() {
             infoWindow = new google.maps.InfoWindow;
 
             var mapOptions = {
-                center: {lat: 52.52000659999999, lng: 13.404954},
-                zoom: 13,
+                center: {lat: 53.90453979999999, lng: 27.5615244},
+                zoom: 5,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             }
     
-            map = new google.maps.Map(document.getElementById('map'), {
-                                                                        center: {lat: 52.52000659999999, lng: 13.404954},
-                                                                        zoom: 13
-                                                                    });
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
             // добавление новой карты во всплывающее окно при ПРОСМОТРЕ созданного зала
             map_detail = new google.maps.Map(document.getElementById("map_detail"), mapOptions);
             // автозаполнение поля с введённым адресом зала
@@ -127,7 +120,7 @@
                   title: json_gym_points['features'][i]['properties']['gym_name'],
                 });
                 attachSecretMessage(marker, json_gym_points['features'][i]['properties']['gym_name']);
-              
+                map.setZoom(17)
             }
         }
         // добавляем сообщение к маркеру на главной карте

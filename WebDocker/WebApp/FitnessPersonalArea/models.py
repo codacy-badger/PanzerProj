@@ -210,6 +210,28 @@ class TrainGym(models.Model):
     def gym_short_description(self):
         return self.gym_description if len(self.gym_description) < 50 else self.gym_description[:50]+' ...'
 
+    # получение информации о зале в формате JSON
+    def get_gym_json(self):
+        """
+        Получение основной информации о записи и представление её в формате JSON
+        gym_user - username автора записи
+        gym_name - список тегов записи
+        gym_description - текст записи
+        gym_destination - название записи
+        gym_geo - дата/время создания записи
+        :return: JSON  с информацией о записи
+        """
+        return {
+                'gym_user': self.user.user.username,
+                'gym_name': self.gym_name,
+                'gym_description': self.gym_description,
+                'gym_destination': self.gym_destination,
+                'gym_geo':{
+                    'lat': self.gym_geo.y,
+                    'lng': self.gym_geo.x
+                    }
+                }
+
 
 # train schedule
 class TrainingSchedule(models.Model):

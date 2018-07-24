@@ -7,7 +7,7 @@
                 <i class="fas fa-map-marked-alt"></i>
                 {% trans "Ваши залы" %}
             </button>
-            <button type="button" class="btn btn-light" id="create_diary_note" data-toggle="modal"
+            <button type="button" class="btn btn-light" data-toggle="modal"
                     data-target="#newGymDestination">
                 <i class="fas fa-plus-square "></i>
             </button>
@@ -84,14 +84,14 @@
                 var gym_description=currentRow.find("td:eq(2)").text();
                 var gym_destination=currentRow.find("td:eq(3)").text();
                 var gym_lat=currentRow.find("td:eq(4)").text().replace(',', '.');
-                var gym_long=currentRow.find("td:eq(5)").text().replace(',', '.');
+                var gym_lng=currentRow.find("td:eq(5)").text().replace(',', '.');
                 
                 $("#gym_title_view_id").text(gym_name);
                 $("#gym_description_view_id").text(gym_description);
                 $("#gym_adress_view_id").text(gym_destination);
 
                 // центрируем карту на новой точке - зале
-                map_detail.setCenter({lat: parseFloat(gym_lat), lng: parseFloat(gym_long)});
+                map_detail.setCenter({lat: parseFloat(gym_lat), lng: parseFloat(gym_lng)});
                 map_detail.setZoom(18);
                 
                 var shape = {
@@ -107,7 +107,7 @@
 
                 // добавляем новый маркер зала
                 var marker = new google.maps.Marker({
-                    position: {lat: parseFloat(gym_lat), lng: parseFloat(gym_long)},
+                    position: {lat: parseFloat(gym_lat), lng: parseFloat(gym_lng)},
                     map: map_detail,
                     shape: shape,
                     label:'G',

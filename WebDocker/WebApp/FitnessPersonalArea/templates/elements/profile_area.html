@@ -54,7 +54,8 @@
                 <i class="fas fa-map-marked-alt"></i>
                 {% trans "Ваши залы" %}
             </button>
-            <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal" data-target="#newGymDestination">
+            <button type="button" class="btn btn-light" data-toggle="modal"
+                    data-target="#newGymDestination">
                 <i class="fas fa-plus-square "></i>
             </button>
         </h5>
@@ -82,6 +83,8 @@
                     {% trans 'Нет ваших залов, добавьте.' %}
                 {% endfor %}
             </div>
+
+        <div id="map" style="height:30%"></div>
         </div>
     </div>
 
@@ -198,66 +201,6 @@
         </div>
     </div>
 
-
-    <script type="text/python">
-        from browser import document as doc, alert, ajax, window, html
-        import json
-        import urllib
-    
-        csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
-    
-        # fill modal window data
-        def fill_medical_modal(response):
-            # clean inputs
-            doc["medical_note_modal_title"].text = ''
-            doc["medical_note_modal_text"].text = ''
-            doc["medical_note_modal_datetime"].text = ''
-            doc["medical_note_modal_tags"].text = ''
-
-            # insert new data
-            doc['medical_note_modal_title'] <= response['medical_note_title']
-            doc['medical_note_modal_text'] <= response['medical_note_text']
-            doc['medical_note_modal_datetime'] <= response['medical_note_datetime']
-            for tag in response['medical_note_tags']:
-                # crete new <a> element and set class (for tags)
-                link = html.A(Class = "badge badge-pill badge-info")
-                # add href fro tags
-                link.href = "{% url 'user_medical' %}tag-"+tag
-                # add text to <a>
-                link <= "#"+tag
-
-                # add <a> to HTML element
-                doc['medical_note_modal_tags'] <= link
-
-        def on_complete(req):
-            json_response = json.loads(req.text)
-            # if NOT success geting data
-            if req.status!=200 and json_response['answer']!=True:
-                alert(json_response['error_answer'])
-            else:
-                fill_medical_modal(json_response['medical_note'])
-                    
-        def get_data(ev):
-            # get medical note ID and set to GET request param
-            qs = "medical_note_id="+ev.currentTarget.value
-
-            req = ajax.ajax()
-            req.bind('complete',on_complete)
-            # send a POST request to the url
-            req.open("GET","{% url 'user_medical' %}"+"?"+qs,True)
-            # set headers
-            req.set_header('content-type','application/x-www-form-urlencoded')
-            req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
-            # set header for Django .is_ajax() method
-            req.set_header('X-Requested-With','XMLHttpRequest')
-
-            req.send()
-    
-        # bind all objects to func
-        for element in doc.select('.btn.btn-link.view_medical'):
-            element.bind("click", get_data)
-    
-    </script>
 
     <div class="card">
         <h5 class="card-header">
@@ -548,6 +491,7 @@
 
     {% block gym_modal %}
 
+        {% include 'elements/modal_edit/gym_modal.html' %}
         {% include 'elements/modal_view/gym_modal.html' %}
 
     {% endblock %}
@@ -562,14 +506,16 @@
 
     {% endblock %}
 
+
+
         <script type="text/python">
             from browser import document as doc, alert, ajax, window, html
             import json
             import urllib
         
             csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
-        
-            # fill modal window data
+
+
             def fill_diary_modal(response):
                 # clean inputs
                 doc["diary_note_modal_title"].text = ''
@@ -592,7 +538,7 @@
                     # add <a> to HTML element
                     doc['diary_note_modal_tags'] <= link
 
-            def on_complete(req):
+            def on_complete_diary(req):
                 json_response = json.loads(req.text)
                 # if NOT success geting data
                 if req.status!=200 and json_response['answer']!=True:
@@ -600,12 +546,12 @@
                 else:
                     fill_diary_modal(json_response['diary_note'])
                         
-            def get_data(ev):
+            def get_data_diary(ev):
                 # get diary note ID and set to GET request param
                 qs = "diary_note_id="+ev.currentTarget.value
 
                 req = ajax.ajax()
-                req.bind('complete',on_complete)
+                req.bind('complete',on_complete_diary)
                 # send a POST request to the url
                 req.open("GET","{% url 'user_diary' %}"+"?"+qs,True)
                 # set headers
@@ -615,11 +561,163 @@
                 req.set_header('X-Requested-With','XMLHttpRequest')
 
                 req.send()
-        
-            # bind all objects to func
-            for element in doc.select('.btn.btn-link.view_diary'):
-                element.bind("click", get_data)
-        
-        </script>
 
+
+            """
+            Fill modal window MEDICAL data
+            """  
+            def fill_medical_modal(response):
+                # clean inputs
+                doc["medical_note_modal_title"].text = ''
+                doc["medical_note_modal_text"].text = ''
+                doc["medical_note_modal_datetime"].text = ''
+                doc["medical_note_modal_tags"].text = ''
+    
+                # insert new data
+                doc['medical_note_modal_title'] <= response['medical_note_title']
+                doc['medical_note_modal_text'] <= response['medical_note_text']
+                doc['medical_note_modal_datetime'] <= response['medical_note_datetime']
+                for tag in response['medical_note_tags']:
+                    # crete new <a> element and set class (for tags)
+                    link = html.A(Class = "badge badge-pill badge-info")
+                    # add href fro tags
+                    link.href = "{% url 'user_medical' %}tag-"+tag
+                    # add text to <a>
+                    link <= "#"+tag
+    
+                    # add <a> to HTML element
+                    doc['medical_note_modal_tags'] <= link
+    
+            """
+            AJAX-get response for MEDICAL notes
+            """              
+            def on_complete_medical(req):
+                json_response = json.loads(req.text)
+                # if NOT success geting data
+                if req.status!=200 and json_response['answer']!=True:
+                    alert(json_response['error_answer'])
+                else:
+                    fill_medical_modal(json_response['medical_note'])
+            
+            """
+            AJAX-get request for MEDICAL notes
+            """            
+            def get_data_medical(ev):
+                # get medical note ID and set to GET request param
+                qs = "medical_note_id="+ev.currentTarget.value
+    
+                req = ajax.ajax()
+                req.bind('complete',on_complete_medical)
+                # send a POST request to the url
+                req.open("GET","{% url 'user_medical' %}"+"?"+qs,True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+    
+                req.send()
+ 
+
+            """
+            Fill modal window GYM data
+            """  
+            def fill_gym_modal(response):
+                # add marker on map
+                window.add_gym_view_marker(response)
+                # clean old data
+                doc["gym_title_view_id"].text = ''
+                doc["gym_description_view_id"].text = ''
+                doc["gym_adress_view_id"].text = ''
+        
+                # insert new data
+                doc['gym_title_view_id'] <= response['gym_name']
+                doc['gym_description_view_id'] <= response['gym_description']
+                doc['gym_adress_view_id'] <= response['gym_destination']
+                
+            """
+            AJAX-get response for GYMS object
+            """                 
+            def on_complete_gym(req):
+                json_response = json.loads(req.text)
+                # if NOT success geting data
+                if req.status!=200 and json_response['answer']!=True:
+                    alert(json_response['error_answer'])
+                else:
+                    fill_gym_modal(json_response['gym_data'])
+             
+            """
+            AJAX-get request for GYM object
+            """ 
+            def get_data_gym(ev):
+                # get medical note ID and set to GET request param
+                qs = "gym_object_id="+ev.currentTarget.value
+    
+                req = ajax.ajax()
+                req.bind('complete',on_complete_gym)
+                # send a POST request to the url
+                req.open("GET","{% url 'user_gyms' %}"+"?"+qs,True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+    
+                req.send()
+
+            # bind all medical objects to func
+            for element in doc.select('.btn.btn-link.view_medical'):
+                element.bind("click", get_data_medical)
+        
+            # bind all diary objects to func
+            for element in doc.select('.btn.btn-link.view_diary'):
+                element.bind("click", get_data_diary)
+        
+            # bind all gyms objects to func
+            for element in doc.select('.btn.btn-link.view_gym'):
+                element.bind("click", get_data_gym)
+        </script>
+        <script>
+        function add_gym_view_marker(gym_data) {
+            var markers = [];
+            // центрируем карту на новой точке - зале
+            map_detail.setCenter({lat: gym_data.gym_geo.lat, lng: gym_data.gym_geo.lng});
+                map_detail.setZoom(18);
+                
+                var shape = {
+                    coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                    type: 'poly'
+                  };
+                
+                // удаляем старые маркеры
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];
+
+                // добавляем новый маркер зала
+                var marker = new google.maps.Marker({
+                    position: {lat: gym_data.gym_geo.lat, lng: gym_data.gym_geo.lng},
+                    map: map_detail,
+                    shape: shape,
+                    label:'G',
+                    title: gym_data.gym_name,
+                  });
+                  attachModalSecretMessage(marker, gym_data.gym_name);
+
+                  markers.push(marker);
+           
+            // добавляем сообщение к маркеру на карте во всплывающем окне
+            function attachModalSecretMessage(marker, secretMessage) {
+                var infowindow = new google.maps.InfoWindow({
+                content: secretMessage
+                });
+        
+                marker.addListener('click', function() {
+                    infowindow.open(map_detail, marker);
+                });
+            }
+           
+        }
+        </script>
 {% endblock %}

@@ -474,8 +474,22 @@ class UserGymsView(View):
         if request.user.is_authenticated:
             # получаем данные пользователя
             fitness_user = FitnessUser.objects.get(user = request.user)
-            # проверяем тип пользователя, должен быть тренером
-            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+            if request.is_ajax() and request.GET.get('gym_object_id'):
+
+                try:
+                    # получаем данные зала из БД
+                    gym_object = TrainGym.objects.get(id = request.GET['gym_object_id'])
+                    self.ajax_content.update({'gym_data': gym_object.get_gym_json()})
+
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                finally:
+                    return JsonResponse(self.ajax_content)
+            else:
+
                 self.content.update({
                     'doc': 'pages/personal_area.html',
                     'private_doc': 'pages/gyms.html',
