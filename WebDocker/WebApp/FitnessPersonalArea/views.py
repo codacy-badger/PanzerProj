@@ -90,7 +90,7 @@ class RegistrationPage(View):
         return render(request, 'base.html', self.content)
 
     def post(self, request):
-        if 'new_account_btn' in request.POST:
+        if request.POST.get('new_account_btn'):
             # проверяем одинаковость ввелённых паролей
             if request.POST['password'] == request.POST['password_repeat']:
                 # проверяем отсутствие email среди зарегистрированных
@@ -154,7 +154,11 @@ class ProfilePage(View):
                                                                  medical_note_show = True).order_by('-id')[:4],
 
                 'user_usual_notes': UserDiary.objects.filter(user = fitness_user,
-                                                             diary_note_show = True).order_by('-id')[:4]
+                                                             diary_note_show = True).order_by('-id')[:4],
+
+                'fitness_user_gyms_json': serialize('geojson', TrainGym.objects.filter(user = fitness_user),
+                                                    geometry_field = 'gym_geo',
+                                                    fields = ('gym_geo', 'gym_destination', 'gym_description', 'gym_name'))
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
@@ -180,10 +184,10 @@ class ProfilePage(View):
         if request.is_ajax() and request.user.is_authenticated:
             ajax_answer = {'answer': False}
             # вносим изменения в описание тренера
-            if 'trainer_description' in request.POST:
+            if request.POST.get('trainer_description'):
                 try:
                     edited_description = FitnessTrainer.objects.get(user__user = request.user)
-                    edited_description.trainer_employment_status = True if 'trainer_employment_status' in request.POST else False
+                    edited_description.trainer_employment_status = True if request.POST.get('trainer_employment_status') else False
                     edited_description.trainer_description = request.POST['trainer_description']
                     edited_description.save()
 
@@ -209,7 +213,7 @@ class UserDiaryView(View):
     def get(self, request, tag = None):
         if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
-            if request.is_ajax() and request.GET['diary_note_id']:
+            if request.is_ajax() and request.GET.get['diary_note_id']:
                 try:
                     diary_note = UserDiary.objects.get(id = request.GET['diary_note_id'])
 
@@ -253,7 +257,7 @@ class UserDiaryView(View):
     def post(self, request, tag = None):
         if request.user.is_authenticated:
             # если пользователь хочет удалить пост
-            if 'diary_note_delete_id' in request.POST:
+            if request.POST.get('diary_note_delete_id'):
                 deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
                 # проверяем, является ли удаляющий автором поста
                 if request.user == deleted_post.user.user:
@@ -275,7 +279,7 @@ class UserDiaryView(View):
             if request.is_ajax():
                 try:
                     # создаём новую запись в дневнике
-                    if 'new_diary_note_btn' in request.POST:
+                    if request.POST.get('new_diary_note_btn'):
                         try:
                             new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
                                                                       diary_note_title = request.POST['diary_note_title'],
@@ -294,7 +298,7 @@ class UserDiaryView(View):
                             self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                     # редакитурем старую запись в дневнике
-                    elif 'diary_note_edit' in request.POST:
+                    elif request.POST.get('diary_note_edit'):
                         try:
                             # получаем запись из БД по id
                             diary_note = UserDiary.objects.get(id = request.POST['diary_note_edit'])
@@ -384,7 +388,7 @@ class UserMedicalView(View):
     def post(self, request, tag = None):
         if request.user.is_authenticated:
             # если пользователь хочет удалить пост
-            if 'medical_note_delete_id' in request.POST:
+            if request.POST.get('medical_note_delete_id'):
                 deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])
                 # проверяем, является ли удаляющий автором поста
                 if request.user == deleted_post.user.user:
@@ -405,7 +409,7 @@ class UserMedicalView(View):
             if request.is_ajax():
                 try:
                     # создаём новую медицинскую запись запись в дневнике
-                    if 'new_medical_note_btn' in request.POST:
+                    if request.POST.get('new_medical_note_btn'):
                         try:
                             new_medical_note = MedicalNote.objects.create(
                                 user = FitnessUser.objects.get(user = request.user),
@@ -426,7 +430,7 @@ class UserMedicalView(View):
                             self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                     # редакитурем старую мед. запись
-                    elif 'medical_note_edit' in request.POST:
+                    elif request.POST.get('medical_note_edit'):
                         try:
                             # получаем запись из БД по id
                             medical_note = MedicalNote.objects.get(id = request.POST['medical_note_edit'])
@@ -464,6 +468,7 @@ class UserGymsView(View):
         а так же создание, редактирование и просмотр всех залов
     """
     content = {}
+    ajax_content = {'answer': False}
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -477,8 +482,8 @@ class UserGymsView(View):
                     'fitness_user': fitness_user,
                     'fitness_user_gyms': TrainGym.objects.filter(user = fitness_user).order_by('id'),
                     'fitness_user_gyms_json': serialize('geojson', TrainGym.objects.filter(user = fitness_user),
-                                                  geometry_field='gym_geo',
-                                                  fields=('gym_geo','gym_destination', 'gym_description','gym_name'))})
+                                                        geometry_field='gym_geo',
+                                                        fields=('gym_geo','gym_destination', 'gym_description','gym_name'))})
 
                 return render(request, 'base.html', self.content)
 
@@ -584,8 +589,8 @@ class TrainerPriceView(View):
                                                 trainer_price_hour = request.POST['trainer_price_hour'],
                                                 trainer_price_comment = request.POST['trainer_price_comment'],
                                                 trainer_price_currency = request.POST['trainer_price_currency'],
-                                                trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False,
-                                                trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False)
+                                                trainer_price_bargaining = True if request.POST.get('trainer_price_bargaining') else False,
+                                                trainer_price_actuality = True if request.POST.get('trainer_price_actuality') else False)
 
                     # обновляем данные для ответа сервера
                     self.ajax_content.update({'answer': True})
@@ -602,9 +607,9 @@ class TrainerPriceView(View):
                         training_price.trainer_price_comment = request.POST['trainer_price_comment']
                         training_price.trainer_price_currency = request.POST['trainer_price_currency']
 
-                        training_price.trainer_price_bargaining = True if 'trainer_price_bargaining' in request.POST else False
+                        training_price.trainer_price_bargaining = True if request.POST.get('trainer_price_bargaining') else False
 
-                        training_price.trainer_price_actuality = True if 'trainer_price_actuality' in request.POST else False
+                        training_price.trainer_price_actuality = True if request.POST.get('trainer_price_actuality') else False
 
                         # сохраняем новые данные расценки
                         training_price.save()
