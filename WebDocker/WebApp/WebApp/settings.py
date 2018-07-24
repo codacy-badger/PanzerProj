@@ -204,3 +204,5 @@ CELERY_RESULT_BACKEND = 'rpc://'
 CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_TIMEZONE = 'Europe/Minsk'
 
+# google geocoding api key
+GGLE_MAP_API_KEY = 'AIzaSyBtuyDtkP7A4TZPmpRySQHb4hv7hW6h0T0'

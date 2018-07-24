@@ -17,8 +17,10 @@ from django.core.paginator import Paginator
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis.geos import Point
+from django.conf import settings
 
-from geopy.geocoders import Nominatim
+
+from geopy.geocoders import GoogleV3
 
 from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, \
     ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
@@ -481,16 +483,15 @@ class UserGymsView(View):
                 return render(request, 'base.html', self.content)
 
     def post(self, request):
-        self.ajax_content = {'answer': False}
         # проверка аторизованности пользователя
         if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если отправлен AJAX запрос
             if request.is_ajax():
-                print(request.POST)
                 try:
+                    # при создании нового зала
                     if request.POST.get('new_gym_btn_id'):
-                        gym_position = Nominatim().geocode(request.POST['gym_adress'])
+                        gym_position = GoogleV3(api_key = settings.GGLE_MAP_API_KEY).geocode(request.POST['gym_adress'])
                         if gym_position:
                             # создаём новый зал
                             TrainGym.objects.create(user = fitness_user,
@@ -513,9 +514,10 @@ class UserGymsView(View):
                         new_gym.gym_destination = new_gym_destination
                         new_gym.save()
                         '''
+                    # при редактировании имебщегося зала
                     elif request.POST.get('gym_edit'):
                         # декодируем адрес в положение на карте
-                        gym_position = Nominatim().geocode(request.POST['gym_adress'])
+                        gym_position = GoogleV3(api_key = settings.GGLE_MAP_API_KEY).geocode(request.POST['gym_adress'])
                         if gym_position:
                             # получаем зал по ID
                             edited_gym = TrainGym.objects.get(id = request.POST['gym_edit'])
