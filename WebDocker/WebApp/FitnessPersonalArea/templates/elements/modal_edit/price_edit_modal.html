@@ -74,4 +74,43 @@
         e.preventDefault(); // avoid to execute the actual submit of the form.
     });
     </script>
+
+    <script>
+        jQuery(document).ready(function(){
+             $("#trainer_prices_table").on('click','.btn.btn-outline-primary',function(){
+                var currentRow=$(this).closest("tr");
+                var userId=currentRow.find("td:eq(0)").text(); // get current row 1st TD value
+                var price=currentRow.find("td:eq(1)").text();
+                var currency=currentRow.find("td:eq(2)").text();
+                var bargain=currentRow.find("td:eq(3)").text();
+                var actual=currentRow.find("td:eq(4)").text();
+                var comment=currentRow.find("td:eq(5)").text();
+
+                $("#price_id_modal").val(userId);
+                $("#price_modal").val(parseFloat(price.replace(',','.')));
+                $("#price_comment_modal").val(comment);
+                $("#price_currency_modal").val(currency);
+
+                $("#price_bargain_modal").prop('checked', false);
+                $("#price_actual_modal").prop('checked', false);
+                if (bargain.includes('True')){
+                    $("#price_bargain_modal").prop('checked', true);
+                }
+                if(actual.includes('True')){
+                    $("#price_actual_modal").prop('checked', true);
+                }
+            });
+             $("#new_trainer_price").click(function(){
+
+                $("#price_id_modal").val(0);
+                $("#price_modal").val(0);
+                $("#price_comment_modal").val("");
+                $("#price_currency_modal").val("");
+
+                $("#price_bargain_modal").prop('checked', false);
+                $("#price_actual_modal").prop('checked', false);
+            });
+        });
+
+        </script>
 {% endblock %}
