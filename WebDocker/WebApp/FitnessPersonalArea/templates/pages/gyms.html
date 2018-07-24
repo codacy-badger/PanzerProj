@@ -52,7 +52,7 @@
                                                 </button>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-outline-primary new" data-toggle="modal"
+                                                <button type="button" class="btn btn-outline-primary edit" data-toggle="modal"
                                                         data-target="#newGymDestination">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
@@ -116,6 +116,20 @@
                   attachModalSecretMessage(marker, gym_name);
 
                   markers.push(marker);
+                
+            });
+            // функция вызывается при редактировании информации о зале.
+            $("#gyms_table").on('click','.btn.btn-outline-primary.edit',function(){
+                var currentRow=$(this).closest("tr");
+                var gym_id=currentRow.find("td:eq(0)").text();
+                var gym_name=currentRow.find("td:eq(1)").text();
+                var gym_description=currentRow.find("td:eq(2)").text();
+                var gym_destination=currentRow.find("td:eq(3)").text();
+                
+                $("#gym_edit_id").val(gym_id);
+                $("#gym_title_id").val(gym_name);
+                $("#gym_description_id").val(gym_description);
+                $("#gym_adress_id").val(gym_destination);
                 
             });
             // добавляем сообщение к маркеру на карте во всплывающем окне
