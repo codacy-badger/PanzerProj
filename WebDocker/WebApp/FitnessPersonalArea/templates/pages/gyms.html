@@ -73,6 +73,30 @@
 
         <div id="map" style="height:30%"></div>
 
+<div id='mapbox' style='height: 30%;'></div>
+    <pre id='coordinates' class='coordinates'></pre>
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmVpZHJhbmciLCJhIjoiY2prMDVqY2w0MDJsODN3bGMxdm04bnlyZSJ9.lvbOWMXnJRX5P_GNDxt0AA';
+  var map = new mapboxgl.Map({
+    container: 'mapbox',
+    style: 'mapbox://styles/andreidrang/cjk09pdm40p492sllvut0e6vy'
+  });
+  // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+    var marker = new mapboxgl.Marker({
+    draggable: true
+})
+    .setLngLat([0, 0])
+    .addTo(map);
+
+function onDragEnd() {
+    var lngLat = marker.getLngLat();
+    coordinates.style.display = 'block';
+    coordinates.innerHTML = 'Longitude: ' + lngLat.lng + '<br />Latitude: ' + lngLat.lat;
+}
+
+marker.on('dragend', onDragEnd);
+</script>
 
     <script>
         jQuery(document).ready(function(){
