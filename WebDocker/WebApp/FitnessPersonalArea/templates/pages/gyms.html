@@ -46,13 +46,13 @@
                                             <td hidden>{{gym.gym_geo.x}}</td>
                                             
                                             <td>
-                                                <button type="button" class="btn btn-outline-primary view" data-toggle="modal"
+                                                <button type="button" class="btn btn-outline-primary view_gym" data-toggle="modal"
                                                         data-target="#viewGymDestination">
                                                         <i class="fas fa-map-marker"></i>
                                                 </button>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-outline-primary edit" data-toggle="modal"
+                                                <button type="button" class="btn btn-outline-primary edit_gym" data-toggle="modal"
                                                         data-target="#newGymDestination">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
@@ -78,7 +78,7 @@
         jQuery(document).ready(function(){
             var markers = [];
             // функция вызывается при попытке детального просмотра информации о зале.
-            $("#gyms_table").on('click','.btn.btn-outline-primary.view',function(){
+            $("#gyms_table").on('click','.btn.btn-outline-primary.view_gym',function(){
                 var currentRow=$(this).closest("tr");
                 var gym_name=currentRow.find("td:eq(1)").text();
                 var gym_description=currentRow.find("td:eq(2)").text();
@@ -92,7 +92,7 @@
 
                 // центрируем карту на новой точке - зале
                 map_detail.setCenter({lat: parseFloat(gym_lat), lng: parseFloat(gym_long)});
-                map_detail.setZoom(16);
+                map_detail.setZoom(18);
                 
                 var shape = {
                     coords: [1, 1, 1, 20, 18, 20, 18, 1],
@@ -119,7 +119,7 @@
                 
             });
             // функция вызывается при редактировании информации о зале.
-            $("#gyms_table").on('click','.btn.btn-outline-primary.edit',function(){
+            $("#gyms_table").on('click','.btn.btn-outline-primary.edit_gym',function(){
                 var currentRow=$(this).closest("tr");
                 var gym_id=currentRow.find("td:eq(0)").text();
                 var gym_name=currentRow.find("td:eq(1)").text();
