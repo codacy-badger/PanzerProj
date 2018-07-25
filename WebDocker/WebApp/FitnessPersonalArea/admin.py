@@ -3,8 +3,8 @@ from django.utils.safestring import mark_safe
 
 from .models import FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, Setting, \
     UserSetting, ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, \
-    TargetBodyParameter, Chat, ChatMessage, Feedback, DefExerciseType, DefTypesBundle, DefExercise, ExerciseType,\
-    TypesBundle, Exercise, ExerciseSet, SharedExercise, SharedSet
+    BodyParameterData, TargetBodyParameter, Chat, ChatMessage, Feedback, DefExerciseType, DefTypesBundle, DefExercise, \
+    ExerciseType, TypesBundle, Exercise, ExerciseSet, SharedExercise, SharedSet
 
 
 #  класс для кастомизации модели FitnessUser (общей модели юзера)
@@ -238,11 +238,11 @@ class ExtendedTrainingPayment(admin.ModelAdmin):
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedBodyParameter(admin.ModelAdmin):
     # поля, отображаемые в модели
-    list_display = ('user_short', 'title_short', 'body_data', 'body_datetime')
+    list_display = ('user_short', 'title_short')
     # поля для поиска
     search_fields = ('id', 'user__user__id', 'user__user__username', 'body_title')
     # поля для фильтрации
-    list_filter = ('body_datetime',)
+    #list_filter = ('body_datetime',)
 
     def user_short(self, obj):
         return obj.user.user.username
@@ -253,14 +253,14 @@ class ExtendedBodyParameter(admin.ModelAdmin):
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedTargetBodyParameter(admin.ModelAdmin):
     # поля, отображаемые в модели
-    list_display = ('user_short', 'title_short', 'target_body_data', 'target_body_datetime')
+    list_display = ('user_short', 'target_parameter', 'target_body_data', 'target_body_datetime')
     # поля для поиска
-    search_fields = ('id', 'user__user__id', 'user__user__username', 'target_body_title')
+    search_fields = ('id', 'target_parameter__user__user__id', 'target_parameter__user__user__username', 'target_parameter__body_title')
     # поля для фильтрации
     list_filter = ('target_body_datetime',)
 
     def user_short(self, obj):
-        return obj.user.user.username
+        return obj.target_parameter.user.user.username
 
     user_short.short_description = 'User name'
 
@@ -438,6 +438,7 @@ admin.site.register(TrainingContract, ExtendedTrainingContract)
 admin.site.register(TrainingPayment, ExtendedTrainingPayment)
 
 admin.site.register(BodyParameter, ExtendedBodyParameter)
+admin.site.register(BodyParameterData)
 admin.site.register(TargetBodyParameter, ExtendedTargetBodyParameter)
 
 admin.site.register(Chat, ExtendedChat)

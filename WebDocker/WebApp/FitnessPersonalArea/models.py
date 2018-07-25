@@ -609,10 +609,6 @@ class BodyParameter(models.Model):
     user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
     # body parameter title
     body_title = models.CharField(max_length = 100)
-    # body parameter data
-    body_data = models.FloatField()
-    # body parameter creating datetime
-    body_datetime = models.DateTimeField(default = now)
 
     def title_short(self):
         return self.body_title if len(self.body_title) < 30 else self.body_title[:30]+' ...'
@@ -620,6 +616,26 @@ class BodyParameter(models.Model):
     def __str__(self):
         return f'User: {self.user.user.username}; ' \
                f'Param title: {self.title_short()}...'
+
+
+# user body parameters data
+class BodyParameterData(models.Model):
+    """
+    Модель предназначена для записи кастомных параметров пользователя
+    user - foreign-key с моделью FitnessUser, пользователем который вносит параметр
+    body_title - название параметра
+    body_data - значение параметра (float)
+    body_datetime - дата внесения параметра в список
+    """
+    user_parameter = models.ForeignKey(BodyParameter, on_delete = models.CASCADE)
+    # body parameter data
+    body_data = models.FloatField()
+    # body parameter creating datetime
+    body_datetime = models.DateTimeField(default = now)
+
+    def __str__(self):
+        return f'User: {self.user_parameter.user.user.username}; ' \
+               f'Param title: {self.user_parameter.title_short()}...'
 
 
 # user body parameters
@@ -631,20 +647,15 @@ class TargetBodyParameter(models.Model):
     target_body_data - значение целевого параметра (float)
     target_body_datetime - дата создания целевого параметра
     """
-    user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
-    # target body parameter title
-    target_body_title = models.CharField(max_length = 100)
+    target_parameter = models.ForeignKey(BodyParameter, on_delete = models.CASCADE)
     # target body parameter data
     target_body_data = models.FloatField()
     # body parameter creating datetime
     target_body_datetime = models.DateTimeField(default = now)
 
-    def title_short(self):
-        return self.target_body_title if len(self.target_body_title) < 30 else self.target_body_title[:30]+' ...'
-
     def __str__(self):
-        return f'User: {self.user.user.username}; ' \
-               f'Target param: {self.title_short()}...'
+        return f'User: {self.target_parameter.user.user.username}; ' \
+               f'Target param: {self.target_parameter.title_short()}...'
 
 
 """
