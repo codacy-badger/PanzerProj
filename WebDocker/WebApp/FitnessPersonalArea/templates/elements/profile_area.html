@@ -50,6 +50,116 @@
 
     <div class="card">
         <h5 class="card-header">
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='#';">
+                <i class="fas fa-chart-area"></i>
+                {% trans "Ваши параметры" %}
+            </button>
+            <button type="button" class="btn btn-light" data-toggle="modal"
+                    data-target="">
+                <i class="fas fa-plus-square "></i>
+            </button>
+        </h5>
+
+        <div class="card-body">
+            <div class="row">
+                {% for param in user_body_params %}
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card" style="width: 15rem; height: 300px">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ gym.gym_name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ gym.gym_destination }}</h6>
+                            <p class="card-text">{{ gym.gym_short_description }}</p>
+
+                          </div>
+                            <div class="card-footer">
+                                <button type="button" value="{{gym.id}}" class="btn btn-link view_gym"
+                                        data-toggle="modal" data-target="#viewGymDestination">
+                                    {% trans "Детали" %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% trans 'Нет ваших параметров, добавьте.' %}
+                {% endfor %}
+            </div>
+
+        <canvas id="canvas" class="chartjs-render-monitor"
+                style="display: block; width: 100%; height: 30%;"></canvas>
+        </div>
+    </div>
+<script>
+
+		var randomScalingFactor = function() {
+			return Math.round(Math.random() * 100);
+		};
+
+		var config = {
+			type: 'line',
+			data: {
+				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'June', 'July', 'June', 'July', 'July', 'June', 'July', 'June', 'July'],
+				datasets: [{
+					label: '{% trans "Ваши параметры" %}',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+					    ],
+					    fill: false,
+                    },
+                        {
+                          label: '{% trans "Цель" %}',
+                          data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+
+                          // Changes this dataset to become a line
+                          type: 'line'
+                        }
+                    ]
+			},
+			options: {
+				responsive: true,
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: '{% trans "Даты" %}'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: '{% trans "Значения, ЕДИНИЦЫ ИЗМЕРЕНИЯ" %}'
+						},
+					}]
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+		};
+
+
+	</script>
+
+    <div class="card">
+        <h5 class="card-header">
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_gyms' %}';">
                 <i class="fas fa-map-marked-alt"></i>
                 {% trans "Ваши залы" %}
