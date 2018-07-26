@@ -167,7 +167,6 @@ class ProfilePage(View):
                 # получаем праметры пользователя
                 'user_body_params': BodyParameterData.objects.filter(user_parameter__user = fitness_user).
                                                 order_by('user_parameter', '-body_data').distinct('user_parameter')[:4]
-
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
@@ -222,7 +221,7 @@ class UserDiaryView(View):
     def get(self, request, tag = None):
         if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
-            if request.is_ajax() and request.GET.get['diary_note_id']:
+            if request.is_ajax() and request.GET.get('diary_note_id'):
                 try:
                     diary_note = UserDiary.objects.get(id = request.GET['diary_note_id'])
 

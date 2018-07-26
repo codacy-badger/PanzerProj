@@ -73,7 +73,7 @@
                           </div>
                             <div class="card-footer">
                                 <button type="button" value="{{param.id}}" class="btn btn-link view_gym"
-                                        data-toggle="modal" data-target="#viewGymDestination">
+                                        data-toggle="modal">
                                     {% trans "Детали" %}
                                 </button>
                             </div>
@@ -105,16 +105,13 @@
 					data: [
 						randomScalingFactor(),
 						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
 					    ],
 					    fill: false,
                     },
                         {
                           label: '{% trans "Цель" %}',
-                          data: [50, 50, 50, 50, 80, 90, 50, 50, 20, 50, 50, 50, 50],
+                          data: [50, 50],
+					        fill: false,
 
                           // Changes this dataset to become a line
                           type: 'line'
@@ -150,11 +147,9 @@
 			}
 		};
 
-		window.onload = function() {
-			var ctx = document.getElementById('canvas').getContext('2d');
-			window.myLine = new Chart(ctx, config);
-		};
-
+		
+		var ctx = document.getElementById('canvas').getContext('2d');
+		window.myLine = new Chart(ctx, config);
 
 	</script>
 
@@ -401,7 +396,7 @@
                             </div>
                         </div>
                     {% empty %}
-                        {% trans 'Нет контрактов, создайте.' %} <i class="fas fa-plus-square"></i>
+                        {% trans 'Нет контрактов, создайте.' %}
                     {% endfor %}
                 </div>
             </div>
@@ -545,7 +540,7 @@
                             </div>
                         </div>
                     {% empty %}
-                        {% trans 'Нет контрактов, создайте.' %} <i class="fas fa-plus-square"></i>
+                        {% trans 'Нет контрактов, создайте.' %}
                     {% endfor %}
                 </div>
             </div>
@@ -608,11 +603,13 @@
     {% block medical_note %}
 
         {% include 'elements/modal_view/medical_note_modal.html' %}
+        {% include 'elements/modal_edit/medical_note_modal.html' %}
 
     {% endblock %}
     {% block diary_note %}
 
         {% include 'elements/modal_view/diary_note_modal.html' %}
+        {% include 'elements/modal_edit/diary_note_modal.html' %}
 
     {% endblock %}
 
