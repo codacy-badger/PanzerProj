@@ -66,13 +66,13 @@
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="card" style="width: 15rem; height: 300px">
                           <div class="card-body">
-                            <h5 class="card-title">{{ gym.gym_name }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ gym.gym_destination }}</h6>
-                            <p class="card-text">{{ gym.gym_short_description }}</p>
+                            <h5 class="card-title">{{ param.user_parameter.title_short }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ param.body_datetime }}</h6>
+                            <p class="card-text">{{ param.body_data }}</p>
 
                           </div>
                             <div class="card-footer">
-                                <button type="button" value="{{gym.id}}" class="btn btn-link view_gym"
+                                <button type="button" value="{{param.id}}" class="btn btn-link view_gym"
                                         data-toggle="modal" data-target="#viewGymDestination">
                                     {% trans "Детали" %}
                                 </button>
@@ -97,7 +97,7 @@
 		var config = {
 			type: 'line',
 			data: {
-				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'June', 'July', 'June', 'July', 'July', 'June', 'July', 'June', 'July'],
+				labels: [{% for param_date in user_body_params %} '{{ param_date.datetime_to_date }}' , {% endfor %}],
 				datasets: [{
 					label: '{% trans "Ваши параметры" %}',
 					backgroundColor: window.chartColors.red,
@@ -114,7 +114,7 @@
                     },
                         {
                           label: '{% trans "Цель" %}',
-                          data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+                          data: [50, 50, 50, 50, 80, 90, 50, 50, 20, 50, 50, 50, 50],
 
                           // Changes this dataset to become a line
                           type: 'line'

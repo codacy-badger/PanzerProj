@@ -637,6 +637,9 @@ class BodyParameterData(models.Model):
         return f'User: {self.user_parameter.user.user.username}; ' \
                f'Param title: {self.user_parameter.title_short()}...'
 
+    def datetime_to_date(self):
+        return self.body_datetime.strftime("%d %B %Y")
+
 
 # user body parameters
 class TargetBodyParameter(models.Model):

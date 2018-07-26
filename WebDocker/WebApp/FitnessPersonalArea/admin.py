@@ -242,7 +242,7 @@ class ExtendedBodyParameter(admin.ModelAdmin):
     # поля для поиска
     search_fields = ('id', 'user__user__id', 'user__user__username', 'body_title')
     # поля для фильтрации
-    #list_filter = ('body_datetime',)
+    # list_filter = ('body_datetime',)
 
     def user_short(self, obj):
         return obj.user.user.username
@@ -255,7 +255,8 @@ class ExtendedTargetBodyParameter(admin.ModelAdmin):
     # поля, отображаемые в модели
     list_display = ('user_short', 'target_parameter', 'target_body_data', 'target_body_datetime')
     # поля для поиска
-    search_fields = ('id', 'target_parameter__user__user__id', 'target_parameter__user__user__username', 'target_parameter__body_title')
+    search_fields = ('id', 'target_parameter__user__user__id', 'target_parameter__user__user__username',
+                     'target_parameter__body_title')
     # поля для фильтрации
     list_filter = ('target_body_datetime',)
 
@@ -328,7 +329,8 @@ class ExtendedDefExercise(admin.ModelAdmin):
     # поля, отображаемые в модели
     list_display = ('short_title', 'short_description', 'exercise_type')
     # поля для поиска
-    search_fields = ('exercise_type__type_title', 'exercise_type__type_description', 'exercise_title', 'exercise_description')
+    search_fields = ('exercise_type__type_title', 'exercise_type__type_description', 'exercise_title',
+                     'exercise_description')
 
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)

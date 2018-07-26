@@ -23,7 +23,8 @@ from django.conf import settings
 from geopy.geocoders import GoogleV3
 
 from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice, TrainGym, TrainingSchedule, \
-    ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, TargetBodyParameter
+    ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, BodyParameterData, \
+    TargetBodyParameter
 
 from .forms import NewGym
 
@@ -152,13 +153,21 @@ class ProfilePage(View):
 
                 'user_medical_notes': MedicalNote.objects.filter(user = fitness_user,
                                                                  medical_note_show = True).order_by('-id')[:4],
-
+                # получаем записи из дневника пользователя
                 'user_usual_notes': UserDiary.objects.filter(user = fitness_user,
                                                              diary_note_show = True).order_by('-id')[:4],
-
+                # получаем залы пользователя
                 'fitness_user_gyms_json': serialize('geojson', TrainGym.objects.filter(user = fitness_user),
                                                     geometry_field = 'gym_geo',
-                                                    fields = ('gym_geo', 'gym_destination', 'gym_description', 'gym_name'))
+                                                    fields = ('gym_geo',
+                                                              'gym_destination',
+                                                              'gym_description',
+                                                              'gym_name')
+                                                    ),
+                # получаем праметры пользователя
+                'user_body_params': BodyParameterData.objects.filter(user_parameter__user = fitness_user).
+                                                order_by('user_parameter', '-body_data').distinct('user_parameter')[:4]
+
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
