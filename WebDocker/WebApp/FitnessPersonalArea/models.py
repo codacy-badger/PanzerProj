@@ -617,6 +617,10 @@ class BodyParameter(models.Model):
         return f'User: {self.user.user.username}; ' \
                f'Param title: {self.title_short()}...'
 
+    # получение последней актуальной цели данного параметра
+    def actual_target(self):
+        return TargetBodyParameter.objects.filter(target_parameter__id = self.id).last()
+
 
 # user body parameters data
 class BodyParameterData(models.Model):
@@ -637,6 +641,7 @@ class BodyParameterData(models.Model):
         return f'User: {self.user_parameter.user.user.username}; ' \
                f'Param title: {self.user_parameter.title_short()}...'
 
+    # форматирование даты+времени в дату
     def datetime_to_date(self):
         return self.body_datetime.strftime("%d %B %Y")
 

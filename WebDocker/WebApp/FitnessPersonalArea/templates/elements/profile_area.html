@@ -68,7 +68,11 @@
                           <div class="card-body">
                             <h5 class="card-title">{{ param.user_parameter.title_short }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ param.body_datetime }}</h6>
-                            <p class="card-text">{{ param.body_data }}</p>
+                            <p class="card-text">
+                                {% trans "Значение" %}: {{ param.body_data }}
+                                <br>
+                                {% trans "Цель" %}: {{ param.user_parameter.actual_target.target_body_data }}
+                            </p>
 
                           </div>
                             <div class="card-footer">
@@ -189,7 +193,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="card" style="width: 15rem; height: 270px">
                             <div class="card-body">
-                                <h5 class="card-title">{{ train.schedule_date }} {% trans "в" %} {{ train.gym_short }} [ДОЛЖНА БЫТЬ ССЫЛКА НА СТАРНИЦУ ЗАЛА С КАРТОЙ]<i class="fas fa-map-marker-alt"></i></h5>
+                                <h5 class="card-title">{{ train.schedule_date }} {% trans "в" %} {{ train.gym_short }}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">{{ train.schedule_train_type }}</h6>
 
                                 {% if train.schedule_exercise_set %}
