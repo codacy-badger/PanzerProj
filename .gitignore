@@ -1,2 +1,6 @@
 \.idea/
 \__pycache__/
+
+WebDocker/WebApp/FitnessPersonalArea/templates/\.vscode/
+
+WebDocker/WebApp/media/
