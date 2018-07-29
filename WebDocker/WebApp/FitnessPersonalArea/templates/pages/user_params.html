@@ -58,7 +58,7 @@
                   </div>
               </div>
               <div class="card-body">
-                    <p hidden class="diary_note_id" >{{ parameter.id }}</p>
+                    <p hidden class="user_params_id" >{{ parameter.id }}</p>
                 <h5 class="card-title">
                     {{ parameter.user_parameter.body_title }}
                 </h5>
@@ -67,8 +67,11 @@
                     <br>
                     {% trans "Актуальная цель" %}: {{ parameter.user_parameter.actual_target.target_body_data }}
 
-                            <canvas id="canvas" class="chartjs-render-monitor"
-                style="display: block; width: 100%; height: 30%;"></canvas>
+
+                <canvas id="canvas_{{ forloop.counter }}" class="chartjs-render-monitor"
+                    style="display: block; width: 100%; height: 30%;">
+            
+                </canvas>
                 </p>
 
               </div>
@@ -147,55 +150,60 @@
         {% endblock %}
 
 <script>
+    
+    {% for parameter in user_body_params %}
+        user_json_data = JSON.parse('{{parameter.get_parameters_json_data | escapejs}}');
 
-    var ctx = document.getElementById("canvas");
+        var user_params_canva_{{forloop.counter}} = document.getElementById("canvas_{{forloop.counter}}");
 
-    var myChart = new Chart(ctx, {
-      type: 'scatter',
-      data: {
-        datasets: [
+        var myChart = new Chart(user_params_canva_{{forloop.counter}}, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                label: '{% trans "Ваши данные" %}',
+                data: user_json_data.user_data,
+                showLine: true,
+                fill: false,
+                borderColor: 'rgba(0, 200, 0, 1)'
+                },
             {
-            label: '{% trans "Ваши параметры" %}',
-            data: [{x: "12 Nov 2018", y: 2}, {x: "19 Nov 2018", y: 4}, {x: "21 Nov 2018", y: 25},{x: "22 Nov 2018", y: 20}, {x: "24 Nov 2018", y: 23},{x: "30 Nov 2018", y: 25}],
-            showLine: true,
-            fill: false,
-            borderColor: 'rgba(0, 200, 0, 1)'
-            },
-          {
-            label: '{% trans "Ваши цели" %}',
-            data: [{x: "2 Nov 2018", y: 3}, {x: "15 Nov 2018", y: 4}, {x: "18 Nov 2018", y: 9}, {x: "29 Nov 2018", y: 19},{x: "30 Nov 2018", y: 19}],
-            showLine: true,
-            fill: false,
-            borderColor: 'rgba(200, 0, 0, 1)'
-            }
-        ]
-      },
-      options: {
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-        },
-        hover: {
-          mode: 'nearest',
-          intersect: true
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero:true
-            }
-          }],
-          xAxes: [{
-            type: 'time',
-            time: {
-                displayFormats: {
-                    week: 'll'
+                label: '{% trans "Ваша цель" %}',
+                data: [{x: user_json_data.user_data[0].x, y: user_json_data.target_data}, {x: user_json_data.user_data[user_json_data.user_data.length-1].x, y: user_json_data.target_data }],
+                showLine: true,
+                fill: false,
+                borderColor: 'rgba(200, 0, 0, 1)'
                 }
-            }
-          }],
+            ]
         },
-      }
-    });
+        options: {
+            tooltips: {
+            mode: 'index',
+            intersect: false,
+            },
+            hover: {
+            mode: 'nearest',
+            intersect: true
+            },
+            scales: {
+            yAxes: [{
+                ticks: {
+                beginAtZero:true
+                }
+            }],
+            xAxes: [{
+                type: 'time',
+                time: {
+                    displayFormats: {
+                        week: 'll'
+                    }
+                }
+            }],
+            },
+        }
+        });
 
+    {%endfor%}
+    
 	</script>
 {% endblock %}

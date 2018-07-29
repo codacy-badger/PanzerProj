@@ -616,7 +616,7 @@ class UserParamsView(View):
                     'new_param_data_form': NewParameterData({'user_id': request.user.id}),
 
                     'user_body_params': Paginator(BodyParameterData.objects.filter(user_parameter__user = fitness_user).
-                        order_by('user_parameter', '-body_data').distinct('user_parameter'), 5, orphans = 2).get_page(page)
+                        order_by('user_parameter', '-body_datetime').distinct('user_parameter'), 5, orphans = 2).get_page(page)
                 })
 
                 return render(request, 'base.html', self.content)

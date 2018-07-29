@@ -1,4 +1,5 @@
 import os
+import json
 
 from django.contrib.auth.models import Group, User, BaseUserManager, AbstractBaseUser
 from django.contrib.gis.db import models
@@ -644,6 +645,17 @@ class BodyParameterData(models.Model):
     # форматирование даты+времени в дату
     def datetime_to_date(self):
         return self.body_datetime.strftime("%d %B %Y")
+
+    # получение данных параметра в формате JSON
+    def get_parameters_json_data(self):
+        # заготовка JSON`a для передачи в графики информации о записанных параметрах пользователя и его целях
+        answer = {'user_data': '',
+                  'target_data': ''}
+        # формирование JSON`a с данными пользователя
+        answer.update({'user_data': [{'x': parameter['body_datetime'].strftime("%d %B %Y"), 'y': parameter['body_data']} for parameter in BodyParameterData.objects.filter(user_parameter=self.user_parameter.id).order_by('-body_datetime').values('body_datetime', 'body_data')]})
+        # формирование JSON`a с целями пользователя
+        answer.update({'target_data': TargetBodyParameter.objects.filter(target_parameter=self.user_parameter.id).last().target_body_data})
+        return json.dumps(answer)
 
 
 # user body parameters
