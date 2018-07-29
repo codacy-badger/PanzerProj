@@ -1,0 +1,201 @@
+{% block user_params %}
+{% load static %}
+{% load i18n %}
+    <div class="page-header">
+    <h2>
+
+    <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_params' %}';">
+<i class="fas fa-chart-area"></i>
+                {% trans "Ваши параметры" %}
+        </button>
+        <button type="button" class="btn btn-light" id="create_user_target" data-toggle="modal"
+                data-target="#newUserTarget">
+            <i class="fas fa-plus-square "></i>
+        </button></h2>
+
+    </div>
+    <hr>
+   
+    {% if user_body_params %}
+        <div class="paginattion">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if user_body_params.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">{% trans 'Первая' %}</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_body_params.previous_page_number }}">{% trans 'Предыдущая' %}</a>
+                        </li>
+                    {% endif %}
+                        
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ user_body_params.number }}<span class="sr-only">(current)</span></a>
+                    </li>
+                        
+                    {% if user_body_params.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_body_params.next_page_number }}">{% trans 'Следующая' %}</a>
+                        </li>                       
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_body_params.paginator.num_pages }}">{% trans 'Последняя' %}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+
+    <div class="row" style="padding-bottom: 20px">
+        <div class="col-12">
+
+        {% for parameter in user_body_params %}
+
+            <div class="card text-center">
+              <div class="card-header">
+                  <div >
+                      {{ parameter.datetime_to_date }}
+                  </div>
+              </div>
+              <div class="card-body">
+                    <p hidden class="diary_note_id" >{{ parameter.id }}</p>
+                <h5 class="card-title">
+                    {{ parameter.user_parameter.body_title }}
+                </h5>
+                <p class="card-text text-justify">
+                    {% trans "Последнее значение" %}: {{ parameter.body_data }}
+                    <br>
+                    {% trans "Актуальная цель" %}: {{ parameter.user_parameter.actual_target.target_body_data }}
+
+                            <canvas id="canvas" class="chartjs-render-monitor"
+                style="display: block; width: 100%; height: 30%;"></canvas>
+                </p>
+
+              </div>
+              <div class="card-footer text-muted">
+                  <div style="float: left; margin-bottom: 0px" class="row buttons">
+                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
+                          data-target="#newMedicalNote">
+                              <i class="fas fa-plus"></i>
+                              {% trans "Добавить данные" %}
+                          </button>
+                  </div>
+                  <div style="float: left; margin-bottom: 0px" class="row buttons">
+                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
+                          data-target="#newMedicalNote">
+                              <i class="fas fa-bullseye"></i>
+                              {% trans "Обновить цель" %}
+                          </button>
+                  </div>
+
+                  <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <input hidden name="medical_note_delete_id" value="{{ note.id }}">
+                      <button type="submit" class="btn btn-danger">
+                          <i class="fas fa-trash"></i>
+                          {% trans "Удалить" %}
+                      </button>
+                  </form>
+              </div>
+            </div>
+
+        {% empty %}
+            {% trans 'Нет параметров, добавьте.' %}
+        {% endfor %}
+
+        </div>
+    </div>
+
+
+   
+    {% if user_body_params %}
+        <div class="paginattion">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if user_body_params.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">{% trans 'Первая' %}</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_body_params.previous_page_number }}">{% trans 'Предыдущая' %}</a>
+                        </li>
+                    {% endif %}
+                        
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ user_body_params.number }}<span class="sr-only">(current)</span></a>
+                    </li>
+                        
+                    {% if user_body_params.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_body_params.next_page_number }}">{% trans 'Следующая' %}</a>
+                        </li>                       
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_body_params.paginator.num_pages }}">{% trans 'Последняя' %}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+
+        {% block user_params_edit %}
+
+            {% include 'elements/modal_edit/user_params/data_param_modal.html' %}
+            {% include 'elements/modal_edit/user_params/target_param_modal.html' %}
+            {% include 'elements/modal_edit/user_params/user_param_modal.html' %}
+
+        {% endblock %}
+
+<script>
+
+    var ctx = document.getElementById("canvas");
+
+    var myChart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [
+            {
+            label: '{% trans "Ваши параметры" %}',
+            data: [{x: "12 Nov 2018", y: 2}, {x: "19 Nov 2018", y: 4}, {x: "21 Nov 2018", y: 25},{x: "22 Nov 2018", y: 20}, {x: "24 Nov 2018", y: 23},{x: "30 Nov 2018", y: 25}],
+            showLine: true,
+            fill: false,
+            borderColor: 'rgba(0, 200, 0, 1)'
+            },
+          {
+            label: '{% trans "Ваши цели" %}',
+            data: [{x: "2 Nov 2018", y: 3}, {x: "15 Nov 2018", y: 4}, {x: "18 Nov 2018", y: 9}, {x: "29 Nov 2018", y: 19},{x: "30 Nov 2018", y: 19}],
+            showLine: true,
+            fill: false,
+            borderColor: 'rgba(200, 0, 0, 1)'
+            }
+        ]
+      },
+      options: {
+        tooltips: {
+          mode: 'index',
+          intersect: false,
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero:true
+            }
+          }],
+          xAxes: [{
+            type: 'time',
+            time: {
+                displayFormats: {
+                    week: 'll'
+                }
+            }
+          }],
+        },
+      }
+    });
+
+	</script>
+{% endblock %}

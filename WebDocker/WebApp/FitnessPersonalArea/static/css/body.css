@@ -12,3 +12,6 @@ a.social_button{
 .card{
     margin-bottom: 10px;
 }
+.row.buttons{
+    padding-right: 40px;
+}

@@ -72,7 +72,7 @@
 
               </div>
               <div class="card-footer text-muted">
-                  <div style="float: left; margin-bottom: 0px" class="row">
+                  <div style="float: left; margin-bottom: 0px" class="row buttons">
 
                       <form style="margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
                           {% csrf_token %}
@@ -82,11 +82,15 @@
                               {% trans "Расшарить" %}
                           </button>
                       </form>
-                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
+                  </div>
+
+                  <div style="float: left; margin-bottom: 0px" class="row buttons">
+
+                      <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
                                   data-target="#newDiaryNote">
-                              <i class="fas fa-edit"></i>
-                              {% trans "Редактировать" %}
-                          </button>
+                          <i class="fas fa-edit"></i>
+                          {% trans "Редактировать" %}
+                      </button>
                   </div>
 
                   <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">

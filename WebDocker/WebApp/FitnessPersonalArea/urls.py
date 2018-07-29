@@ -29,6 +29,9 @@ urlpatterns = [
     # редактирование, создание и просмотр залов пользователя
     path('user-gyms/', views.UserGymsView.as_view(), name = 'user_gyms'),
 
+    # редактирование, создание и просмотр залов пользователя
+    path('user-params/', views.UserParamsView.as_view(), name = 'user_params'),
+
     # редактирование, создание и просмотр расценок тренера
     path('trainer-price/', views.TrainerPriceView.as_view(), name = 'trainer_price'),
 

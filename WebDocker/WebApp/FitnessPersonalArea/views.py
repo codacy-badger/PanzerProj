@@ -26,7 +26,7 @@ from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice,
     ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, BodyParameterData, \
     TargetBodyParameter
 
-from .forms import NewGym
+from .forms import NewParameterData
 
 
 # log in
@@ -218,7 +218,7 @@ class UserDiaryView(View):
     content = {}
     ajax_content = {'answer': False}
 
-    def get(self, request, tag = None):
+    def get(self, request, tag: str = None):
         if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
             if request.is_ajax() and request.GET.get('diary_note_id'):
@@ -262,7 +262,7 @@ class UserDiaryView(View):
 
             return render(request, 'base.html', self.content)
 
-    def post(self, request, tag = None):
+    def post(self, request, tag: str = None):
         if request.user.is_authenticated:
             # если пользователь хочет удалить пост
             if request.POST.get('diary_note_delete_id'):
@@ -348,7 +348,7 @@ class UserMedicalView(View):
     content = {}
     ajax_content = {'answer': False}
 
-    def get(self, request, tag = None):
+    def get(self, request, tag: str = None):
         if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
             if request.is_ajax() and request.GET['medical_note_id']:
@@ -393,7 +393,7 @@ class UserMedicalView(View):
 
             return render(request, 'base.html', self.content)
 
-    def post(self, request, tag = None):
+    def post(self, request, tag: str = None):
         if request.user.is_authenticated:
             # если пользователь хочет удалить пост
             if request.POST.get('medical_note_delete_id'):
@@ -579,6 +579,116 @@ class UserGymsView(View):
                     return JsonResponse(self.ajax_content)
 
 
+# user params
+class UserParamsView(View):
+    """
+    UserParamsView отвечает за страницу с отслеживаемыми параметрами пользователя
+    """
+    content = {}
+    ajax_content = {'answer': False}
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            # получаем данные пользователя
+            fitness_user = FitnessUser.objects.get(user = request.user)
+            if request.is_ajax() and request.GET.get('gym_object_id'):
+
+                try:
+                    # получаем данные параметра из БД
+                    gym_object = BodyParameterData.objects.get(id = request.GET['gym_object_id'])
+                    self.ajax_content.update({'gym_data': gym_object.get_gym_json()})
+
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                finally:
+                    return JsonResponse(self.ajax_content)
+            else:
+                # получаем номер страницы для отображения при пагинации
+                page = request.GET.get('page')
+
+                self.content.update({
+                    'doc': 'pages/personal_area.html',
+                    'private_doc': 'pages/user_params.html',
+                    'fitness_user': fitness_user,
+                    'new_param_data_form': NewParameterData({'user_id': request.user.id}),
+
+                    'user_body_params': Paginator(BodyParameterData.objects.filter(user_parameter__user = fitness_user).
+                        order_by('user_parameter', '-body_data').distinct('user_parameter'), 5, orphans = 2).get_page(page)
+                })
+
+                return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        # проверка аторизованности пользователя
+        if request.user.is_authenticated:
+            fitness_user = FitnessUser.objects.get(user = request.user)
+            # если отправлен AJAX запрос
+            if request.is_ajax():
+                try:
+                    # при создании нового зала
+                    if request.POST.get('new_body_parameter_id'):
+                        # создаём новый параметр для отслеживания
+                        new_param = BodyParameter.objects.create(user = fitness_user,
+                                                                 body_title = request.POST['body_title'])
+
+                        # вводим первоначальные значения параметра
+                        BodyParameterData.objects.create(user_parameter = new_param,
+                                                         body_data = request.POST['body_data'])
+
+                        # вводим первоначальную цель для отслеживания
+                        TargetBodyParameter.objects.create(target_parameter = new_param,
+                                                           target_body_data = request.POST['target_body_data'])
+
+                        messages.add_message(request, messages.SUCCESS, _('Параметр сохранён'))
+                        # обновляем ответ на AJAX-запрос, об успешном создании зала
+                        self.ajax_content.update({'answer': True})
+                        '''
+                        # локацию (долготу/широту) в адрес
+                        new_gym_destination = Nominatim().reverse(new_gym_form.cleaned_data['gym_destination'])
+                        new_gym.gym_destination = new_gym_destination
+                        new_gym.save()
+                        '''
+                    # при редактировании имебщегося зала
+                    elif request.POST.get('body_parameter_edit'):
+                        # декодируем адрес в положение на карте
+                        gym_position = GoogleV3(api_key = settings.GGLE_MAP_API_KEY).geocode(request.POST['gym_adress'])
+                        if gym_position:
+                            # получаем зал по ID
+                            edited_gym = TrainGym.objects.get(id = request.POST['gym_edit'])
+                            # проверяем, является ли пользователь владельцем записи о зале
+                            if request.user == edited_gym.user.user:
+                                # обновляем данные зала
+                                edited_gym.gym_name = request.POST['gym_title']
+                                edited_gym.gym_description = request.POST['gym_description']
+                                edited_gym.gym_destination = request.POST['gym_adress']
+                                edited_gym.gym_geo = Point(gym_position.longitude, gym_position.latitude,
+                                                           srid = gym_position.raw['place_id'])
+
+                                edited_gym.save()
+
+                                messages.add_message(request, messages.SUCCESS, _('Изменения сохранены'))
+                                # обновляем ответ на AJAX-запрос, об успешном создании зала
+                                self.ajax_content.update({'answer': True})
+                            else:
+                                # обновляем ответ на AJAX-запрос, с проблемой на права доступа
+                                self.ajax_content.update({'answer': False,
+                                                          'error_answer': _('Нехвататет прав для действия')})
+                        else:
+                            # обновляем ответ на AJAX-запрос, об ошибке при декодировании адреса в местоположение
+                            self.ajax_content.update({'error_answer': _('Данный адрес не найден')})
+
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                finally:
+                    return JsonResponse(self.ajax_content)
+
+
 # trainer price page
 class TrainerPriceView(View):
     """
@@ -654,7 +764,7 @@ class ChangeLanguage(View):
     """
     Класс отвечает за смену языка интерфейса
     """
-    def get(self, request, language):
+    def get(self, request, language: str):
         """
         Метод отвечает за принятие GET запроса с новым языком интерфейса
         :param request:

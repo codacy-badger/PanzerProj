@@ -50,7 +50,7 @@
 
     <div class="card">
         <h5 class="card-header">
-            <button type="button" class="btn btn-outline-primary" onclick="location.href='#';">
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url "user_params" %}';">
                 <i class="fas fa-chart-area"></i>
                 {% trans "Ваши параметры" %}
             </button>
@@ -62,21 +62,21 @@
 
         <div class="card-body">
             <div class="row">
-                {% for param in user_body_params %}
+                {% for parameter in user_body_params %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="card" style="width: 15rem; height: 300px">
                           <div class="card-body">
-                            <h5 class="card-title">{{ param.user_parameter.title_short }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ param.body_datetime }}</h6>
+                            <h5 class="card-title">{{ parameter.user_parameter.title_short }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ parameter.body_datetime }}</h6>
                             <p class="card-text">
-                                {% trans "Значение" %}: {{ param.body_data }}
+                                {% trans "Последнее значение" %}: {{ parameter.body_data }}
                                 <br>
-                                {% trans "Цель" %}: {{ param.user_parameter.actual_target.target_body_data }}
+                                {% trans "Актуальная цель" %}: {{ parameter.user_parameter.actual_target.target_body_data }}
                             </p>
 
                           </div>
                             <div class="card-footer">
-                                <button type="button" value="{{param.id}}" class="btn btn-link view_gym"
+                                <button type="button" value="{{parameter.id}}" class="btn btn-link view_gym"
                                         data-toggle="modal">
                                     {% trans "Детали" %}
                                 </button>
@@ -84,66 +84,14 @@
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших параметров, добавьте.' %}
+                    {% trans 'Нет параметров, добавьте.' %}
                 {% endfor %}
             </div>
 
-        <canvas id="canvas" class="chartjs-render-monitor"
-                style="display: block; width: 100%; height: 30%;"></canvas>
+
         </div>
     </div>
-<script>
 
-    var ctx = document.getElementById("canvas");
-
-    var myChart = new Chart(ctx, {
-      type: 'scatter',
-      data: {
-        datasets: [
-            {
-            label: '{% trans "Ваши параметры" %}',
-            data: [{x: "12 Nov 2018", y: 2}, {x: "19 Nov 2018", y: 4}, {x: "21 Nov 2018", y: 25},{x: "22 Nov 2018", y: 20}, {x: "24 Nov 2018", y: 23},{x: "30 Nov 2018", y: 25}],
-            showLine: true,
-            fill: false,
-            borderColor: 'rgba(0, 200, 0, 1)'
-            },
-          {
-            label: '{% trans "Ваши цели" %}',
-            data: [{x: "2 Nov 2018", y: 3}, {x: "15 Nov 2018", y: 4}, {x: "18 Nov 2018", y: 9}, {x: "29 Nov 2018", y: 19},{x: "30 Nov 2018", y: 19}],
-            showLine: true,
-            fill: false,
-            borderColor: 'rgba(200, 0, 0, 1)'
-            }
-        ]
-      },
-      options: {
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-        },
-        hover: {
-          mode: 'nearest',
-          intersect: true
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero:true
-            }
-          }],
-          xAxes: [{
-            type: 'time',
-            time: {
-                displayFormats: {
-                    week: 'll'
-                }
-            }
-          }],
-        },
-      }
-    });
-
-	</script>
 
     <div class="card">
         <h5 class="card-header">
@@ -776,6 +724,7 @@
             for element in doc.select('.btn.btn-link.view_gym'):
                 element.bind("click", get_data_gym)
         </script>
+
         <script>
         function add_gym_view_marker(gym_data) {
             var markers = [];
