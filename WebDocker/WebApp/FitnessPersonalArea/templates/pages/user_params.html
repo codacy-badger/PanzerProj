@@ -58,7 +58,7 @@
                   </div>
               </div>
               <div class="card-body">
-                    <p hidden class="user_params_id" >{{ parameter.id }}</p>
+                    <p hidden class="user_params_id" >{{ parameter.user_parameter.id }}</p>
                 <h5 class="card-title">
                     {{ parameter.user_parameter.body_title }}
                 </h5>
@@ -77,15 +77,15 @@
               </div>
               <div class="card-footer text-muted">
                   <div style="float: left; margin-bottom: 0px" class="row buttons">
-                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
-                          data-target="#newMedicalNote">
+                          <button type="button" class="btn btn-secondary new_param_data" value="{{ parameter.user_parameter.id }}"  name="new_param_data" data-toggle="modal"
+                          data-target="#addUserParamData">
                               <i class="fas fa-plus"></i>
                               {% trans "Добавить данные" %}
                           </button>
                   </div>
                   <div style="float: left; margin-bottom: 0px" class="row buttons">
-                          <button type="button" class="btn btn-secondary edit"  name="edit_post" data-toggle="modal"
-                          data-target="#newMedicalNote">
+                          <button type="button" class="btn btn-secondary edit" value="{{ parameter.user_parameter.id }}"  name="edit_post" data-toggle="modal"
+                          data-target="#addUserTargetData">
                               <i class="fas fa-bullseye"></i>
                               {% trans "Обновить цель" %}
                           </button>
@@ -93,7 +93,7 @@
 
                   <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
                       {% csrf_token %}
-                      <input hidden name="medical_note_delete_id" value="{{ note.id }}">
+                      <input hidden name="medical_note_delete_id" value="{{ parameter.user_parameter.id }}">
                       <button type="submit" class="btn btn-danger">
                           <i class="fas fa-trash"></i>
                           {% trans "Удалить" %}
@@ -150,7 +150,7 @@
         {% endblock %}
 
 <script>
-    
+    // рисуем графики для параметров
     {% for parameter in user_body_params %}
         user_json_data = JSON.parse('{{parameter.get_parameters_json_data | escapejs}}');
 
@@ -205,5 +205,79 @@
 
     {%endfor%}
     
-	</script>
+    </script>
+
+    <script>
+        function reloader () {
+            location.reload(true)
+            }         
+    </script>
+
+    <script type="text/python">
+        from browser import document as doc, alert, ajax, window
+        import json
+        import urllib
+    
+        csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+        
+        # selected param to update
+        param_id=0
+        
+        # add param ID to form
+        def add_param_id(ev):
+            global param_id
+            param_id=ev.currentTarget.value
+            
+        """
+        AJAX request for adding new data
+        """
+        def on_addding_param_complete(req):
+            json_response = json.loads(req.text)
+            # if success creation
+            if req.status==200 and json_response['answer']==True:
+                # reload page from JS
+                window.reloader()
+            # if error - show message
+            else:
+                alert(json_response['error_answer'])
+
+        def send_new_param_data(ev):
+            req = ajax.ajax()
+            req.bind('complete',on_addding_param_complete)
+            # send a POST request to the url
+            req.open("POST","{% url 'user_params' %}",True)
+            # set headers
+            req.set_header('content-type','application/x-www-form-urlencoded')
+            req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+            # set header for Django .is_ajax() method
+            req.set_header('X-Requested-With','XMLHttpRequest')
+
+            # get inserted form data
+            body_param_data = doc['body_param_data_id'].value
+
+            # check inputs 
+            if body_param_data:
+                # prepare request dictionary
+                request_body = {
+                                'csrfmiddlewaretoken':csrf_token, 
+                                'param_id':param_id, 
+                                'body_param_data': body_param_data,
+                                'new_body_param_data_id':True
+                                }
+
+                # send data as a dictionary
+                req.send(request_body)
+            else:
+                alert('Заполните все поля.')
+
+    
+    
+        # bind all add new data params objects to func
+        for element in doc.select('.btn.btn-secondary.new_param_data'):
+            element.bind("click", add_param_id)
+        
+        # bind adding new param data
+        doc['save_body_param_data_id'].bind('click', send_new_param_data)
+    
+    </script>
 {% endblock %}

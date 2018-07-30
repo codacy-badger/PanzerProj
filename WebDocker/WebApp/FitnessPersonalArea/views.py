@@ -628,7 +628,7 @@ class UserParamsView(View):
             # если отправлен AJAX запрос
             if request.is_ajax():
                 try:
-                    # при создании нового зала
+                    # при создании нового параметра для слежения
                     if request.POST.get('new_body_parameter_id'):
                         # создаём новый параметр для отслеживания
                         new_param = BodyParameter.objects.create(user = fitness_user,
@@ -645,40 +645,19 @@ class UserParamsView(View):
                         messages.add_message(request, messages.SUCCESS, _('Параметр сохранён'))
                         # обновляем ответ на AJAX-запрос, об успешном создании зала
                         self.ajax_content.update({'answer': True})
-                        '''
-                        # локацию (долготу/широту) в адрес
-                        new_gym_destination = Nominatim().reverse(new_gym_form.cleaned_data['gym_destination'])
-                        new_gym.gym_destination = new_gym_destination
-                        new_gym.save()
-                        '''
-                    # при редактировании имебщегося зала
-                    elif request.POST.get('body_parameter_edit'):
-                        # декодируем адрес в положение на карте
-                        gym_position = GoogleV3(api_key = settings.GGLE_MAP_API_KEY).geocode(request.POST['gym_adress'])
-                        if gym_position:
-                            # получаем зал по ID
-                            edited_gym = TrainGym.objects.get(id = request.POST['gym_edit'])
-                            # проверяем, является ли пользователь владельцем записи о зале
-                            if request.user == edited_gym.user.user:
-                                # обновляем данные зала
-                                edited_gym.gym_name = request.POST['gym_title']
-                                edited_gym.gym_description = request.POST['gym_description']
-                                edited_gym.gym_destination = request.POST['gym_adress']
-                                edited_gym.gym_geo = Point(gym_position.longitude, gym_position.latitude,
-                                                           srid = gym_position.raw['place_id'])
 
-                                edited_gym.save()
+                    # при добавлении новый данных от пользователя
+                    elif request.POST.get('new_body_param_data_id'):
+                        # получаем параметр для отслеживания
+                        add_param = BodyParameter.objects.get(id = request.POST['param_id'])
 
-                                messages.add_message(request, messages.SUCCESS, _('Изменения сохранены'))
-                                # обновляем ответ на AJAX-запрос, об успешном создании зала
-                                self.ajax_content.update({'answer': True})
-                            else:
-                                # обновляем ответ на AJAX-запрос, с проблемой на права доступа
-                                self.ajax_content.update({'answer': False,
-                                                          'error_answer': _('Нехвататет прав для действия')})
-                        else:
-                            # обновляем ответ на AJAX-запрос, об ошибке при декодировании адреса в местоположение
-                            self.ajax_content.update({'error_answer': _('Данный адрес не найден')})
+                        # вводим новое значения параметра
+                        BodyParameterData.objects.create(user_parameter = add_param,
+                                                         body_data = request.POST['body_param_data'])
+
+                        messages.add_message(request, messages.SUCCESS, _('Данные сохранениы'))
+                        # обновляем ответ на AJAX-запрос, об успешном создании зала
+                        self.ajax_content.update({'answer': True})
 
                 # TODO добавить логгирование ошибок
                 except Exception as err:
