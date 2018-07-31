@@ -238,17 +238,35 @@ class ExtendedTrainingPayment(admin.ModelAdmin):
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedBodyParameter(admin.ModelAdmin):
     # поля, отображаемые в модели
-    list_display = ('user_short', 'title_short')
+    list_display = ('user_short', 'title_short', 'body_show')
     # поля для поиска
     search_fields = ('id', 'user__user__id', 'user__user__username', 'body_title')
     # поля для фильтрации
-    # list_filter = ('body_datetime',)
+    list_filter = ('body_show',)
 
     def user_short(self, obj):
         return obj.user.user.username
 
     user_short.short_description = 'User name'
 
+
+#  класс для кастомизации модели BodyParameterData (раширения модели пользователя под тренера)
+class ExtendedBodyParameterData(admin.ModelAdmin):
+    # поля, отображаемые в модели
+    list_display = ('user_short', 'param_title_short')
+    # поля для поиска
+    search_fields = ('id', 'user__user__id', 'user__user__username', 'user_parameter__body_title')
+    # поля для фильтрации
+    # list_filter = ('body_show',)
+
+    def user_short(self, obj):
+        return obj.user_parameter.user.user.username
+
+    def param_title_short(self, obj):
+        return obj.user_parameter.title_short
+
+    param_title_short.short_description = 'Param title'
+    user_short.short_description = 'User name'
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedTargetBodyParameter(admin.ModelAdmin):
@@ -440,7 +458,7 @@ admin.site.register(TrainingContract, ExtendedTrainingContract)
 admin.site.register(TrainingPayment, ExtendedTrainingPayment)
 
 admin.site.register(BodyParameter, ExtendedBodyParameter)
-admin.site.register(BodyParameterData)
+admin.site.register(BodyParameterData, ExtendedBodyParameterData)
 admin.site.register(TargetBodyParameter, ExtendedTargetBodyParameter)
 
 admin.site.register(Chat, ExtendedChat)

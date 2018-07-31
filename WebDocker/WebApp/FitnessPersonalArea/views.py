@@ -165,7 +165,8 @@ class ProfilePage(View):
                                                               'gym_name')
                                                     ),
                 # получаем праметры пользователя
-                'user_body_params': BodyParameterData.objects.filter(user_parameter__user = fitness_user).
+                'user_body_params': BodyParameterData.objects.filter(user_parameter__user = fitness_user,
+                                                                     user_parameter__body_show = True).
                                                 order_by('user_parameter', '-body_data').distinct('user_parameter')[:4]
             })
 
@@ -186,7 +187,9 @@ class ProfilePage(View):
 
             return render(request, 'base.html', self.content)
         else:
-            return redirect('/private/login/')
+            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def post(self, request):
         if request.is_ajax() and request.user.is_authenticated:
@@ -208,7 +211,11 @@ class ProfilePage(View):
                     ajax_answer.update({'error_answer': _('Произошла ошибка!')})
 
             return JsonResponse(ajax_answer)
+        else:
 
+            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 # diary notes
 class UserDiaryView(View):
@@ -393,6 +400,10 @@ class UserMedicalView(View):
 
             return render(request, 'base.html', self.content)
 
+        else:
+            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     def post(self, request, tag: str = None):
         if request.user.is_authenticated:
             # если пользователь хочет удалить пост
@@ -595,8 +606,9 @@ class UserParamsView(View):
 
                 try:
                     # получаем данные параметра из БД
-                    gym_object = BodyParameterData.objects.get(id = request.GET['gym_object_id'])
-                    self.ajax_content.update({'gym_data': gym_object.get_gym_json()})
+                    param_data = BodyParameterData.objects.get(id = request.GET['gym_object_id'],
+                                                               user_parameter__body_show = True)
+                    self.ajax_content.update({'param_data': param_data.get_parameters_json_data()})
 
                 # TODO добавить логгирование ошибок
                 except Exception as err:
@@ -615,11 +627,17 @@ class UserParamsView(View):
                     'fitness_user': fitness_user,
                     'new_param_data_form': NewParameterData({'user_id': request.user.id}),
 
-                    'user_body_params': Paginator(BodyParameterData.objects.filter(user_parameter__user = fitness_user).
+                    'user_body_params': Paginator(BodyParameterData.objects.filter(user_parameter__user = fitness_user,
+                                                                                   user_parameter__body_show = True).
                         order_by('user_parameter', '-body_datetime').distinct('user_parameter'), 5, orphans = 2).get_page(page)
                 })
 
                 return render(request, 'base.html', self.content)
+        else:
+
+            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def post(self, request):
         # проверка аторизованности пользователя
@@ -649,13 +667,26 @@ class UserParamsView(View):
                     # при добавлении новый данных от пользователя
                     elif request.POST.get('new_body_param_data_id'):
                         # получаем параметр для отслеживания
-                        add_param = BodyParameter.objects.get(id = request.POST['param_id'])
+                        add_data_param = BodyParameter.objects.get(id = request.POST['param_id'])
 
                         # вводим новое значения параметра
-                        BodyParameterData.objects.create(user_parameter = add_param,
+                        BodyParameterData.objects.create(user_parameter = add_data_param,
                                                          body_data = request.POST['body_param_data'])
 
-                        messages.add_message(request, messages.SUCCESS, _('Данные сохранениы'))
+                        messages.add_message(request, messages.SUCCESS, _('Данные сохранены'))
+                        # обновляем ответ на AJAX-запрос, об успешном создании зала
+                        self.ajax_content.update({'answer': True})
+
+                    # при добавлении новый целей от пользователя
+                    elif request.POST.get('new_body_target_data_id'):
+                        # получаем параметр для отслеживания
+                        add_target_param = BodyParameter.objects.get(id = request.POST['param_id'])
+
+                        # вводим новое значения параметра
+                        TargetBodyParameter.objects.create(target_parameter = add_target_param,
+                                                           target_body_data = request.POST['body_target_data'])
+
+                        messages.add_message(request, messages.SUCCESS, _('Данные сохранены'))
                         # обновляем ответ на AJAX-запрос, об успешном создании зала
                         self.ajax_content.update({'answer': True})
 
@@ -666,6 +697,26 @@ class UserParamsView(View):
 
                 finally:
                     return JsonResponse(self.ajax_content)
+            else:
+                # при удалении отслеживаемого параметра
+                if request.POST.get('param_id'):
+                    # получаем параметр для отслеживания
+                    hide_param = BodyParameter.objects.get(id = request.POST['param_id'])
+                    # меняем область видимости на False и сохраняем модель
+                    hide_param.body_show = False
+                    hide_param.save()
+
+                    messages.add_message(request, messages.SUCCESS, _('Данные удалены'))
+                    # обновляем ответ на AJAX-запрос, об успешном создании зала
+                    self.ajax_content.update({'answer': True})
+
+                # возвращаем пользователя назад на ту же страницу
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+
+            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 # trainer price page

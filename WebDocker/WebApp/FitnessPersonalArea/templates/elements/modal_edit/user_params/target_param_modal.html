@@ -16,92 +16,25 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
-                <form name="new_gym_form" method="post" action="" id="new_gym_id" enctype="multipart/form-data">
+                <form name="new_target_data_form" method="post" action="" id="new_target_data_form" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <input hidden name="gym_edit" value="-1" id="gym_edit_id">
                     <!-- Modal body -->
                     <div class="modal-body">
                         <dl class="row">
-                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название зала"%}</dt>
-                            <dd class="col-sm-8"><input type="text" id="gym_title_id" required name="gym_title" maxlength="100"></dd>
-
-                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Описание зала"%}</dt>
-                            <dd class="col-sm-8"><textarea type="text" class="form-control" id="gym_description_id" required name="gym_description" maxlength="1000"></textarea></dd>
-
-                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Адрес зала"%}</dt>
-                            <dd class="col-sm-8"><input type="text" id="gym_adress_id" required name="gym_adress" maxlength="100"></dd>
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Обновить цель"%}</dt>
+                            <dd class="col-sm-8"><input type="number"  step="0.01"  id="body_target_data_id" required"></dd>
                         </dl>
                     </div>
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" id="new_gym_btn_id" name="new_gym_btn">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-success" id="save_body_target_data_id">{% trans "Сохранить" %}</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
                     </div>
                 </form>
 
             </div>
         </div>
-
-<script type="text/python3">
-   from browser import document as doc, alert, ajax, window
-   import json
-   import urllib
-
-   csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
-
-   def on_gym_complete(req):
-       json_response = json.loads(req.text)
-       # if success creation
-       if req.status==200 and json_response['answer']==True:
-           # reload page from JS
-           window.reloader()
-       # if error - show message
-       else:
-           alert(json_response['error_answer'])
-
-   def post_gym_request(ev):
-       req = ajax.ajax()
-       req.bind('complete',on_gym_complete)
-       # send a POST request to the url
-       req.open("POST","{% url 'user_gyms' %}",True)
-       # set headers
-       req.set_header('content-type','application/x-www-form-urlencoded')
-       req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
-       # set header for Django .is_ajax() method
-       req.set_header('X-Requested-With','XMLHttpRequest')
-
-       # get inserted form data
-       gym_title = doc['gym_title_id'].value
-       gym_description = doc['gym_description_id'].value
-       gym_adress = doc['gym_adress_id'].value
-
-       # check inputs 
-       if gym_title and gym_description and gym_adress:
-           # prepare request dictionary
-           request_body = {
-                           'csrfmiddlewaretoken':csrf_token, 
-                           'gym_title': gym_title, 
-                           'gym_description': gym_description, 
-                           'gym_adress': gym_adress
-                           }
-           # if edit old note, set note id
-           if doc['gym_edit_id'].value != '-1':
-               request_body.update({'gym_edit': doc['gym_edit_id'].value})
-           # if create new note
-           else:
-               request_body.update({'new_gym_btn_id': True})   
-
-           print(request_body)
-           # send data as a dictionary
-           req.send(request_body)
-       else:
-           alert('Заполните все поля.')
-
-
-   doc["new_gym_btn_id"].bind("click", post_gym_request)
-
-</script>
     </div>
   
 {% endblock %}
