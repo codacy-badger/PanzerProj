@@ -604,12 +604,13 @@ class BodyParameter(models.Model):
     Модель предназначена для записи кастомных параметров пользователя
     user - foreign-key с моделью FitnessUser, пользователем который вносит параметр
     body_title - название параметра
-    body_data - значение параметра (float)
-    body_datetime - дата внесения параметра в список
+    body_show - отображение данного параметра пользователю(скрывается при удалении параметра)
     """
     user = models.ForeignKey(FitnessUser, on_delete = models.CASCADE)
     # body parameter title
     body_title = models.CharField(max_length = 100)
+    # show user param
+    body_show = models.BooleanField(default = True)
 
     def title_short(self):
         return self.body_title if len(self.body_title) < 30 else self.body_title[:30]+' ...'
@@ -627,8 +628,8 @@ class BodyParameter(models.Model):
 class BodyParameterData(models.Model):
     """
     Модель предназначена для записи кастомных параметров пользователя
-    user - foreign-key с моделью FitnessUser, пользователем который вносит параметр
-    body_title - название параметра
+    user_parameter - foreign-key с моделью BodyParameter, параметр для которого происходит отслежиывание и добавление
+        новых данных
     body_data - значение параметра (float)
     body_datetime - дата внесения параметра в список
     """
@@ -652,7 +653,8 @@ class BodyParameterData(models.Model):
         answer = {'user_data': '',
                   'target_data': ''}
         # формирование JSON`a с данными пользователя
-        answer.update({'user_data': [{'x': parameter['body_datetime'].strftime("%d %B %Y"), 'y': parameter['body_data']} for parameter in BodyParameterData.objects.filter(user_parameter=self.user_parameter.id).order_by('-body_datetime').values('body_datetime', 'body_data')]})
+        answer.update({'user_data': [{'x': parameter['body_datetime'].strftime("%d %B %Y"), 'y': parameter['body_data']} for parameter in BodyParameterData.objects.filter(user_parameter=self.user_parameter.id,
+                                                                                                                                                                           user_parameter__body_show = True).order_by('-body_datetime')[:20].values('body_datetime', 'body_data')]})
         # формирование JSON`a с целями пользователя
         answer.update({'target_data': TargetBodyParameter.objects.filter(target_parameter=self.user_parameter.id).last().target_body_data})
         return json.dumps(answer)
@@ -662,8 +664,8 @@ class BodyParameterData(models.Model):
 class TargetBodyParameter(models.Model):
     """
     Модель предназначена для записи кастомных ЦЕЛЕЙ параметров пользователя
-    user - foreign-key с моделью FitnessUser, пользователем который вносит целевой параметр
-    target_body_title - название целевого параметра
+    target_parameter - foreign-key с моделью BodyParameter, параметр для которого происходит отслеживание и добавление
+        новых целей
     target_body_data - значение целевого параметра (float)
     target_body_datetime - дата создания целевого параметра
     """
