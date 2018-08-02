@@ -152,7 +152,7 @@
 <script>
     // рисуем графики для параметров
     {% for parameter in user_body_params %}
-        user_json_data = JSON.parse('{{parameter.get_parameters_json_data | escapejs}}');
+        user_json_data = JSON.parse('{{parameter.get_parameters_chart_json_data | escapejs}}');
 
         var user_params_canva_{{forloop.counter}} = document.getElementById("canvas_{{forloop.counter}}");
 

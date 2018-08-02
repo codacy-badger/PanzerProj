@@ -167,7 +167,7 @@ class ProfilePage(View):
                 # получаем праметры пользователя
                 'user_body_params': BodyParameterData.objects.filter(user_parameter__user = fitness_user,
                                                                      user_parameter__body_show = True).
-                                                order_by('user_parameter', '-body_data').distinct('user_parameter')[:4]
+                                                order_by('user_parameter', '-body_datetime').distinct('user_parameter')[:4]
             })
 
             # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
@@ -216,6 +216,7 @@ class ProfilePage(View):
             messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
             # возвращаем пользователя назад на ту же страницу
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 # diary notes
 class UserDiaryView(View):
@@ -602,13 +603,18 @@ class UserParamsView(View):
         if request.user.is_authenticated:
             # получаем данные пользователя
             fitness_user = FitnessUser.objects.get(user = request.user)
-            if request.is_ajax() and request.GET.get('gym_object_id'):
+            # если получен AJAX-get запрос с ID параметра
+            if request.is_ajax() and request.GET.get('param_object_id'):
 
                 try:
-                    # получаем данные параметра из БД
-                    param_data = BodyParameterData.objects.get(id = request.GET['gym_object_id'],
-                                                               user_parameter__body_show = True)
-                    self.ajax_content.update({'param_data': param_data.get_parameters_json_data()})
+                    # получаем данные параметра из БД. Нулевой элемент
+                    param_data = BodyParameterData.objects.filter(user_parameter__id__in = request.GET['param_object_id'],
+                                                                  user_parameter__body_show = True).distinct('user_parameter')[0]
+                    # проверка прав на получение информации о зале
+                    if param_data.user_parameter.user == fitness_user:
+                        self.ajax_content.update({'param_json_data': param_data.get_param_json()})
+                    else:
+                        self.ajax_content.update({'error_answer': _('Недостаточно прав!')})
 
                 # TODO добавить логгирование ошибок
                 except Exception as err:

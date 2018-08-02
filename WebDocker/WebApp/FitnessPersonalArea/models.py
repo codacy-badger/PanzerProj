@@ -648,7 +648,7 @@ class BodyParameterData(models.Model):
         return self.body_datetime.strftime("%d %B %Y")
 
     # получение данных параметра в формате JSON
-    def get_parameters_json_data(self):
+    def get_parameters_chart_json_data(self):
         # заготовка JSON`a для передачи в графики информации о записанных параметрах пользователя и его целях
         answer = {'user_data': '',
                   'target_data': ''}
@@ -658,6 +658,20 @@ class BodyParameterData(models.Model):
         # формирование JSON`a с целями пользователя
         answer.update({'target_data': TargetBodyParameter.objects.filter(target_parameter=self.user_parameter.id).last().target_body_data})
         return json.dumps(answer)
+
+    # получение информации о зале в формате JSON
+    def get_param_json(self):
+        """
+
+
+        :return: JSON  с информацией о записи
+        """
+        return {
+                'param_title': self.user_parameter.body_title,
+                'param_data': BodyParameterData.objects.filter(user_parameter__id=self.user_parameter.id).order_by('body_datetime').last().body_data,
+                'param_target': TargetBodyParameter.objects.filter(target_parameter=self.user_parameter.id).last().target_body_data,
+                'param_chart_data': self.get_parameters_chart_json_data()
+                }
 
 
 # user body parameters
