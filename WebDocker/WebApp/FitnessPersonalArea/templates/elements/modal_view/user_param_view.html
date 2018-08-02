@@ -38,7 +38,6 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" id="new_body_parameter_id" name="new_body_parameter">{% trans "Сохранить" %}</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
                     </div>
                 </form>
@@ -51,13 +50,18 @@
               }         
     </script>
 <script>
+        var myChart = null;
     // рисуем графики для параметров
         function draw_param_graph(param_data) {
-        user_json_data = JSON.parse('{{parameter.get_parameters_json_data | escapejs}}');
+        user_json_data = JSON.parse(param_data.param_chart_data);
 
         var user_params_canva = document.getElementById("canvas");
 
-        var myChart = new Chart(user_params_canva, {
+        // удаляем старый график перед рисовкой нового
+        if(myChart!=null){
+            myChart.destroy();
+        }
+        myChart = new Chart(user_params_canva, {
         type: 'scatter',
         data: {
             datasets: [
@@ -117,7 +121,7 @@
             """
             def fill_param_modal(response):
                 # add chart
-                # window.add_gym_view_marker(response)
+                window.draw_param_graph(response)
                 # clean old data
                 doc["param_modal_view_title"].text = ''
                 doc["param_modal_view_data"].text = ''
