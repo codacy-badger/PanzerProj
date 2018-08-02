@@ -263,10 +263,11 @@ class ExtendedBodyParameterData(admin.ModelAdmin):
         return obj.user_parameter.user.user.username
 
     def param_title_short(self, obj):
-        return obj.user_parameter.title_short
+        return obj.user_parameter.body_title
 
-    param_title_short.short_description = 'Param title'
+    param_title_short.short_description = 'Parameter title'
     user_short.short_description = 'User name'
+
 
 #  класс для кастомизации модели FitnessTrainer (раширения модели пользователя под тренера)
 class ExtendedTargetBodyParameter(admin.ModelAdmin):
