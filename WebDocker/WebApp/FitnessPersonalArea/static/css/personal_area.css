@@ -2,6 +2,9 @@
     overflow: hidden;
     z-index: 3;
 }
+.dropdown-item.delete{
+    color:#dc3545;
+}
 img.avatar{
     max-width: 220px;
     width: 100%;

@@ -91,7 +91,7 @@
                           </button>
                   </div>
 
-                  <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
+                  <form style="float: right; margin-bottom: 0px" method="post" action="{% url 'user_params' %}" enctype="multipart/form-data">
                       {% csrf_token %}
                       <input hidden name="param_id" value="{{ parameter.user_parameter.id }}">
                       <button type="submit" class="btn btn-danger">

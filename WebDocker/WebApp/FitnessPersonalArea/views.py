@@ -194,9 +194,9 @@ class ProfilePage(View):
     def post(self, request):
         if request.is_ajax() and request.user.is_authenticated:
             ajax_answer = {'answer': False}
-            # вносим изменения в описание тренера
-            if request.POST.get('trainer_description'):
-                try:
+            try:
+                # вносим изменения в описание тренера
+                if request.POST.get('trainer_description'):
                     edited_description = FitnessTrainer.objects.get(user__user = request.user)
                     edited_description.trainer_employment_status = True if request.POST.get('trainer_employment_status') else False
                     edited_description.trainer_description = request.POST['trainer_description']
@@ -205,17 +205,12 @@ class ProfilePage(View):
                     ajax_answer.update({'answer': True})
 
                     messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
-                # TODO добавить логгирование ошибок
-                except Exception as err:
-                    print(err)
-                    ajax_answer.update({'error_answer': _('Произошла ошибка!')})
-
-            return JsonResponse(ajax_answer)
-        else:
-
-            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            # TODO добавить логгирование ошибок
+            except Exception as err:
+                print(err)
+                ajax_answer.update({'error_answer': _('Произошла ошибка!')})
+            finally:
+                return JsonResponse(ajax_answer)
 
 
 # diary notes
@@ -231,7 +226,9 @@ class UserDiaryView(View):
             # если ajax запрос на получение полной информации о записи в дневнике
             if request.is_ajax() and request.GET.get('diary_note_id'):
                 try:
-                    diary_note = UserDiary.objects.get(id = request.GET['diary_note_id'])
+                    diary_note = UserDiary.objects.get(id = request.GET['diary_note_id'],
+                                                       user__user = request.user,
+                                                       diary_note_show = True)
 
                     self.ajax_content.update({'answer': True})
                     self.ajax_content['diary_note'] = diary_note.get_note_json()
@@ -272,21 +269,28 @@ class UserDiaryView(View):
 
     def post(self, request, tag: str = None):
         if request.user.is_authenticated:
+            fitness_user = FitnessUser.objects.get(user = request.user)
             # если пользователь хочет удалить пост
             if request.POST.get('diary_note_delete_id'):
-                deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
-                # проверяем, является ли удаляющий автором поста
-                if request.user == deleted_post.user.user:
-                    # делаем пост невидимым для пользователя-автора
-                    deleted_post.diary_note_show = False
-                    deleted_post.save()
+                try:
+                    deleted_post = UserDiary.objects.get(id = request.POST['diary_note_delete_id'])
+                    # проверяем, является ли удаляющий автором поста
+                    if fitness_user == deleted_post.user:
+                        # делаем пост невидимым для пользователя-автора
+                        deleted_post.diary_note_show = False
+                        deleted_post.save()
 
-                    messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
-                else:
-                    messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
+                        messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
+                    else:
+                        messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
 
-                # возвращаем пользователя назад на ту же страницу
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    messages.add_message(request, messages.ERROR, _("Невозможно удалить запись. Ошибка."))
+                finally:
+                    # возвращаем пользователя назад на ту же страницу
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
             """
             Ajax запросы
@@ -296,49 +300,38 @@ class UserDiaryView(View):
                 try:
                     # создаём новую запись в дневнике
                     if request.POST.get('new_diary_note_btn'):
-                        try:
-                            new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
-                                                                      diary_note_title = request.POST['diary_note_title'],
-                                                                      diary_note_text = request.POST['diary_note_text'])
-                            # добавляем теги к записи в дневнике
-                            for tag in request.POST['diary_note_tags'].split(','):
-                                new_diary_note.diary_note_tags.add(tag.lower().strip())
-                            new_diary_note.save()
+                        new_diary_note = UserDiary.objects.create(user = FitnessUser.objects.get(user = request.user),
+                                                                  diary_note_title = request.POST['diary_note_title'],
+                                                                  diary_note_text = request.POST['diary_note_text'])
+                        # добавляем теги к записи в дневнике
+                        for tag in request.POST['diary_note_tags'].split(','):
+                            new_diary_note.diary_note_tags.add(tag.lower().strip())
+                        new_diary_note.save()
 
-                            self.ajax_content.update({'answer': True})
+                        self.ajax_content.update({'answer': True})
 
-                            messages.add_message(request, messages.SUCCESS, _('Запись создана'))
-                        # TODO добавить логгирование ошибок
-                        except Exception as err:
-                            print(err)
-                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                        messages.add_message(request, messages.SUCCESS, _('Запись создана'))
 
                     # редакитурем старую запись в дневнике
                     elif request.POST.get('diary_note_edit'):
-                        try:
-                            # получаем запись из БД по id
-                            diary_note = UserDiary.objects.get(id = request.POST['diary_note_edit'])
-                            # проверка соответсвия хозяина заметки и пользователя пытающегося изменить запись
-                            if diary_note.user.user == request.user:
-                                # вносим изменённые данные в модель записи
-                                diary_note.diary_note_title = request.POST['diary_note_title']
-                                diary_note.diary_note_text = request.POST['diary_note_text']
-                                # обновляем дату записи
-                                diary_note.diary_note_datetime = now()
+                        # получаем запись из БД по id
+                        diary_note = UserDiary.objects.get(id = request.POST['diary_note_edit'])
+                        # проверка соответсвия хозяина заметки и пользователя пытающегося изменить запись
+                        if diary_note.user == fitness_user:
+                            # вносим изменённые данные в модель записи
+                            diary_note.diary_note_title = request.POST['diary_note_title']
+                            diary_note.diary_note_text = request.POST['diary_note_text']
+                            # обновляем дату записи
+                            diary_note.diary_note_datetime = now()
 
-                                # добавляем теги к записи в дневнике
-                                for tag in request.POST['diary_note_tags'].split(','):
-                                    diary_note.diary_note_tags.add(tag.lower().strip())
-                                diary_note.save()
+                            # добавляем теги к записи в дневнике
+                            for tag in request.POST['diary_note_tags'].split(','):
+                                diary_note.diary_note_tags.add(tag.lower().strip())
+                            diary_note.save()
 
-                                self.ajax_content.update({'answer': True})
+                            self.ajax_content.update({'answer': True})
 
-                                messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
-                        # TODO добавить логгирование ошибок
-                        except Exception as err:
-                            print(err)
-                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
-
+                            messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
                 # TODO добавить логгирование ошибок
                 except Exception as err:
                     print(err)
@@ -361,7 +354,7 @@ class UserMedicalView(View):
             # если ajax запрос на получение полной информации о записи в дневнике
             if request.is_ajax() and request.GET['medical_note_id']:
                 try:
-                    medical_note = MedicalNote.objects.get(id = request.GET['medical_note_id'])
+                    medical_note = MedicalNote.objects.get(id = request.GET['medical_note_id'], user__user = request.user)
 
                     self.ajax_content.update({'answer': True})
                     self.ajax_content['medical_note'] = medical_note.get_note_json()
@@ -373,11 +366,11 @@ class UserMedicalView(View):
 
                 finally:
                     return JsonResponse(self.ajax_content)
+
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/medical_notes.html',
                 'fitness_user': FitnessUser.objects.get(user = request.user)})
-
 
             # ели был передан тег - выбираем записи с ним
             if tag:
@@ -402,26 +395,34 @@ class UserMedicalView(View):
             return render(request, 'base.html', self.content)
 
         else:
-            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            messages.add_message(request, messages.ERROR, _('Недостаточно прав'))
             # возвращаем пользователя назад на ту же страницу
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
     def post(self, request, tag: str = None):
         if request.user.is_authenticated:
+            fitness_user = FitnessUser.objects.get(user = request.user)
             # если пользователь хочет удалить пост
             if request.POST.get('medical_note_delete_id'):
-                deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])
-                # проверяем, является ли удаляющий автором поста
-                if request.user == deleted_post.user.user:
-                    # делаем пост невидимым для пользователя-автора
-                    deleted_post.medical_note_show = False
-                    deleted_post.save()
+                try:
+                    deleted_post = MedicalNote.objects.get(id = request.POST['medical_note_delete_id'])
+                    # проверяем, является ли удаляющий автором поста
+                    if fitness_user == deleted_post.user:
+                        # делаем пост невидимым для пользователя-автора
+                        deleted_post.medical_note_show = False
+                        deleted_post.save()
 
-                    messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
-                else:
-                    messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
+                        messages.add_message(request, messages.SUCCESS, _("Запись удалена"))
+                    else:
+                        messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
 
-                # возвращаем пользователя назад на ту же страницу
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                # TODO добавить логгирование ошибок
+                except Exception as err:
+                    print(err)
+                    messages.add_message(request, messages.ERROR, _("Невозможно удалить запись. Ошибка."))
+                finally:
+                    # возвращаем пользователя назад на ту же страницу
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
             """
             Ajax запросы
             """
@@ -430,55 +431,47 @@ class UserMedicalView(View):
                 try:
                     # создаём новую медицинскую запись запись в дневнике
                     if request.POST.get('new_medical_note_btn'):
-                        try:
-                            new_medical_note = MedicalNote.objects.create(
-                                user = FitnessUser.objects.get(user = request.user),
-                                medical_note_title = request.POST['medical_note_title'],
-                                medical_note_text = request.POST['medical_note_text'])
+                        new_medical_note = MedicalNote.objects.create(
+                            user = fitness_user,
+                            medical_note_title = request.POST['medical_note_title'],
+                            medical_note_text = request.POST['medical_note_text'])
 
-                            # добавляем теги к медицинской записи
-                            for tag in request.POST['medical_note_tags'].split(','):
-                                new_medical_note.medical_note_tags.add(tag.lower().strip())
-                            new_medical_note.save()
+                        # добавляем теги к медицинской записи
+                        for tag in request.POST['medical_note_tags'].split(','):
+                            new_medical_note.medical_note_tags.add(tag.lower().strip())
+                        new_medical_note.save()
 
-                            self.ajax_content.update({'answer': True})
+                        self.ajax_content.update({'answer': True})
 
-                            messages.add_message(request, messages.SUCCESS, _('Запись создана'))
-                        # TODO добавить логгирование ошибок
-                        except Exception as err:
-                            print(err)
-                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                        messages.add_message(request, messages.SUCCESS, _('Запись создана'))
 
                     # редакитурем старую мед. запись
                     elif request.POST.get('medical_note_edit'):
-                        try:
-                            # получаем запись из БД по id
-                            medical_note = MedicalNote.objects.get(id = request.POST['medical_note_edit'])
-                            # проверка соответсвия хозяина мед.заметки и пользователя пытающегося изменить запись
-                            if medical_note.user.user == request.user:
-                                # вносим изменённые данные в модель записи
-                                medical_note.medical_note_title = request.POST['medical_note_title']
-                                medical_note.medical_note_text = request.POST['medical_note_text']
-                                # обновляем дату записи
-                                medical_note.medical_note_datetime = now()
+                        # получаем запись из БД по id
+                        medical_note = MedicalNote.objects.get(id = request.POST['medical_note_edit'])
+                        # проверка соответсвия хозяина мед.заметки и пользователя пытающегося изменить запись
+                        if medical_note.user == fitness_user:
+                            # вносим изменённые данные в модель записи
+                            medical_note.medical_note_title = request.POST['medical_note_title']
+                            medical_note.medical_note_text = request.POST['medical_note_text']
+                            # обновляем дату записи
+                            medical_note.medical_note_datetime = now()
 
-                                # добавляем теги к записи в дневнике
-                                for tag in request.POST['medical_note_tags'].split(','):
-                                    medical_note.medical_note_tags.add(tag.lower().strip())
-                                medical_note.save()
+                            # добавляем теги к записи в дневнике
+                            for tag in request.POST['medical_note_tags'].split(','):
+                                medical_note.medical_note_tags.add(tag.lower().strip())
+                            medical_note.save()
 
-                                self.ajax_content.update({'answer': True})
+                            self.ajax_content.update({'answer': True})
 
-                                messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
-                        # TODO добавить логгирование ошибок
-                        except Exception as err:
-                            print(err)
-                            self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                            messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
+
                 # TODO добавить логгирование ошибок
                 except Exception as err:
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
-        return JsonResponse(self.ajax_content)
+                finally:
+                    return JsonResponse(self.ajax_content)
 
 
 # user gym`s
@@ -498,7 +491,7 @@ class UserGymsView(View):
 
                 try:
                     # получаем данные зала из БД
-                    gym_object = TrainGym.objects.get(id = request.GET['gym_object_id'])
+                    gym_object = TrainGym.objects.get(id = request.GET['gym_object_id'], user = fitness_user)
                     self.ajax_content.update({'gym_data': gym_object.get_gym_json()})
 
                 # TODO добавить логгирование ошибок
@@ -561,7 +554,7 @@ class UserGymsView(View):
                             # получаем зал по ID
                             edited_gym = TrainGym.objects.get(id = request.POST['gym_edit'])
                             # проверяем, является ли пользователь владельцем записи о зале
-                            if request.user == edited_gym.user.user:
+                            if fitness_user == edited_gym.user:
                                 # обновляем данные зала
                                 edited_gym.gym_name = request.POST['gym_title']
                                 edited_gym.gym_description = request.POST['gym_description']
@@ -589,6 +582,25 @@ class UserGymsView(View):
 
                 finally:
                     return JsonResponse(self.ajax_content)
+            else:
+                # при удалении отслеживаемого параметра
+                if request.POST.get('gym_id'):
+                    # получаем данные зала
+                    delete_gym = TrainGym.objects.get(id = request.POST['gym_id'])
+                    # проверка прав доступа
+                    if delete_gym.user == fitness_user:
+                        # меняем область видимости на False и сохраняем модель
+                        delete_gym.delete()
+
+                        messages.add_message(request, messages.SUCCESS, _('Данные удалены'))
+                    else:
+                        messages.add_message(request, messages.ERROR, _('Данные не удалены. Недостаточно прав.'))
+
+                    # обновляем ответ на AJAX-запрос, об успешном создании зала
+                    self.ajax_content.update({'answer': True})
+
+                # возвращаем пользователя назад на ту же страницу
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 # user params
@@ -610,11 +622,11 @@ class UserParamsView(View):
                     # получаем данные параметра из БД. Нулевой элемент
                     param_data = BodyParameterData.objects.filter(user_parameter__id__in = request.GET['param_object_id'],
                                                                   user_parameter__body_show = True).distinct('user_parameter')[0]
-                    # проверка прав на получение информации о зале
+                    # проверка прав на получение информации о параметре
                     if param_data.user_parameter.user == fitness_user:
                         self.ajax_content.update({'param_json_data': param_data.get_param_json()})
                     else:
-                        self.ajax_content.update({'error_answer': _('Недостаточно прав!')})
+                        self.ajax_content.update({'error_answer': _('Недостаточно прав')})
 
                 # TODO добавить логгирование ошибок
                 except Exception as err:
@@ -641,7 +653,7 @@ class UserParamsView(View):
                 return render(request, 'base.html', self.content)
         else:
 
-            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
+            messages.add_message(request, messages.ERROR, _('Недостаточно прав для просмотра'))
             # возвращаем пользователя назад на ту же страницу
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -708,13 +720,16 @@ class UserParamsView(View):
                 if request.POST.get('param_id'):
                     # получаем параметр для отслеживания
                     hide_param = BodyParameter.objects.get(id = request.POST['param_id'])
-                    # меняем область видимости на False и сохраняем модель
-                    hide_param.body_show = False
-                    hide_param.save()
+                    # проверка прав
+                    if hide_param.user == fitness_user:
+                        # меняем область видимости на False и сохраняем модель
+                        hide_param.body_show = False
+                        hide_param.save()
 
-                    messages.add_message(request, messages.SUCCESS, _('Данные удалены'))
-                    # обновляем ответ на AJAX-запрос, об успешном создании зала
-                    self.ajax_content.update({'answer': True})
+                        messages.add_message(request, messages.SUCCESS, _('Данные удалены'))
+                    else:
+
+                        messages.add_message(request, messages.ERROR, _('Данные не удалены. Недостаточно прав'))
 
                 # возвращаем пользователя назад на ту же страницу
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

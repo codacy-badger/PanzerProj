@@ -80,6 +80,40 @@
                                         data-toggle="modal" data-target="#userParamDetailView">
                                     {% trans "Детали" %}
                                 </button>
+
+
+                                <div style="float:right">
+                                    <div class="dropdown show">
+                                        <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {% trans "Действия" %}
+                                        </a>
+                                        
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                            <h6 class="dropdown-header">
+                                                {% trans "Действия с параметрами" %}
+                                            </h6>
+                                            <button type="button" class="dropdown-item param_data" value="{{ parameter.user_parameter.id }}"  name="new_param_data" data-toggle="modal"
+                                                    data-target="#addUserParamData">
+                                                <i class="fas fa-plus"></i>
+                                                {% trans "Добавить данные" %}
+                                            </button>
+                                            <button type="button" class="dropdown-item param_data" value="{{ parameter.user_parameter.id }}"  name="new_target_data" data-toggle="modal"
+                                                    data-target="#addUserTargetData">
+                                                <i class="fas fa-bullseye"></i>
+                                                {% trans "Обновить цель" %}
+                                            </button>
+                                            <div class="dropdown-divider"></div>
+                                            <form style="margin-bottom: 0px" method="post" action="{% url 'user_params' %}" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <input hidden name="param_id" value="{{ parameter.user_parameter.id }}">
+                                                <button type="submit" class="dropdown-item delete">
+                                                    <i class="fas fa-trash"></i>
+                                                    {% trans "Удалить" %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -121,6 +155,29 @@
                                         data-toggle="modal" data-target="#viewGymDestination">
                                     {% trans "Детали" %}
                                 </button>
+
+
+                                <div style="float:right">
+                                    <div class="dropdown show">
+                                        <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {% trans "Действия" %}
+                                        </a>
+                                        
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                            <h6 class="dropdown-header">
+                                                {% trans "Действия с залами" %}
+                                            </h6>
+                                            <form style="margin-bottom: 0px" method="post" action="{% url 'user_gyms' %}" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <input hidden name="gym_id" value="{{ gym.id }}">
+                                                <button type="submit" class="dropdown-item delete">
+                                                    <i class="fas fa-trash"></i>
+                                                    {% trans "Удалить" %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -536,10 +593,14 @@
 
     {% block user_params_edit %}
 
-        {% include 'elements/modal_edit/user_params/user_param_modal.html' %}
         {% include 'elements/modal_view/user_param_view.html' %}
 
+        {% include 'elements/modal_edit/user_params/data_param_modal.html' %}
+        {% include 'elements/modal_edit/user_params/target_param_modal.html' %}
+        {% include 'elements/modal_edit/user_params/user_param_modal.html' %}
+
     {% endblock %}
+
     {% block gym_modal %}
 
         {% include 'elements/modal_edit/gym_modal.html' %}
@@ -568,6 +629,89 @@
 
             csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
 
+            # ID параметра для обновления
+            param_id=0
+            
+            # add param ID to form
+            def add_param_id(ev):
+                global param_id
+                param_id=ev.currentTarget.value
+
+            def on_complete(req):
+                json_response = json.loads(req.text)
+                # if success creation
+                if req.status==200 and json_response['answer']==True:
+                    # reload page from JS
+                    window.reloader()
+                # if error - show message
+                else:
+                    alert(json_response['error_answer'])
+
+            """
+            AJAX request for adding new data target
+            """    
+            def send_new_target_data(ev):
+                req = ajax.ajax()
+                req.bind('complete',on_complete)
+                # send a POST request to the url
+                req.open("POST","{% url 'user_params' %}",True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+        
+                # get inserted form data
+                body_target_data = doc['body_target_data_id'].value
+        
+                # check inputs 
+                if body_target_data:
+                    # prepare request dictionary
+                    request_body = {
+                                    'csrfmiddlewaretoken':csrf_token, 
+                                    'param_id':param_id, 
+                                    'body_target_data': body_target_data,
+                                    'new_body_target_data_id':True
+                                    }
+        
+                    # send data as a dictionary
+                    req.send(request_body)
+                else:
+                    alert('Заполните все поля.')
+            
+            """
+            AJAX request for adding new data
+            """
+            def send_new_param_data(ev):
+                req = ajax.ajax()
+                req.bind('complete',on_complete)
+                # send a POST request to the url
+                req.open("POST","{% url 'user_params' %}",True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+    
+                # get inserted form data
+                body_param_data = doc['body_param_data_id'].value
+    
+                # check inputs 
+                if body_param_data:
+                    # prepare request dictionary
+                    request_body = {
+                                    'csrfmiddlewaretoken':csrf_token, 
+                                    'param_id':param_id, 
+                                    'body_param_data': body_param_data,
+                                    'new_body_param_data_id':True
+                                    }
+    
+                    # send data as a dictionary
+                    req.send(request_body)
+                else:
+                    alert('Заполните все поля.')
+    
+                        
 
             def fill_diary_modal(response):
                 # clean inputs
@@ -717,6 +861,16 @@
                 req.set_header('X-Requested-With','XMLHttpRequest')
 
                 req.send()
+        
+            # запоминаем ID параметра для которого нажата кнопка по добавлению новых целей/данных
+            for element in doc.select('.dropdown-item.param_data'):
+                element.bind("click", add_param_id)
+        
+            # привязываем кнопку по отправке пользовательских данных к функции
+            doc['save_body_param_data_id'].bind('click', send_new_param_data)
+        
+            # привязываем кнопку для задания новой цели к функции
+            doc['save_body_target_data_id'].bind('click', send_new_target_data)
 
             # bind all medical objects to func
             for element in doc.select('.btn.btn-link.view_medical'):
