@@ -687,7 +687,7 @@ class TargetBodyParameter(models.Model):
     # target body parameter data
     target_body_data = models.FloatField()
     # body parameter creating datetime
-    gi = models.DateTimeField(default = now)
+    target_body_datetime = models.DateTimeField(default = now)
 
     def __str__(self):
         return f'User: {self.target_parameter.user.user.username}; ' \

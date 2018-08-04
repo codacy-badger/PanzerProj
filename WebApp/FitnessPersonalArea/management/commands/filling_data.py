@@ -26,7 +26,7 @@ class Command(BaseCommand):
         fake = Faker()
         # получаем кол-во аккаунтов для создания
         target = options['target_amount'][0]
-        for z, i in enumerate(range(1, target)):
+        for user, index in enumerate(range(1, target)):
             try:
                 # создаём обычного юзера
                 new_user = User.objects.create_user(username = fake.simple_profile()['username'],
@@ -110,7 +110,6 @@ class Command(BaseCommand):
                 print(err)
                 break
             finally:
-                print(f'{round(i/target*100, 1)}% выполнено ...')
+                print(f'{round(index/target*100, 2)}% выполнено ...')
 
-        time_result = time.clock() - start_time
-        self.stdout.write(self.style.SUCCESS(f'Gotovo epta in {time_result} seconds'))
+        self.stdout.write(self.style.SUCCESS(f'Наполнение выполнено за {round(time.clock() - start_time, 3)} секунд'))
