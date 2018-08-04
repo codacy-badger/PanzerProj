@@ -1,0 +1,43 @@
+{% block header %}
+{% load i18n %}
+    <header>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a class="navbar-brand" href="#">FS | Fitness Social</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                    aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+
+                {% if not user.is_authenticated %}
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">{% trans "Вход" %}</a>
+                        </li>
+                        <li class="nav-item" >
+                            <a class="nav-link" href="{% url 'registration' %}">{% trans "Регистрация" %}</a>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="navbar-nav">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'personal_area' %}">{% trans "Профиль" %}</a>
+                        </li>
+                        <li class="nav-item" style="padding-right: 50px" >
+                            <a class="nav-link" href="{% url 'registration' %}">{% trans "Настройки" %}</a>
+                        </li>
+                        <li class="nav-item" >
+                            <a class="nav-link" href="{% url 'logout' %}">{% trans "Выход" %}</a>
+                        </li>
+
+
+
+                    </ul>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+{% endblock %}

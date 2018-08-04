@@ -1,0 +1,164 @@
+{% block left_menu %}
+{% load static %}
+{% load i18n %}
+
+
+        <div class="col-md-4 col-sm-5 col-lg-3 float-left col-1 pl-0 pr-0 collapse width show" id="sidebar">
+            <div class="list-group border-0 card text-center text-md-left">
+
+                <a href="#menuProfile" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                   aria-expanded="false"><i class="fas fa-user-circle"></i>
+                    <span class="d-none d-md-inline">{% trans "Вошли как"%}: {{ user.username }}</span>
+                </a>
+                <div class="collapse" id="menuProfile" data-parent="#sidebar">
+
+                    <a href="{% url 'personal_profile' %}" class="list-group-item button" >
+                        <i class="far fa-user-circle"></i>
+                        {% trans "Профиль" %}
+                    </a>
+
+
+                    <a href="#menuNotes" class="list-group-item" data-toggle="collapse" aria-expanded="false">
+                        <i class="fas fa-pencil-alt"></i>
+                        {% trans "Записи" %}
+                    </a>
+                    <div class="collapse" id="menuNotes" data-parent="#menuProfile">
+                        <a href="{% url 'user_medical' %}" class="list-group-item button">
+                            <i class="fas fa-notes-medical"></i>
+                            {% trans "Медицинские" %}
+                        </a>
+                        <a href="{% url 'user_diary' %}" class="list-group-item button" >
+                            <i class="fas fa-book-open"></i>
+                            {% trans "Дневник" %}
+                        </a>
+                    </div>
+
+
+                    <a class="list-group-item button" href="{% url 'user_gyms' %}">
+                        <i class="fas fa-map-marked-alt"></i>
+                        {% trans "Залы" %}
+                    </a>
+
+
+                    {% if fitness_user.fitness_user_type == fitness_user.teacher_user %}
+                        <a class="list-group-item button" href="{% url 'trainer_price' %}" >
+                            <i class="fas fa-dollar-sign"></i>
+                            {% trans "Расценки" %}
+                        </a>
+                    {% else %}
+                        <a class="list-group-item button" >
+                            <i class="fas fa-user-graduate"></i>
+                            {% trans "Тренер" %}
+                        </a>
+                    {% endif %}
+
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-eye"></i>
+                        {% trans "Отзывы" %}
+                    </a>
+
+                    <a href="#menuSettings" class="list-group-item" data-toggle="collapse" aria-expanded="false">
+                        <i class="fas fa-cog"></i>
+                        {% trans "Настройки" %}
+                    </a>
+                    <div class="collapse" id="menuSettings" data-parent="#menuProfile">
+                        <a class="list-group-item button" >
+                            <i class="fas fa-sliders-h"></i>
+                            {% trans "Настройки профиля" %}
+                        </a>
+                        <a class="list-group-item button" >
+                            <i class="fas fa-wrench"></i>
+                            {% trans "Общие настройки" %}
+                        </a>
+                    </div>
+
+                </div>
+
+
+                <a href="#menuTrainers" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                   aria-expanded="false">
+                    <i class="fas fa-dumbbell"></i>
+                    <span class="d-none d-md-inline">{% trans "Тренировка" %}</span>
+                </a>
+
+                <div class="collapse" id="menuTrainers" data-parent="#sidebar">
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-plus-circle"></i>
+                        {% trans "Создать тренировку" %}
+                    </a>
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-plus-square"></i>
+                        {% trans "Создать упражнение" %}
+                    </a>
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-plus-square"></i>
+                        {% trans "Создать план тренировки" %}
+                    </a>
+
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-ellipsis-h"></i>
+                        {% trans "Мои упражнения" %}
+                    </a>
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-grip-horizontal"></i>
+                        {% trans "Мои планы тренеровок" %}
+                    </a>
+
+
+                </div>
+
+
+                <a class="list-group-item button" >
+                    <i class="fas fa-images"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваши фото" %}</span>
+                </a>
+
+                <a class="list-group-item button" href="{% url 'user_params' %}" >
+                    <i class="fas fa-bullseye"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваши цели" %}</span>
+                </a>
+
+                <a class="list-group-item button" >
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="d-none d-md-inline">{% trans "Ваш календарь" %}</span>
+                </a>
+
+                <a href="#menuSearch" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
+                   aria-expanded="false">
+                    <i class="fas fa-search"></i>
+                    <span class="d-none d-md-inline">Поиск</span>
+                </a>
+
+                <div class="collapse" id="menuSearch" data-parent="#sidebar">
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-users"></i>
+                        {% trans "Найти тренера" %}
+                    </a>
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-map-marked-alt"></i>
+                        {% trans "Найти зал" %}
+                    </a>
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-ellipsis-h"></i>
+                        {% trans "Найти упражнения" %}
+                    </a>
+
+                    <a class="list-group-item button" >
+                        <i class="fas fa-grip-horizontal"></i>
+                        {% trans "Найти планы тренеровок" %}
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+{% endblock %}

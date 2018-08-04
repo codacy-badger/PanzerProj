@@ -1,0 +1,45 @@
+{% block gym_modal_view %}
+{% load static %}
+{% load i18n %}
+
+<link href="{% static "/css/gym.css" %}" rel="stylesheet">
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="viewGymDestination">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-map-marked-alt"></i>
+                        {% trans "Ваши залы" %}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form name="new_gym_form" method="post" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название зала"%}</dt>
+                            <dd class="col-sm-8" id="gym_title_view_id"></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Описание зала"%}</dt>
+                            <dd class="col-sm-8" id="gym_description_view_id"></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Адрес зала"%}</dt>
+                            <dd class="col-sm-8" id="gym_adress_view_id" ></dd>
+                        </dl>
+                    </div>
+
+                <div id="map_detail" style="height:30%"></div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    {%endblock%}

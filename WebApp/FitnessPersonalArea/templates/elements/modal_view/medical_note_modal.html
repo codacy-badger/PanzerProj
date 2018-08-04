@@ -1,0 +1,44 @@
+{% block medical_note_view %}
+{% load static %}
+{% load i18n %}
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="viewMedicalNote">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-notes-medical"></i>
+                        {% trans "Ваши записи" %}</h4>
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                        <div style="float: left" class="datetime"  id="medical_note_modal_datetime">
+                                
+                        </div>
+                        <div style="float: right" class="tags" id="medical_note_modal_tags">
+          
+                            
+          
+                        </div>
+                        <div>
+                            <h4><strong><p class="text-center" id="medical_note_modal_title"></p></strong></h4>
+                                <p class="card-text text-justify" id="medical_note_modal_text"></p>
+
+                        </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% block user_param_modal_view %}
+{% load static %}
+{% load i18n %}
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="userParamDetailView">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-chart-area"></i>
+                        {% trans "Ваши параметры" %}
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form name="new_parameter_form" method="post" action="" id="new_parameter_form_id" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input hidden name="body_parameter_edit" value="-1" id="body_parameter_edit_id">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Название параметра"%}</dt>
+                            <dd class="col-sm-8" id="param_modal_view_title"></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Последнее значение"%}</dt>
+                            <dd class="col-sm-8" id="param_modal_view_data" ></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Актуальная цель"%}</dt>
+                            <dd class="col-sm-8" id="param_modal_view_target"></dd>
+                        </dl>
+                    </div>
+                    <canvas id="canvas" class="chartjs-render-monitor"
+                            style="display: block; width: 100%; height: 30%;">
+                    </canvas>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <script>
+            function reloader () {
+                location.reload(true)
+              }         
+    </script>
+<script>
+        var myChart = null;
+    // рисуем графики для параметров
+        function draw_param_graph(param_data) {
+        user_json_data = JSON.parse(param_data.param_chart_data);
+
+        var user_params_canva = document.getElementById("canvas");
+
+        // удаляем старый график перед рисовкой нового
+        if(myChart!=null){
+            myChart.destroy();
+        }
+        myChart = new Chart(user_params_canva, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                label: '{% trans "Ваши данные" %}',
+                data: user_json_data.user_data,
+                showLine: true,
+                fill: false,
+                borderColor: 'rgba(0, 200, 0, 1)'
+                },
+            {
+                label: '{% trans "Ваша цель" %}',
+                data: [{x: user_json_data.user_data[0].x, y: user_json_data.target_data}, {x: user_json_data.user_data[user_json_data.user_data.length-1].x, y: user_json_data.target_data }],
+                showLine: true,
+                fill: false,
+                borderColor: 'rgba(200, 0, 0, 1)'
+                }
+            ]
+        },
+        options: {
+            tooltips: {
+            mode: 'index',
+            intersect: false,
+            },
+            hover: {
+            mode: 'nearest',
+            intersect: true
+            },
+            scales: {
+            yAxes: [{
+                ticks: {
+                beginAtZero:false
+                }
+            }],
+            xAxes: [{
+                type: 'time',
+                time: {
+                    displayFormats: {
+                        week: 'll'
+                    }
+                }
+            }],
+            },
+        }
+        });
+        }
+
+    </script>
+    <script type="text/python">
+            from browser import document as doc, alert, ajax, window, html
+            import json
+            import urllib
+
+            csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+            """
+            Fill modal window PARAM data
+            """
+            def fill_param_modal(response):
+                # add chart
+                window.draw_param_graph(response)
+                # clean old data
+                doc["param_modal_view_title"].text = ''
+                doc["param_modal_view_data"].text = ''
+                doc["param_modal_view_target"].text = ''
+
+                # insert new data
+                doc['param_modal_view_title'] <= response['param_title']
+                doc['param_modal_view_data'] <= response['param_data']
+                doc['param_modal_view_target'] <= response['param_target']
+
+            """
+            AJAX-get response for PARAM object
+            """
+            def on_complete_param(req):
+                json_response = json.loads(req.text)
+                # if NOT success geting data
+                if req.status!=200 and json_response['answer']!=True:
+                    alert(json_response['error_answer'])
+                else:
+                    fill_param_modal(json_response['param_json_data'])
+
+            """
+            AJAX-get request for PARAM object
+            """
+            def get_data_param(ev):
+                # get medical note ID and set to GET request param
+                qs = "param_object_id="+ev.currentTarget.value
+
+                req = ajax.ajax()
+                req.bind('complete',on_complete_param)
+                # send a POST request to the url
+                req.open("GET","{% url 'user_params' %}"+"?"+qs,True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+
+                req.send()
+
+            # bind all params objects to func
+            for element in doc.select('.btn.btn-link.view_param'):
+                element.bind("click", get_data_param)
+        </script>
+    </div>
+  
+{% endblock %}

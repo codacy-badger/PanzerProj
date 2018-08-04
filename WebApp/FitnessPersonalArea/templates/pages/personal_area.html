@@ -1,0 +1,25 @@
+{% block personal_area %}
+{% load static %}
+{% load i18n %}
+
+    <link href="{% static "/css/personal_area.css" %}" rel="stylesheet">
+
+<div class="container-fluid">
+    <div class="row d-flex d-md-block flex-nowrap wrapper">
+        {% block left_menu %}
+
+            {% include 'elements/personal_area_menu_left.html' %}
+
+        {% endblock %}
+
+        <div  id="personal_main_area" class="col-md-8  col-sm-12  col-lg-9 float-left col px-5 pl-md-2 pt-2 main">
+
+                {% block private_content %}
+
+                    {% include private_doc %}
+
+                {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

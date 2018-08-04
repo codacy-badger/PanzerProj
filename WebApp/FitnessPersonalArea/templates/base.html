@@ -1,0 +1,70 @@
+<html lang="ru" >
+{% load i18n %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>FS | Fitness-Social</title>
+
+    <!-- Bootstrap 4 core CSS -->
+    <link href="{% static "/bootstrap_4/css/bootstrap.css" %}" rel="stylesheet">
+    <link href="{% static "/css/footer.css" %}" rel="stylesheet">
+    <link href="{% static "/css/body.css" %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+   
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.css' rel='stylesheet' />
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+<script src="{% static "js/chart_utils.js" %}"></script>
+
+
+
+    <script src="{% static 'brython/brython.js' %}"></script>
+    <script src="{% static 'brython/brython_stdlib.js' %}"></script>
+
+  </head>
+<body  onload=brython()>
+
+{% block header %}
+    {% include 'elements/header.html' %}
+{% endblock %}
+
+
+<main role="main" class="container">
+
+    {% block main_content %}
+        {% include doc %}
+    {% endblock %}
+
+</main>
+
+{% block footer %}
+    {% include 'elements/footer.html' %}
+{% endblock %}
+
+
+
+ {% if messages %}
+     {% block messaage_modal %}
+         {% include 'elements/modal_edit/message_modal.html' %}
+     {% endblock %}
+<script>
+        jQuery(document).ready(function(){
+            $('#messageModal').modal('show');
+        });
+</script>
+ {% endif %}
+
+<script src="{% static "/bootstrap_4/js/bootstrap.js" %}"></script>
+</body>
+</html>
