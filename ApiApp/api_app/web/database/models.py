@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 import datetime
 
-from ApiDocker.api_app import  db_name, db_user, db_password
+from ApiApp.api_app import db_name, db_user, db_password
 
 # автоматический сбор инфомрации о таблицах в БД
 Base = automap_base()
