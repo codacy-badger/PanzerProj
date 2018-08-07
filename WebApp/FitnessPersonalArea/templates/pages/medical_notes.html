@@ -84,8 +84,7 @@
 
                   <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
                       {% csrf_token %}
-                      <input hidden name="medical_note_delete_id" value="{{ note.id }}">
-                      <button type="submit" class="btn btn-danger">
+                      <button type="submit" class="btn btn-danger" name="medical_note_delete_id" value="{{ note.id }}">
                           <i class="fas fa-trash"></i>
                           {% trans "Удалить" %}
                       </button>
