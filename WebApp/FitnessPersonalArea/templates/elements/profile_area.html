@@ -52,7 +52,7 @@
         <h5 class="card-header">
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url "user_params" %}';">
                 <i class="fas fa-chart-area"></i>
-                {% trans "Ваши параметры" %}
+                {% trans "Ваши цели" %}
             </button>
             <button type="button" class="btn btn-light" data-toggle="modal"
                     data-target="#newUserTarget">
@@ -90,7 +90,7 @@
                                         
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                             <h6 class="dropdown-header">
-                                                {% trans "Действия с параметрами" %}
+                                                {% trans "Действия с целями" %}
                                             </h6>
                                             <button type="button" class="dropdown-item param_data" value="{{ parameter.user_parameter.id }}"  name="new_param_data" data-toggle="modal"
                                                     data-target="#addUserParamData">
@@ -105,8 +105,7 @@
                                             <div class="dropdown-divider"></div>
                                             <form style="margin-bottom: 0px" method="post" action="{% url 'user_params' %}" enctype="multipart/form-data">
                                                 {% csrf_token %}
-                                                <input hidden name="param_id" value="{{ parameter.user_parameter.id }}">
-                                                <button type="submit" class="dropdown-item delete">
+                                                <button type="submit" class="dropdown-item delete" name="param_id" value="{{ parameter.user_parameter.id }}">
                                                     <i class="fas fa-trash"></i>
                                                     {% trans "Удалить" %}
                                                 </button>
@@ -118,7 +117,7 @@
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет параметров, добавьте.' %}
+                    {% trans 'Нет целей, добавьте.' %}
                 {% endfor %}
             </div>
 
@@ -169,8 +168,7 @@
                                             </h6>
                                             <form style="margin-bottom: 0px" method="post" action="{% url 'user_gyms' %}" enctype="multipart/form-data">
                                                 {% csrf_token %}
-                                                <input hidden name="gym_id" value="{{ gym.id }}">
-                                                <button type="submit" class="dropdown-item delete">
+                                                <button type="submit" class="dropdown-item delete" name="gym_id" value="{{ gym.id }}">
                                                     <i class="fas fa-trash"></i>
                                                     {% trans "Удалить" %}
                                                 </button>
@@ -293,6 +291,28 @@
                                 <button type="button" value="{{medical_note.id}}" class="btn btn-link view_medical" data-toggle="modal" data-target="#viewMedicalNote">
                                     {% trans "Детали" %}
                                 </button>
+
+                                <div style="float:right">
+                                    <div class="dropdown show">
+                                        <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {% trans "Действия" %}
+                                        </a>
+
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                            <h6 class="dropdown-header">
+                                                {% trans "Действия с записями" %}
+                                            </h6>
+                                            <form style="margin-bottom: 0px" method="post" action="{% url 'user_medical' %}" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item delete" name="medical_note_delete_id"  value="{{ medical_note.id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                    {% trans "Удалить" %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -343,6 +363,31 @@
                                 <button type="button" value="{{usual_note.id}}" class="btn btn-link view_diary" data-toggle="modal" data-target="#viewDiaryNote">
                                     {% trans "Детали" %}
                                 </button>
+
+
+                                <div style="float:right">
+                                    <div class="dropdown show">
+                                        <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {% trans "Действия" %}
+                                        </a>
+
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                            <h6 class="dropdown-header">
+                                                {% trans "Действия с дневниками" %}
+                                            </h6>
+                                            <form style="margin-bottom: 0px" method="post" action="{% url 'user_diary' %}" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item delete" name="diary_note_delete_id"  value="{{ usual_note.id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                    {% trans "Удалить" %}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
                             </div>
                         </div>
                     </div>
