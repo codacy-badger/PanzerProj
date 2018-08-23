@@ -31,31 +31,37 @@
                                         <th scope="col">{% trans "Название" %}</th>
                                         <th scope="col">{% trans "Описание" %}</th>
                                         <th scope="col">{% trans "Адрес" %}</th>
-                                        <th scope="col">{% trans "Карта" %}</th>
-                                        <th scope="col">{% trans "Изменить" %}</th>
+                                        <th scope="col">{% trans "Действия" %}</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {% for gym in fitness_user_gyms %}
                                         <tr>
                                             <td hidden>{{ gym.id }}</td>
-                                            <td>{{ gym.gym_name }}</td>
-                                            <td>{{ gym.gym_description }}</td>
-                                            <td>{{ gym.gym_destination }}</td>
-                                            <td hidden>{{gym.gym_geo.y}}</td>
-                                            <td hidden>{{gym.gym_geo.x}}</td>
-                                            
                                             <td>
                                                 <button type="button" class="btn btn-outline-primary view_gym" data-toggle="modal"
                                                         data-target="#viewGymDestination">
                                                         <i class="fas fa-map-marker"></i>
+                                                    {{ gym.gym_name }}
                                                 </button>
                                             </td>
+                                            <td>{{ gym.gym_description }}</td>
+                                            <td>{{ gym.gym_destination }}</td>
+                                            <td hidden>{{gym.gym_geo.y}}</td>
+                                            <td hidden>{{gym.gym_geo.x}}</td>
                                             <td>
                                                 <button type="button" class="btn btn-outline-primary edit_gym" data-toggle="modal"
                                                         data-target="#newGymDestination">
                                                     <i class="fas fa-edit"></i>
+                                                        {% trans "Редактировать" %}
                                                 </button>
+                                                <form method="post" action="{% url 'user_gyms' %}" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger delete" name="gym_id" value="{{ gym.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                        {% trans "Удалить" %}
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -147,6 +153,7 @@ marker.on('dragend', onDragEnd);
                 var currentRow=$(this).closest("tr");
                 var gym_id=currentRow.find("td:eq(0)").text();
                 var gym_name=currentRow.find("td:eq(1)").text();
+                gym_name = $.trim(gym_name);
                 var gym_description=currentRow.find("td:eq(2)").text();
                 var gym_destination=currentRow.find("td:eq(3)").text();
                 

@@ -5,6 +5,9 @@
 .dropdown-item.delete{
     color:#dc3545;
 }
+.delete{
+    color:#dc3545;
+}
 img.avatar{
     max-width: 220px;
     width: 100%;
