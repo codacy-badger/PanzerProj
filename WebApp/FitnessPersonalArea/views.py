@@ -629,8 +629,9 @@ class UserParamsView(View):
 
                 try:
                     # получаем данные параметра из БД. Нулевой элемент
-                    param_data = BodyParameterData.objects.filter(user_parameter__id__in = request.GET['param_object_id'],
-                                                                  user_parameter__body_show = True).distinct('user_parameter')[0]
+                    param_data = BodyParameterData.objects.filter(user_parameter__id = request.GET['param_object_id'],
+                                                                  user_parameter__body_show = True).first()
+
                     # проверка прав на получение информации о параметре
                     if param_data.user_parameter.user == fitness_user:
                         self.ajax_content.update({'param_json_data': param_data.get_param_json()})

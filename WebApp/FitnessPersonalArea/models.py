@@ -647,7 +647,7 @@ class BodyParameterData(models.Model):
     def datetime_to_date(self):
         return self.body_datetime.strftime("%d %B %Y")
 
-    # получение данных параметра в формате JSON
+    # получение данных параметра в формате JSON. Получаем последние 20 параметров.
     def get_parameters_chart_json_data(self):
         # заготовка JSON`a для передачи в графики информации о записанных параметрах пользователя и его целях
         answer = {'user_data': '',
