@@ -11,7 +11,7 @@
                 <div class="modal-header">
                     <h4 class="modal-title">
                         <i class="fas fa-chart-area"></i>
-                        {% trans "Ваши параметры" %}
+                        {% trans "Параметры" %}
                     </h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
@@ -66,14 +66,14 @@
         data: {
             datasets: [
                 {
-                label: '{% trans "Ваши данные" %}',
+                label: '{% trans "Данные" %}',
                 data: user_json_data.user_data,
                 showLine: true,
                 fill: false,
                 borderColor: 'rgba(0, 200, 0, 1)'
                 },
             {
-                label: '{% trans "Ваша цель" %}',
+                label: '{% trans "Цель" %}',
                 data: [{x: user_json_data.user_data[0].x, y: user_json_data.target_data}, {x: user_json_data.user_data[user_json_data.user_data.length-1].x, y: user_json_data.target_data }],
                 showLine: true,
                 fill: false,
