@@ -67,14 +67,14 @@ class LoginPage(View):
                 return redirect('personal_profile')
             # при ошибке в введённых данных для входа
             else:
-                messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
+                messages.add_message(request, messages.ERROR, _('Ошибка при входе. Проверьте введённые данные'))
 
         except User.DoesNotExist:
             messages.add_message(request, messages.ERROR, _('Такой E-mail не существует'))
 
         except Exception as err:
             print(err)
-            messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
+            messages.add_message(request, messages.ERROR, _('Ошибка при входе, Обратитесь к администрации'))
 
         return redirect('/private/login/')
 
