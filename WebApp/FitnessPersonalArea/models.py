@@ -114,6 +114,10 @@ class FitnessTrainer(models.Model):
     # personal description
     trainer_description = models.TextField(max_length=5000, default = 'Description')
 
+    # краткое описание тренера
+    def trainer_description_short(self):
+        return self.trainer_description if len(self.trainer_description) < 50 else self.trainer_description[:50] + ' ...'
+
     def __str__(self):
         return f'User: {self.user.user.username}; Busy: {self.trainer_employment_status}'
 
@@ -134,7 +138,7 @@ class TrainerDoc(models.Model):
 
     # preview названия документа
     def doc_title_preview(self):
-        return self.doc_title if len(self.doc_title) < 50 else self.doc_title[:50]+' ...'
+        return self.doc_title if len(self.doc_title) < 100 else self.doc_title[:100]+' ...'
 
     def filename(self):
         return os.path.basename(self.doc_file.name)
