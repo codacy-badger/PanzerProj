@@ -183,11 +183,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
-    #'social_core.pipeline.debug.debug', # uncomment to print debug
+    'social_core.pipeline.debug.debug', # uncomment to print debug
+    # проверка наличия пользователя в системе (нельзя регистрироваться через соц.сети
+    # доступен лишь логин через зарание привязанный аккаунт)
+    'FitnessPersonalArea.scripts.check_social_user_exist',
 )
 
 SOCIAL_AUTH_TWITTER_KEY = 'P9jlutAT1baIhGnb3MK2RYtd0'
