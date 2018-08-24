@@ -34,6 +34,8 @@ urlpatterns = [
 
     # редактирование, создание и просмотр расценок тренера
     path('trainer-price/', views.TrainerPriceView.as_view(), name = 'trainer_price'),
+    # редактирование, создание описаний тренера и его документов
+    path('trainer-data/', views.TrainerDataView.as_view(), name = 'trainer_data_page'),
 
     # авторизация через соц-сети
     path('oauth/', include('social_django.urls', namespace='social')),

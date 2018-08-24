@@ -1,0 +1,59 @@
+{% block trainer_data_page %}
+{% load static %}
+{% load i18n %}
+    <div class="page-header">
+    <h2>
+
+
+                <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_data_page' %}';">
+                    <i class="fas fa-user-graduate"></i>
+                    {% trans "Данные тренера" %}
+                </button>
+
+                <button type="button" class="btn btn-light" data-toggle="modal"
+                        data-target="#descriptionEdit">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+
+    </h2>
+
+    </div>
+    <hr>
+
+        <div class="card">
+            <h5 class="card-header">
+
+                    {% trans "Данные тренера" %}
+
+                <button type="button" class="btn btn-light" data-toggle="modal"
+                        data-target="#descriptionEdit">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </h5>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>
+                            {% trans "Занятость тренера"%}
+                        </strong>:
+                        {% if fitness_trainer.trainer_employment_status %}
+                            Занят
+                        {% else %}
+                            Свободен
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item small_text">
+                        <strong>
+                            {% trans "Описание тренера"%}
+                        </strong>: {{ fitness_trainer.trainer_description }}</li>
+                </ul>
+            </div>
+        </div>
+
+        {% block description_edit %}
+
+            {% include 'elements/modal_edit/trainer_description_edit_modal.html' %}
+
+        {% endblock %}
+{% endblock %}

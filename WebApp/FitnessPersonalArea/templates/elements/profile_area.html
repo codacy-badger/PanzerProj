@@ -2,7 +2,7 @@
 {% load static %}
 {% load i18n %}
     <div class="page-header">
-        <h2>{% trans 'Ваш профиль' %}</h2>
+        <h2>{% trans 'Профиль' %}</h2>
     </div>
     <hr>
     <div class="row" style="padding-bottom: 20px">
@@ -480,11 +480,17 @@
     {% if fitness_user.fitness_user_type == fitness_user.teacher_user %}
 
         <div class="card">
-            <h5 class="card-header">{% trans "Данные тренера" %}
-                <button type="button" class="btn btn-outline-primary" id="price_edit_btn" data-toggle="modal"
+            <h5 class="card-header">
+                <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_data_page' %}';">
+                    <i class="fas fa-user-graduate"></i>
+                    {% trans "Данные тренера" %}
+                </button>
+
+                <button type="button" class="btn btn-light" data-toggle="modal"
                         data-target="#descriptionEdit">
                     <i class="fas fa-edit"></i>
-                </button></h5>
+                </button>
+            </h5>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
@@ -500,12 +506,85 @@
                     <li class="list-group-item small_text">
                         <strong>
                             {% trans "Описание тренера"%}
-                        </strong>: {{ fitness_trainer.trainer_description }}</li>
+                        </strong>: {{ fitness_trainer.trainer_description_short }}</li>
                 </ul>
             </div>
         </div>
 
 
+        <div class="card">
+            <h5 class="card-header">
+
+                <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_data_page' %}';">
+                    <i class="fas fa-file-alt"></i>
+                    {% trans "Документы тренера" %}
+                </button>
+
+                <button type="button" class="btn btn-light" data-toggle="modal"
+                        data-target="#descriptionEdit">
+                    <i class="fas fa-plus-square "></i>
+                </button>
+            </h5>
+            <div class="card-body">
+                <div class="row">
+
+                    {% for doc in fitness_trainer_docs %}
+
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card" style="width: 15rem; height: 300px">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ doc.doc_title_preview }}</h5>
+                                    <p class="card-text">
+
+                                        <button type="button" class="btn btn-link">
+                                            <a href="/media/{{ doc.doc_file }}">
+                                                {% trans "Скачать документ" %}:
+                                                {{ doc.filename }}
+                                            </a>
+                                        </button>
+                                    </p>
+
+                                </div>
+                                <div class="card-footer">
+                                    <button type="button" value="{{doc.user_parameter.id}}" class="btn btn-link view_param"
+                                            data-toggle="modal" data-target="#_BLANK_DATA_">
+                                        {% trans "Детали" %}
+                                    </button>
+
+                                    <div style="float:right">
+                                        <div class="dropdown show">
+                                            <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {% trans "Действия" %}
+                                            </a>
+
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                <h6 class="dropdown-header">
+                                                    {% trans "Действия с документами" %}
+                                                </h6>
+                                                <div class="dropdown-divider"></div>
+                                                <form style="margin-bottom: 0px" method="post" action="{% url 'trainer_data_page' %}" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="dropdown-item delete" name="param_id" value="{{ doc.id }}">
+                                                        <i class="fas fa-trash"></i>
+                                                        {% trans "Удалить" %}
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+
+                        {% trans 'Нет документов, добавьте.' %}
+                    {% endfor %}
+
+
+
+                </div>
+            </div>
+        </div>
 
 
         <div class="card">
@@ -627,37 +706,6 @@
                 </div>
             </div>
         </div>
-
-
-
-        {% if fitness_trainer_docs %}
-
-                <div class="card">
-                    <h5 class="card-header">{% trans "Документы тренера" %}  <i class="fas fa-plus-square"></i></h5>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-
-                            {% for doc in fitness_trainer_docs %}
-
-                                <li class="list-group-item small_text">
-                                    {{ doc.doc_title }}
-                                    <br>
-                                    <button type="button" class="btn btn-link">
-                                        <a href="/media/{{ doc.doc_file }}">
-                                            {% trans "Скачать документ" %} - {{ doc.filename }}
-                                        </a>
-                                    </button>
-                                </li>
-
-
-                            {% endfor %}
-
-                        </ul>
-                    </div>
-                </div>
-
-        {% endif %}
-
 
         {% block price_edit %}
 

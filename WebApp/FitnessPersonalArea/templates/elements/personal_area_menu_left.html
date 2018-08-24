@@ -45,6 +45,10 @@
                             <i class="fas fa-dollar-sign"></i>
                             {% trans "Расценки" %}
                         </a>
+                        <a class="list-group-item button" href="{% url 'trainer_data_page' %}" >
+                            <i class="fas fa-user-graduate"></i>
+                            {% trans "Данные тренера" %}
+                        </a>
                     {% else %}
                         <a class="list-group-item button" >
                             <i class="fas fa-user-graduate"></i>
@@ -130,7 +134,7 @@
 
                 <a class="list-group-item button" >
                     <i class="fas fa-calendar-alt"></i>
-                    <span class="d-none d-md-inline">{% trans "Ваш календарь" %}</span>
+                    <span class="d-none d-md-inline">{% trans "Календарь" %}</span>
                 </a>
 
                 <a href="#menuSearch" class="list-group-item d-inline-block collapsed" data-toggle="collapse"
