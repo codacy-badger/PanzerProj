@@ -52,6 +52,10 @@
                         </a>
                     {% endif %}
 
+                    <a class="list-group-item button" href="{% url 'trainer_price' %}" >
+                        <i class="fas fa-file-signature"></i>
+                        {% trans "Контракты" %}
+                    </a>
 
                     <a class="list-group-item button" >
                         <i class="fas fa-eye"></i>
@@ -116,12 +120,12 @@
 
                 <a class="list-group-item button" >
                     <i class="fas fa-images"></i>
-                    <span class="d-none d-md-inline">{% trans "Ваши фото" %}</span>
+                    <span class="d-none d-md-inline">{% trans "Фото" %}</span>
                 </a>
 
                 <a class="list-group-item button" href="{% url 'user_params' %}" >
                     <i class="fas fa-bullseye"></i>
-                    <span class="d-none d-md-inline">{% trans "Ваши цели" %}</span>
+                    <span class="d-none d-md-inline">{% trans "Цели" %}</span>
                 </a>
 
                 <a class="list-group-item button" >

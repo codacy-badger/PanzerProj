@@ -52,7 +52,7 @@
         <h5 class="card-header">
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url "user_params" %}';">
                 <i class="fas fa-chart-area"></i>
-                {% trans "Ваши цели" %}
+                {% trans "Цели" %}
             </button>
             <button type="button" class="btn btn-light" data-toggle="modal"
                     data-target="#newUserTarget">
@@ -130,7 +130,7 @@
         <h5 class="card-header">
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_gyms' %}';">
                 <i class="fas fa-map-marked-alt"></i>
-                {% trans "Ваши залы" %}
+                {% trans "Залы" %}
             </button>
             <button type="button" class="btn btn-light" data-toggle="modal"
                     data-target="#newGymDestination">
@@ -180,7 +180,7 @@
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших залов, добавьте.' %}
+                    {% trans 'Нет залов, добавьте.' %}
                 {% endfor %}
             </div>
 
@@ -189,7 +189,17 @@
     </div>
 
     <div class="card">
-        <h5 class="card-header">{% trans "Ваши тренеровки" %} <i class="fas fa-plus-square"></i></h5>
+        <h5 class="card-header">
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_price' %}';">
+                <i class="fas fa-calendar-alt"></i>
+                {% trans "Расписание" %}
+            </button>
+
+            <button type="button" class="btn btn-light" data-toggle="modal"
+                    data-target="#newGymDestination">
+                <i class="fas fa-plus-square "></i>
+            </button>
+        </h5>
         <div class="card-body">
             <div class="row">
                 {% for train in user_training_schedule %}
@@ -232,7 +242,17 @@
 
 
     <div class="card">
-        <h5 class="card-header">{% trans "Ваши фотографии" %} <i class="fas fa-plus-square"></i></h5>
+        <h5 class="card-header">
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_price' %}';">
+                <i class="fas fa-images"></i>
+                {% trans "Фотографии" %}
+            </button>
+
+            <button type="button" class="btn btn-light" data-toggle="modal"
+                    data-target="#newGymDestination">
+                <i class="fas fa-plus-square "></i>
+            </button>
+        </h5>
         <div class="card-body">
             <div class="row">
                 {% for photo in user_projection_photos %}
@@ -259,7 +279,7 @@
         <h5 class="card-header">
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_medical' %}';">
                 <i class="fas fa-notes-medical"></i>
-                {% trans "Ваши записи" %}
+                {% trans "Записи" %}
             </button>
             <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
                     data-target="#newMedicalNote">
@@ -317,7 +337,7 @@
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших записей, добавьте.' %}
+                    {% trans 'Нет записей, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
@@ -328,7 +348,7 @@
         <h5 class="card-header">
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_diary' %}';">
                 <i class="fas fa-book-open"></i>
-                {% trans "Ваш дневник" %}
+                {% trans "Дневник" %}
             </button>
             <button type="button" class="btn btn-light" id="new_trainer_price" data-toggle="modal"
                     data-target="#newDiaryNote">
@@ -392,7 +412,7 @@
                         </div>
                     </div>
                 {% empty %}
-                    {% trans 'Нет ваших записей, добавьте.' %}
+                    {% trans 'Нет записей, добавьте.' %}
                 {% endfor %}
             </div>
         </div>
@@ -403,7 +423,17 @@
     {% if not fitness_trainer %}
 
         <div class="card">
-            <h5 class="card-header">{% trans "Ваши контракты" %} <i class="fas fa-plus-square"></i></h5>
+            <h5 class="card-header">
+                <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_price' %}';">
+                    <i class="fas fa-file-signature"></i>
+                    {% trans "Контракты" %}
+                </button>
+
+                <button type="button" class="btn btn-light" data-toggle="modal"
+                        data-target="#newGymDestination">
+                    <i class="fas fa-plus-square "></i>
+                </button>
+            </h5>
             <div class="card-body">
                 <div class="row">
                     {% for contract in user_train_contracts %}
@@ -547,7 +577,17 @@
 
 
         <div class="card">
-            <h5 class="card-header">{% trans "Ваши контракты" %} <i class="fas fa-plus-square"></i></h5>
+            <h5 class="card-header">
+                <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'trainer_price' %}';">
+                    <i class="fas fa-file-signature"></i>
+                    {% trans "Контракты" %}
+                </button>
+
+                <button type="button" class="btn btn-light" data-toggle="modal"
+                        data-target="#newGymDestination">
+                    <i class="fas fa-plus-square "></i>
+                </button>
+            </h5>
             <div class="card-body">
                 <div class="row">
                     {% for contract in fitness_trainer_contracts %}
