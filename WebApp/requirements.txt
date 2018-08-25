@@ -5,3 +5,5 @@ uwsgi==2.0.17
 django-taggit==0.22.2
 social-auth-core>=1.7.0
 faker>=0.8
+geopy>=1.16
+social-auth-app-django==2.1.0

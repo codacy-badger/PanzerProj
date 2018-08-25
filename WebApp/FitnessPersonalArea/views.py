@@ -67,14 +67,14 @@ class LoginPage(View):
                 return redirect('personal_profile')
             # при ошибке в введённых данных для входа
             else:
-                messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
+                messages.add_message(request, messages.ERROR, _('Ошибка при входе. Проверьте введённые данные'))
 
         except User.DoesNotExist:
             messages.add_message(request, messages.ERROR, _('Такой E-mail не существует'))
 
         except Exception as err:
             print(err)
-            messages.add_message(request, messages.ERROR, _('Ошибка при входе'))
+            messages.add_message(request, messages.ERROR, _('Ошибка при входе, Обратитесь к администрации'))
 
         return redirect('/private/login/')
 
@@ -819,6 +819,29 @@ class TrainerPriceView(View):
             finally:
                 return JsonResponse(self.ajax_content)
 
+
+# trainer data page
+class TrainerDataView(View):
+    """
+    TrainerPriceView отвечает за страницу с расценками тренера,
+        а так же создание, редактирование и просмотр расценок тренера
+    """
+    content = {}
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            fitness_user = FitnessUser.objects.get(user=request.user)
+            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+                self.content.update({
+                    'doc': 'pages/personal_area.html',
+                    'private_doc': 'pages/trainer_data.html',
+                    'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
+                    'fitness_trainer_docs': TrainerDoc.objects.filter(user__user = fitness_user).order_by('id')})
+
+                return render(request, 'base.html', self.content)
+
+    def post(self, request):
+        pass
 
 # change language
 class ChangeLanguage(View):

@@ -1,4 +1,5 @@
 {% block registration %}
+{% load i18n %}
 {% load static %}
     <link href="{% static "/css/registration.css" %}" rel="stylesheet">
     <form class="form-signin" name="new_account" method="post" enctype="multipart/form-data">
@@ -115,7 +116,7 @@
             <input name="password_repeat" id="second_pass" required class="form-control" minlength="8" maxlength="16"
                    placeholder="Повторите пароль" type="password">
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" id="new_account_btn"
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="new_account_btn" value="1"
                 name="new_account_btn">Регистрация</button>
         <p class="text-center" style="padding-bottom: 65px">Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a> </p>
     </form>

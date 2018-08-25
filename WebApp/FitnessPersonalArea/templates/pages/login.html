@@ -1,4 +1,5 @@
 {% block login %}
+{% load i18n %}
 {% load static %}
     <link href="{% static "/css/login.css" %}" rel="stylesheet">
     <form class="form-signin" method="post" name="login">
@@ -48,6 +49,9 @@
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
 
-        <p class="text-center" style="padding-top: 20px"><a href="{% url 'registration' %}">Регистрация</a> </p>
+        <p class="text-center" style="padding-top: 20px">
+            {% trans 'Впервые тут?' %}
+            <br>
+            <a href="{% url 'registration' %}">{% trans 'Регистрация' %}</a> </p>
     </form>
 {% endblock %}
