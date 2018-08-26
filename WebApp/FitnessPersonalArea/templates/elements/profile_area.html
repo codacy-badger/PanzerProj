@@ -538,15 +538,14 @@
 
                                         <button type="button" class="btn btn-link">
                                             <a href="/media/{{ doc.doc_file }}">
-                                                {% trans "Скачать документ" %}:
-                                                {{ doc.filename }}
+                                                {% trans "Скачать документ" %}
                                             </a>
                                         </button>
                                     </p>
 
                                 </div>
                                 <div class="card-footer">
-                                    <button type="button" value="{{doc.user_parameter.id}}" class="btn btn-link view_param"
+                                    <button type="button" value="{{doc.id}}" class="btn btn-link view_trainer_doc"
                                             data-toggle="modal" data-target="#_BLANK_DATA_">
                                         {% trans "Детали" %}
                                     </button>
@@ -719,6 +718,11 @@
         {% endblock %}
 
 
+        {% block trainer_doc %}
+
+            {% include 'elements/modal_view/trainer_doc_modal.html' %}
+
+        {% endblock %}
 
     {% endif %}
 

@@ -830,8 +830,26 @@ class TrainerDataView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            fitness_user = FitnessUser.objects.get(user=request.user)
-            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+            fitness_user = FitnessUser.objects.get(user = request.user)
+            # проверка реквеста на AJAX (при получении полных данных о документе тренера)
+            if request.is_ajax():
+                self.ajax_content = {'answer': False}
+                # запрос на получение информации о документе тренера
+                if request.GET.get('trainer_doc_object_id'):
+                    # TODO добавить проверку прав доступа к файлу документов
+                    trainer_doc = TrainerDoc.objects.get(id = request.GET['trainer_doc_object_id'])
+                    self.ajax_content.update({'answer': True,
+                                              'trainer_doc_data': {
+                                                  'trainer_doc_download_link': trainer_doc.filename(),
+                                                  'trainer_doc_title': trainer_doc.doc_title
+                                                }
+                                              }
+                                             )
+
+                return JsonResponse(self.ajax_content)
+
+            # проверка прав доступа к данным страницы
+            elif fitness_user.fitness_user_type == FitnessUser.teacher_user:
                 self.content.update({
                     'doc': 'pages/personal_area.html',
                     'private_doc': 'pages/trainer_data.html',

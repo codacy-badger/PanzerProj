@@ -1,0 +1,96 @@
+{% block trainer_doc_modal_view %}
+{% load static %}
+{% load i18n %}
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="viewDocInfo">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Документы тренера" %}
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                        <div>
+                            <h4>
+                                <strong>
+                                    <p class="text-center" id="trainer_doc_title"></p>
+                                </strong>
+                            </h4>
+                            <p class="card-text text-justify" id="trainer_doc_download_link"></p>
+
+                        </div>
+                </div>
+
+                <div id="map_detail" style="height:30%"></div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+
+        <script type="text/python">
+
+            from browser import document as doc, alert, ajax, window, html
+            import json
+            import urllib
+
+            csrf_token = doc.get(name='csrfmiddlewaretoken')[0].value
+
+            """
+            Fill modal window TRAINER DOCUMENT data
+            """
+            def fill_trainer_doc_modal(response):
+                # clean old data
+                doc["trainer_doc_title"].text = ''
+                doc["trainer_doc_download_link"].text = ''
+
+                # insert new data
+                doc['trainer_doc_title'] <= response['trainer_doc_title']
+                doc['trainer_doc_download_link'] <= response['trainer_doc_download_link']
+
+            """
+            AJAX-get response for TRAINER DOCUMENT object
+            """
+            def on_complete_trainer_doc(req):
+                json_response = json.loads(req.text)
+                # if NOT success geting data
+                if req.status!=200 and json_response['answer']!=True:
+                    alert(json_response['error_answer'])
+                else:
+                    fill_trainer_doc_modal(json_response['trainer_doc_data'])
+
+            """
+            AJAX-get request for TRAINER DOCUMENT object
+            """
+            def get_trainer_doc_data(ev):
+                # get medical note ID and set to GET request param
+                qs = "trainer_doc_object_id="+ev.currentTarget.value
+
+                req = ajax.ajax()
+                req.bind('complete',on_complete_trainer_doc)
+                # send a POST request to the url
+                req.open("GET","{% url 'trainer_data_page' %}"+"?"+qs,True)
+                # set headers
+                req.set_header('content-type','application/x-www-form-urlencoded')
+                req.set_header('accept','text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
+                # set header for Django .is_ajax() method
+                req.set_header('X-Requested-With','XMLHttpRequest')
+
+                req.send()
+
+            # bind all trainer docs objects to func
+            for element in doc.select('.btn.btn-link.view_trainer_doc'):
+                element.bind("click", get_trainer_doc_data)
+        </script>
+    {%endblock%}
