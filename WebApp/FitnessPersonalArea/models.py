@@ -1,5 +1,8 @@
 import os
 import json
+import hashlib
+import time
+import random
 
 from django.contrib.auth.models import Group, User, BaseUserManager, AbstractBaseUser
 from django.contrib.gis.db import models
@@ -14,28 +17,46 @@ Files upload functions
 """
 
 
+# функция для рассчёта хэш-суммы из названия файла
+def file_name_hash(filename: str)->str:
+    """
+    Функция поулчает название файла, вычесляет хэщ-сумму, разделяет хэщ на части и возвращает в виде части пути
+    :param filename: Название файла
+    :return: Путь к файлу состоящий из частей хэщ-суммы
+    """
+    file_hash = hashlib.sha256(bytes(filename+str(time.time()), encoding='utf-8')).hexdigest()
+    file_route = file_hash[random.randint(1, 5):random.randint(6, 20)]+'/'\
+                 +file_hash[random.randint(15, 20):random.randint(21, 35)]+'/'\
+                 +file_hash[random.randint(30, 35):random.randint(36, 45)] + '/'\
+                 +file_hash[random.randint(45, 50):random.randint(51, 64)]
+
+    return file_route
+
+
 # место для хранения файлов из чата
 def chat_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return f'chat_files/chat_{instance.message_chat.id}/user_{instance.user.user.id}/' \
-           f'{now().date().strftime("%Y/%m/%d")}/{filename}'
+           f'{now().date().strftime("%Y/%m/%d")}/{file_name_hash(filename)}/{filename}'
 
 
 # место для хранения аватаров
 def profile_photo_path(instance, filename):
-    return f'profiles_photo/user_{instance.user.id}/{filename}'
+    return f'profiles_photo/user_{instance.user.id}/' \
+           f'{now().date().strftime("%Y/%m/%d")}/{file_name_hash(filename)}/{filename}'
 
 
 # место для хранения документов тренера
 def trainer_docs_path(instance, filename):
-    return f'trainer_docs/trainer_{instance.user.user.id}/{filename}'
+    return f'trainer_docs/trainer_{instance.user.user.id}/' \
+           f'{now().date().strftime("%Y/%m/%d")}/{file_name_hash(filename)}/{filename}'
 
 
 # место для хранения фотографий пользователя в различных проекциях
 def projection_photo_path(instance, filename):
     return f'projection_view_photo/user_{instance.user.user.id}/' \
            f'projection_{instance.get_projection_view_type_display()}/' \
-           f'{now().date().strftime("%Y/%m/%d")}/{filename}'
+           f'{now().date().strftime("%Y/%m/%d")}/{file_name_hash(filename)}/{filename}'
 
 
 """

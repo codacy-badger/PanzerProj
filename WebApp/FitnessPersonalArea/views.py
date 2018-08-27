@@ -861,6 +861,7 @@ class TrainerDataView(View):
     def post(self, request):
         pass
 
+
 # change language
 class ChangeLanguage(View):
     """
