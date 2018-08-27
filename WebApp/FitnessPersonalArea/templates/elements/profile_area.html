@@ -546,7 +546,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <button type="button" value="{{doc.id}}" class="btn btn-link view_trainer_doc"
-                                            data-toggle="modal" data-target="#_BLANK_DATA_">
+                                            data-toggle="modal" data-target="#viewDocInfo">
                                         {% trans "Детали" %}
                                     </button>
 
@@ -560,6 +560,11 @@
                                                 <h6 class="dropdown-header">
                                                     {% trans "Действия с документами" %}
                                                 </h6>
+                                                <button type="button" class="dropdown-item param_data" value="{{ doc.id }}"  name="trainer_doc_edit" data-toggle="modal"
+                                                        data-target="#BLANK_MODAL">
+                                                    <i class="fas fa-edit"></i>
+                                                    {% trans "Редактировать" %}
+                                                </button>
                                                 <div class="dropdown-divider"></div>
                                                 <form style="margin-bottom: 0px" method="post" action="{% url 'trainer_data_page' %}" enctype="multipart/form-data">
                                                     {% csrf_token %}
