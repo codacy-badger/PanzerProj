@@ -26,8 +26,7 @@ def file_name_hash(filename: str)->str:
     """
     file_hash = hashlib.sha256(bytes(filename+str(time.time()), encoding='utf-8')).hexdigest()
     file_route = file_hash[random.randint(1, 5):random.randint(6, 20)]+'/'\
-                 +file_hash[random.randint(15, 20):random.randint(21, 35)]+'/'\
-                 +file_hash[random.randint(30, 35):random.randint(36, 45)] + '/'\
+                 +file_hash[random.randint(20, 30):random.randint(31, 40)]+'/'\
                  +file_hash[random.randint(45, 50):random.randint(51, 64)]
 
     return file_route

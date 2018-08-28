@@ -19,17 +19,11 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                         <div>
-                            <h4>
-                                <strong>
-                                    <p class="text-center" id="trainer_doc_title"></p>
-                                </strong>
-                            </h4>
-                            <p class="card-text text-justify" id="trainer_doc_download_link"></p>
+                            <p class="text-center" id="trainer_doc_title"></p>
 
                         </div>
                 </div>
 
-                <div id="map_detail" style="height:30%"></div>
                     <!-- Modal footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
@@ -53,11 +47,9 @@
             def fill_trainer_doc_modal(response):
                 # clean old data
                 doc["trainer_doc_title"].text = ''
-                doc["trainer_doc_download_link"].text = ''
 
                 # insert new data
                 doc['trainer_doc_title'] <= response['trainer_doc_title']
-                doc['trainer_doc_download_link'] <= response['trainer_doc_download_link']
 
             """
             AJAX-get response for TRAINER DOCUMENT object

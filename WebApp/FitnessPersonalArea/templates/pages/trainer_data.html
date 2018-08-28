@@ -50,7 +50,7 @@
                 {% trans "Документы тренера" %}
 
                 <button type="button" class="btn btn-light" data-toggle="modal"
-                        data-target="#descriptionEdit">
+                        data-target="#newTrainerDoc">
                     <i class="fas fa-plus-square "></i>
                 </button>
             </h5>
@@ -97,7 +97,7 @@
                                                 <div class="dropdown-divider"></div>
                                                 <form style="margin-bottom: 0px" method="post" action="{% url 'trainer_data_page' %}" enctype="multipart/form-data">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="dropdown-item delete" name="param_id" value="{{ doc.id }}">
+                                                    <button type="submit" class="dropdown-item delete" name="doc_id" value="{{ doc.id }}">
                                                         <i class="fas fa-trash"></i>
                                                         {% trans "Удалить" %}
                                                     </button>
@@ -128,6 +128,7 @@
         {% block trainer_doc %}
 
             {% include 'elements/modal_view/trainer_doc_modal.html' %}
+            {% include 'elements/modal_edit/trainer_doc_new_modal.html' %}
 
         {% endblock %}
 {% endblock %}

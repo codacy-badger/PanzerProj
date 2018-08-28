@@ -1,0 +1,45 @@
+{% block trainer_doc_modal_view %}
+{% load static %}
+{% load i18n %}
+
+    <!-- The Modal -->
+    <div class="modal fade bd-example-modal-lg" id="newTrainerDoc">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-file-alt"></i>
+                        {% trans "Документы тренера" %}
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form name="new_trainer_doc" method="post" action="{% url 'trainer_data_page' %}" id="new_trainer_doc" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input hidden name="trainer_doc_edit" value="-1" id="trainer_doc_edit">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <dl class="row">
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Описание документа"%}</dt>
+                            <dd class="col-sm-8"><textarea class="form-control" type="text" id="doc_title" required name="doc_title" maxlength="900"></textarea></dd>
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Документ"%}</dt>
+                            <dd class="col-sm-8"><input accept="image/*, .doc, .docx, .xml, .pdf" class="form-control-file" id="doc_file"  type="file" name="doc_file"  maxlength="4000" required></dd>
+
+                        </dl>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" id="new_trainer_doc_btn_id" value="1" name="new_trainer_doc_btn">{% trans "Сохранить" %}</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    {%endblock%}

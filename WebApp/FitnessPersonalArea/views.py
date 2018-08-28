@@ -137,9 +137,7 @@ class ProfilePage(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            start_f = time.time()
             fitness_user = FitnessUser.objects.get(user = request.user)
-            start_s = time.time()
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'elements/profile_area.html',
@@ -173,14 +171,13 @@ class ProfilePage(View):
                                                                      user_parameter__body_show = True).
                                                 order_by('user_parameter', '-body_datetime').distinct('user_parameter')[:4]
             })
-            step = time.time()
 
             # если пользовтель тренер - добавляем данные об аккаунте, документах, расценках и
             # контрактах в которых пользователь - тренер
             if fitness_user.fitness_user_type == FitnessUser.teacher_user:
                 self.content.update({'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
                                      'fitness_trainer_docs': TrainerDoc.objects.filter(
-                                                                user__user = fitness_user),
+                                                                user__user = fitness_user)[:4],
                                      'fitness_trainer_price': TrainerPrice.objects.filter(user__user = fitness_user,
                                                                                           trainer_price_show = True,
                                                                                           trainer_price_actuality = True).
@@ -189,10 +186,6 @@ class ProfilePage(View):
                                              contract_trainer_user = FitnessTrainer.objects.get(user = fitness_user),
                                              contract_trainer_start = True)
                                      })
-            last = time.time()
-            print(f'Get user - {start_s-start_f}')
-            print(f'Get data - {step - start_s}')
-            print(f'End - {last-step}')
 
             return render(request, 'base.html', self.content)
         else:
@@ -605,9 +598,6 @@ class UserGymsView(View):
                     else:
                         messages.add_message(request, messages.ERROR, _('Данные не удалены. Недостаточно прав.'))
 
-                    # обновляем ответ на AJAX-запрос, об успешном создании зала
-                    self.ajax_content.update({'answer': True})
-
                 # возвращаем пользователя назад на ту же страницу
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -827,22 +817,23 @@ class TrainerDataView(View):
         а так же создание, редактирование и просмотр расценок тренера
     """
     content = {}
+    ajax_content = {'answer': False}
 
     def get(self, request):
         if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             # проверка реквеста на AJAX (при получении полных данных о документе тренера)
             if request.is_ajax():
-                self.ajax_content = {'answer': False}
                 # запрос на получение информации о документе тренера
                 if request.GET.get('trainer_doc_object_id'):
-                    # TODO добавить проверку прав доступа к файлу документов
-                    trainer_doc = TrainerDoc.objects.get(id = request.GET['trainer_doc_object_id'])
+                    # получаем документ тренера
+                    trainer_doc = TrainerDoc.objects.get(id = request.GET['trainer_doc_object_id'],
+                                                         user__user=fitness_user)
+
                     self.ajax_content.update({'answer': True,
                                               'trainer_doc_data': {
-                                                  'trainer_doc_download_link': trainer_doc.filename(),
                                                   'trainer_doc_title': trainer_doc.doc_title
-                                                }
+                                              }
                                               }
                                              )
 
@@ -859,7 +850,33 @@ class TrainerDataView(View):
                 return render(request, 'base.html', self.content)
 
     def post(self, request):
-        pass
+        if request.user.is_authenticated:
+            # получаем пользователя от которого пришёл запрос
+            fitness_user = FitnessUser.objects.get(user = request.user)
+
+            # создаём новую медицинскую запись запись в дневнике
+            if request.POST.get('new_trainer_doc_btn'):
+                # создаём новый документ
+                TrainerDoc.objects.create(
+                    user=FitnessTrainer.objects.get(user = fitness_user),
+                    doc_title=request.POST['doc_title'],
+                    doc_file=request.FILES['doc_file'])
+
+                # добавляем сообщение для пользователя
+                messages.add_message(request, messages.SUCCESS, _('Документ создан'))
+
+            # если удаление дкоумента
+            elif request.POST.get('doc_id'):
+                # получение документа для удаления
+                trainer_doc = TrainerDoc.objects.get(id=request.POST['doc_id'],
+                                                     user__user=fitness_user)
+
+                trainer_doc.delete()
+
+                messages.add_message(request, messages.SUCCESS, _('Документ удалён'))
+
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 # change language
