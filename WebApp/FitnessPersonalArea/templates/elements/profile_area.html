@@ -64,7 +64,7 @@
             <div class="row">
                 {% for parameter in user_body_params %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 300px">
+                        <div class="card profile_area">
                           <div class="card-body">
                             <h5 class="card-title">{{ parameter.user_parameter.title_short }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ parameter.body_datetime }}</h6>
@@ -142,7 +142,7 @@
             <div class="row">
                 {% for gym in user_gyms %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 300px">
+                        <div class="card profile_area">
                           <div class="card-body">
                             <h5 class="card-title">{{ gym.gym_name }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ gym.gym_destination }}</h6>
@@ -289,7 +289,7 @@
             <div class="row">
                 {% for medical_note in user_medical_notes %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 300px">
+                        <div class="card profile_area" >
                           <div class="card-body">
                             <h5 class="card-title">{{ medical_note.short_title }}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{ medical_note.medical_note_datetime }}</h6>
@@ -359,7 +359,7 @@
             <div class="row">
                 {% for usual_note in user_usual_notes %}
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="card" style="width: 15rem; height: 300px">
+                        <div class="card profile_area" >
                           <div class="card-body">
                             <h5 class="card-title">
                                     {{ usual_note.short_title }}
@@ -532,7 +532,7 @@
                     {% for doc in fitness_trainer_docs %}
 
                         <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card" style="width: 15rem; height: 300px">
+                            <div class="card profile_area">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ doc.doc_title_preview }}</h5>
                                     <p class="card-text">
