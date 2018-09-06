@@ -28,6 +28,12 @@
                             <dt class="col-sm-4" style="padding-bottom: 20px">{% trans "Документ"%}</dt>
                             <dd class="col-sm-8"><input accept="image/*, .doc, .docx, .xml, .pdf" class="form-control-file" id="doc_file"  type="file" name="doc_file"  maxlength="4000" required></dd>
 
+
+                            <dt class="col-sm-4" style="padding-bottom: 20px" style="display: none">{% trans "Выбранный документ"%}</dt>
+                            <dd class="col-sm-8" id="chosen_filename" style="display: none"></dd>
+
+
+
                         </dl>
                     </div>
 
@@ -41,5 +47,44 @@
             </div>
         </div>
     </div>
+<script>
+            jQuery(document).ready(function(){
+                $( "button.dropdown-item.edit" ).click(function() {
+                    var trainer_doc_id = $(this).closest("button.dropdown-item.edit").val();
 
+                    $.ajax({
+                                type: "GET",
+                                url: "{% url 'trainer_data_page' %}",
+                                data: {'edit_doc_id': trainer_doc_id},
+                                success: function(data)
+                                {
+                                    if (data.answer === true) {
+                                        $("#doc_file").attr("required", false);
+
+
+                                        $("#chosen_filename").text(data.trainer_doc_data.trainer_doc_filename);
+                                        $("#chosen_filename").show();
+                                        $("#doc_title").val(data.trainer_doc_data.trainer_doc_title);
+                                    }
+                                    else {
+                                        alert(data.error_answer)
+                                    }
+                                }
+                            });
+
+                });
+            });
+        </script>
+
+        <script type="text/python3">
+            from browser import document as doc
+
+            def clear_inputs(ev):
+                print('dasdasd')
+                doc["chosen_filename"].val = ''
+                doc["doc_title"].val = ''
+
+            doc["plus_trainer_doc"].bind("click", clear_inputs)
+
+        </script>
     {%endblock%}

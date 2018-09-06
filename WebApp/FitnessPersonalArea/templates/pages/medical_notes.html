@@ -136,36 +136,4 @@
             {% include 'elements/modal_edit/medical_note_modal.html' %}
 
         {% endblock %}
-
-        <script>
-            jQuery(document).ready(function(){
-                $( "button.btn.btn-secondary.edit" ).click(function() {
-                    var medical_dom = $(this).closest("div.card.text-center");
-    
-                    var medical_tags = medical_dom.find('.card-header').find('.tags');
-    
-                    var medical_note_id = medical_dom.find('.card-body').find('.diary_note_id');
-
-                    var medical_title = medical_dom.find('.card-body').find('.card-title');
-                    var medical_text = medical_dom.find('.card-body').find('.card-text.text-justify');
-    
-                    $("#medical_note_tags_id").val($.trim(medical_tags.text()).replace(/ +(?= )/g,'').replace(/[#]/g, '').replace(/\s+/g, ', '));
-                    $("#medical_note_title_id").val($.trim(medical_title.text()));
-                    $("#medical_note_text_id").val(medical_text.text());
-                    $("#medical_note_edit").val(medical_note_id.text());
-                });
-            });
-        </script>
-        <script type="text/python">
-            from browser import document as doc, alert, ajax, window
-        
-            def clear_inputs(ev):
-                doc["medical_note_tags_id"].val = ''
-                doc["medical_note_title_id"].val = ''
-                doc["medical_note_text_id"].val = ''    
-                doc["medical_note_edit"].val = -1 
-        
-            doc["create_medical_note"].bind("click", clear_inputs)
-        
-        </script> 
 {% endblock %}

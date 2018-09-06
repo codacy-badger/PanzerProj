@@ -837,6 +837,20 @@ class TrainerDataView(View):
                                               }
                                              )
 
+                # запрос на получение информации о документе для последующего редактирования
+                elif request.GET.get('edit_doc_id'):
+                    # получаем документ тренера
+                    trainer_doc = TrainerDoc.objects.get(id = request.GET['edit_doc_id'],
+                                                         user__user=fitness_user)
+
+                    self.ajax_content.update({'answer': True,
+                                              'trainer_doc_data': {
+                                                  'trainer_doc_title': trainer_doc.doc_title,
+                                                  'trainer_doc_filename': trainer_doc.filename(),
+                                              }
+                                              }
+                                             )
+
                 return JsonResponse(self.ajax_content)
 
             # проверка прав доступа к данным страницы
@@ -845,7 +859,7 @@ class TrainerDataView(View):
                     'doc': 'pages/personal_area.html',
                     'private_doc': 'pages/trainer_data.html',
                     'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
-                    'fitness_trainer_docs': TrainerDoc.objects.filter(user__user = fitness_user).order_by('id')})
+                    'fitness_trainer_docs': TrainerDoc.objects.filter(user__user = fitness_user)})
 
                 return render(request, 'base.html', self.content)
 
