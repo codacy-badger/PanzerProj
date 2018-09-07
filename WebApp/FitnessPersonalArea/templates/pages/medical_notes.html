@@ -82,9 +82,9 @@
                           </button>
                   </div>
 
-                  <form style="float: right; margin-bottom: 0px" method="post" action="" enctype="multipart/form-data">
+                  <form method="post" action="" enctype="multipart/form-data">
                       {% csrf_token %}
-                      <button type="submit" class="btn btn-danger" name="medical_note_delete_id" value="{{ note.id }}">
+                      <button type="submit" class="btn btn-danger delete" name="medical_note_delete_id" value="{{ note.id }}">
                           <i class="fas fa-trash"></i>
                           {% trans "Удалить" %}
                       </button>
@@ -93,7 +93,7 @@
             </div>
 
         {% empty %}
-            {% trans 'Нет активных записей, добавьте.' %} <i class="fas fa-plus-square"></i>
+            {% trans 'Нет активных записей, добавьте.' %}
         {% endfor %}
 
         </div>

@@ -15,3 +15,7 @@ a.social_button{
 .row.buttons{
     padding-right: 40px;
 }
+.btn.btn-danger.delete{
+    float: right;
+    margin-bottom: 0;
+}
