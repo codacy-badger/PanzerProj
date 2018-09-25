@@ -1,6 +1,6 @@
 import falcon
 
-from web import UserInfo, NewUserCreating
+from mobile.web_api import UserInfo, NewUserCreating
 
 api = application = falcon.API()
 
