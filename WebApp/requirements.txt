@@ -7,3 +7,4 @@ social-auth-core>=1.7.0
 faker>=0.8
 geopy>=1.16
 social-auth-app-django==2.1.0
+logme>=1.2

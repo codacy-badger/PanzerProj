@@ -1,23 +1,18 @@
-import json
-import timeit
-import time
+import logme
 
 from django.shortcuts import render
 from django.views import View
 from django.shortcuts import redirect
-from django.template.loader import render_to_string
-from django.utils.translation import activate
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.utils.timezone import now
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.core.serializers import serialize
-from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis.geos import Point
 from django.conf import settings
 
@@ -129,6 +124,7 @@ class RegistrationPage(View):
 
 
 # personal area
+@logme.log
 class ProfilePage(View):
     """
     Класс отвечает за личиную страницу
@@ -207,15 +203,18 @@ class ProfilePage(View):
                     ajax_answer.update({'answer': True})
 
                     messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
-            # TODO добавить логгирование ошибок
             except Exception as err:
-                print(err)
+                self.logger.error(f'In - ProfilePage.post; '
+                                  f'User - {request.user}; '
+                                  f'Sended params - {request.POST.get("trainer_description")}; '
+                                  f'Text - {err} ')
                 ajax_answer.update({'error_answer': _('Произошла ошибка!')})
             finally:
                 return JsonResponse(ajax_answer)
 
 
 # diary notes
+@logme.log
 class UserDiaryView(View):
     """
     UserDiaryView отвечает за создание, редактирование и просмотр записей в дневник пользователя
@@ -288,7 +287,10 @@ class UserDiaryView(View):
 
                 # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserDiaryView.post; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST.get("diary_note_delete_id")}; '
+                                      f'Text - {err} ')
                     messages.add_message(request, messages.ERROR, _("Невозможно удалить запись. Ошибка."))
                 finally:
                     # возвращаем пользователя назад на ту же страницу
