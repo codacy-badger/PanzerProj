@@ -39,7 +39,7 @@
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success" id="new_trainer_doc_btn_id" value="1" name="new_trainer_doc_btn">{% trans "Сохранить" %}</button>
+                        <button type="submit" class="btn btn-success" id="new_trainer_doc_btn_id" name="new_trainer_doc_btn">{% trans "Сохранить" %}</button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans "Закрыть" %}</button>
                     </div>
                 </form>
@@ -64,6 +64,7 @@
 
                                         $("#chosen_filename").text(data.trainer_doc_data.trainer_doc_filename);
                                         $("#chosen_filename").show();
+                                        $("#trainer_doc_edit").prop('value', trainer_doc_id);
                                         $("#doc_title").val(data.trainer_doc_data.trainer_doc_title);
                                     }
                                     else {
@@ -76,13 +77,15 @@
             });
         </script>
 
-        <script type="text/python3">
+        <script type="text/python">
             from browser import document as doc
 
+            # clear inputs and butt values before creation new document
             def clear_inputs(ev):
-                print('dasdasd')
-                doc["chosen_filename"].val = ''
-                doc["doc_title"].val = ''
+                doc["chosen_filename"].value = ''
+                doc["doc_title"].value = ''
+                doc["chosen_filename"].text = ''
+                doc["trainer_doc_edit"].value = -1
 
             doc["plus_trainer_doc"].bind("click", clear_inputs)
 

@@ -571,7 +571,7 @@
                                                 <div class="dropdown-divider"></div>
                                                 <form style="margin-bottom: 0px" method="post" action="{% url 'trainer_data_page' %}" enctype="multipart/form-data">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="dropdown-item delete" name="doc_id" value="{{ doc.id }}">
+                                                    <button type="submit" class="dropdown-item delete" name="doc_delete_id" value="{{ doc.id }}">
                                                         <i class="fas fa-trash"></i>
                                                         {% trans "Удалить" %}
                                                     </button>

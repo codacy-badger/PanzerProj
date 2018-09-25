@@ -839,6 +839,7 @@ class TrainerPriceView(View):
 
 
 # trainer data page
+@logme.log
 class TrainerDataView(View):
     """
     TrainerPriceView отвечает за страницу с расценками тренера,
@@ -850,72 +851,93 @@ class TrainerDataView(View):
     def get(self, request):
         if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
-            # проверка реквеста на AJAX (при получении полных данных о документе тренера)
-            if request.is_ajax():
-                # запрос на получение информации о документе тренера
-                if request.GET.get('trainer_doc_object_id'):
-                    # получаем документ тренера
-                    trainer_doc = TrainerDoc.objects.get(id = request.GET['trainer_doc_object_id'],
-                                                         user__user=fitness_user)
-
-                    self.ajax_content.update({'answer': True,
-                                              'trainer_doc_data': {
-                                                  'trainer_doc_title': trainer_doc.doc_title
-                                              }
-                                              }
-                                             )
-
-                # запрос на получение информации о документе для последующего редактирования
-                elif request.GET.get('edit_doc_id'):
-                    # получаем документ тренера
-                    trainer_doc = TrainerDoc.objects.get(id = request.GET['edit_doc_id'],
-                                                         user__user=fitness_user)
-
-                    self.ajax_content.update({'answer': True,
-                                              'trainer_doc_data': {
-                                                  'trainer_doc_title': trainer_doc.doc_title,
-                                                  'trainer_doc_filename': trainer_doc.filename(),
-                                              }
-                                              }
-                                             )
-
-                return JsonResponse(self.ajax_content)
 
             # проверка прав доступа к данным страницы
-            elif fitness_user.fitness_user_type == FitnessUser.teacher_user:
-                self.content.update({
-                    'doc': 'pages/personal_area.html',
-                    'private_doc': 'pages/trainer_data.html',
-                    'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
-                    'fitness_trainer_docs': TrainerDoc.objects.filter(user__user = fitness_user)})
+            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+                # проверка реквеста на AJAX (при получении полных данных о документе тренера)
+                if request.is_ajax():
+                    try:
+                        # запрос на получение информации о документе тренера
+                        if request.GET.get('trainer_doc_object_id'):
+                            # получаем документ тренера
+                            trainer_doc = TrainerDoc.objects.get(id = request.GET.get('trainer_doc_object_id'),
+                                                                 user__user=fitness_user)
 
-                return render(request, 'base.html', self.content)
+                            self.ajax_content.update({'answer': True,
+                                                      'trainer_doc_data': {
+                                                          'trainer_doc_title': trainer_doc.doc_title
+                                                      }
+                                                      }
+                                                     )
+
+                        # запрос на получение информации о документе для последующего редактирования
+                        elif request.GET.get('edit_doc_id'):
+                            # получаем документ тренера
+                            trainer_doc = TrainerDoc.objects.get(id = request.GET.get('edit_doc_id'),
+                                                                 user__user=fitness_user)
+
+                            self.ajax_content.update({'answer': True,
+                                                      'trainer_doc_data': {
+                                                          'trainer_doc_title': trainer_doc.doc_title,
+                                                          'trainer_doc_filename': trainer_doc.filename(),
+                                                      }
+                                                      }
+                                                     )
+                    except Exception as err:
+                        self.logger.error(f'In - TrainerDataView.get; '
+                                          f'User - {request.user}; '
+                                          f'Sended params - {request.GET}; '
+                                          f'Text - {err}')
+                        self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+                    finally:
+                        return JsonResponse(self.ajax_content)
+
+                else:
+                    self.content.update({
+                        'doc': 'pages/personal_area.html',
+                        'private_doc': 'pages/trainer_data.html',
+                        'fitness_trainer': FitnessTrainer.objects.get(user=fitness_user),
+                        'fitness_trainer_docs': TrainerDoc.objects.filter(user__user = fitness_user)})
+
+                    return render(request, 'base.html', self.content)
 
     def post(self, request):
         if request.user.is_authenticated:
             # получаем пользователя от которого пришёл запрос
             fitness_user = FitnessUser.objects.get(user = request.user)
+            # проверка прав доступа к данным страницы
+            if fitness_user.fitness_user_type == FitnessUser.teacher_user:
+                # создаём новвый документ тренера
+                if request.POST.get('trainer_doc_edit') == -1:
+                    # создаём новый документ
+                    TrainerDoc.objects.create(
+                        user=FitnessTrainer.objects.get(user = fitness_user),
+                        doc_title=request.POST.get('doc_title'),
+                        doc_file=request.FILES.get('doc_file'))
 
-            # создаём новую медицинскую запись запись в дневнике
-            if request.POST.get('new_trainer_doc_btn'):
-                # создаём новый документ
-                TrainerDoc.objects.create(
-                    user=FitnessTrainer.objects.get(user = fitness_user),
-                    doc_title=request.POST['doc_title'],
-                    doc_file=request.FILES['doc_file'])
+                    # добавляем сообщение для пользователя
+                    messages.add_message(request, messages.SUCCESS, _('Документ создан'))
 
-                # добавляем сообщение для пользователя
-                messages.add_message(request, messages.SUCCESS, _('Документ создан'))
+                # обновляем ранее созданный документ
+                elif request.POST.get('trainer_doc_edit') != -1:
+                    # получаем документ тренера для обновления
+                    updated_trainer_doc = TrainerDoc.objects.get(id = request.POST.get('trainer_doc_edit'))
+                    updated_trainer_doc.doc_title = request.POST.get('doc_title')
+                    if request.FILES.get('doc_file'):
+                        updated_trainer_doc.doc_file = request.FILES.get('doc_file')
+                    updated_trainer_doc.save()
 
-            # если удаление дкоумента
-            elif request.POST.get('doc_id'):
-                # получение документа для удаления
-                trainer_doc = TrainerDoc.objects.get(id=request.POST['doc_id'],
-                                                     user__user=fitness_user)
+                    # добавляем сообщение для пользователя
+                    messages.add_message(request, messages.SUCCESS, _('Документ обновлён'))
+                # если удаление документа
+                elif request.POST.get('doc_delete_id'):
+                    # получение документа для удаления
+                    trainer_doc = TrainerDoc.objects.get(id=request.POST.get('doc_delete_id'),
+                                                         user__user=fitness_user)
 
-                trainer_doc.delete()
+                    trainer_doc.delete()
 
-                messages.add_message(request, messages.SUCCESS, _('Документ удалён'))
+                    messages.add_message(request, messages.SUCCESS, _('Документ удалён'))
 
             # возвращаем пользователя назад на ту же страницу
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
