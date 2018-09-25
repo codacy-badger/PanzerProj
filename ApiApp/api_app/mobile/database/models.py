@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 import datetime
 
-from ApiApp.api_app import  db_name, db_user, db_password
+from .config import db_name, db_user, db_password
 
 # автоматический сбор инфомрации о таблицах в БД
 Base = automap_base()
@@ -14,6 +14,7 @@ engine = create_engine(f'postgresql://{db_user}:{db_password}@localhost:5432/{db
 
 # получаем схему таблиц в БД
 Base.prepare(engine, reflect=True)
+
 
 class User():
     def __init__(self):
@@ -35,8 +36,9 @@ class User():
                                     'email': db_result.email,
                                     'first_name': db_result.first_name,
                                     'last_name': db_result.last_name,
-                                    'last_login_date': db_result.last_login.strftime("%d.%m.%Y"),
-                                    'last_login_time': db_result.last_login.strftime("%H:%M")})
+                                    'is_active': db_result.is_active,
+                                    'last_login_date': db_result.last_login.strftime("%d.%m.%Y") if db_result.last_login else None,
+                                    'last_login_time': db_result.last_login.strftime("%H:%M") if db_result.last_login else None})
             else:
                 self.result.update({'success': False,
                                     'error': 'no_user'})
@@ -129,7 +131,6 @@ class User():
 
         finally:
             return self.result
-
 
     def __del__(self):
         self.session.close()

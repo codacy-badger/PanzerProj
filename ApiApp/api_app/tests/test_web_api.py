@@ -1,6 +1,6 @@
 import requests
 
-from ApiApp.api_app.web.database.models import User
+from ApiApp.api_app.mobile.database.models import User
 
 
 class TestRouts(object):

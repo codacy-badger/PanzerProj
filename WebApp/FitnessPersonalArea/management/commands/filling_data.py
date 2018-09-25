@@ -1,5 +1,6 @@
 import random
 import time
+import logme
 
 from django.core.management.base import BaseCommand, CommandError
 from FitnessPersonalArea.models import FitnessUser, FitnessTrainer, TrainerPrice, MedicalNote, UserDiary, BodyParameter,\
@@ -11,9 +12,10 @@ from django.utils import timezone
 from faker import Faker
 
 
+@logme.log
 class Command(BaseCommand):
     '''
-    ./manage_py filling_data <amount of users>
+    python3 manage.py filling_data filling_data <amount of users>
     '''
 
     help = "Populate DB with User`s accounts, and other FAKE data."
@@ -107,9 +109,10 @@ class Command(BaseCommand):
             except IntegrityError:
                 pass
             except Exception as err:
-                print(err)
+                self.logger.error(f'In - Command.handle; '
+                                  f'Error - {err};')
                 break
             finally:
-                print(f'{round(index/target*100, 2)}% выполнено ...')
+                self.logger.info(f'{round(index/target*100, 2)}% выполнено ...')
 
-        self.stdout.write(self.style.SUCCESS(f'Наполнение выполнено за {round(time.clock() - start_time, 3)} секунд'))
+        self.logger.info(f'\n Наполнение выполнено за {round(time.clock() - start_time, 3)} секунд')
