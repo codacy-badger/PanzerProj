@@ -234,9 +234,11 @@ class UserDiaryView(View):
                     self.ajax_content.update({'answer': True})
                     self.ajax_content['diary_note'] = diary_note.get_note_json()
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserDiaryView.get; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST.get("diary_note_id")}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -285,12 +287,11 @@ class UserDiaryView(View):
                     else:
                         messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
                     self.logger.error(f'In - UserDiaryView.post; '
                                       f'User - {request.user}; '
                                       f'Sended params - {request.POST.get("diary_note_delete_id")}; '
-                                      f'Text - {err} ')
+                                      f'Text - {err}')
                     messages.add_message(request, messages.ERROR, _("Невозможно удалить запись. Ошибка."))
                 finally:
                     # возвращаем пользователя назад на ту же страницу
@@ -336,9 +337,12 @@ class UserDiaryView(View):
                             self.ajax_content.update({'answer': True})
 
                             messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
-                # TODO добавить логгирование ошибок
+
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserDiaryView.post; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -346,6 +350,7 @@ class UserDiaryView(View):
 
 
 # medical notes
+@logme.log
 class UserMedicalView(View):
     """
     UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей пользователя
@@ -356,16 +361,18 @@ class UserMedicalView(View):
     def get(self, request, tag: str = None):
         if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
-            if request.is_ajax() and request.GET['medical_note_id']:
+            if request.is_ajax() and request.GET.get('medical_note_id'):
                 try:
                     medical_note = MedicalNote.objects.get(id = request.GET['medical_note_id'], user__user = request.user)
 
                     self.ajax_content.update({'answer': True})
                     self.ajax_content['medical_note'] = medical_note.get_note_json()
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserMedicalView.get; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.GET.get("medical_note_id")}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -420,9 +427,11 @@ class UserMedicalView(View):
                     else:
                         messages.add_message(request, messages.ERROR, _("Невозможно удалить запись"))
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserMedicalView.post; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST.get("medical_note_delete_id")}; '
+                                      f'Text - {err}')
                     messages.add_message(request, messages.ERROR, _("Невозможно удалить запись. Ошибка."))
                 finally:
                     # возвращаем пользователя назад на ту же страницу
@@ -470,8 +479,11 @@ class UserMedicalView(View):
 
                             messages.add_message(request, messages.SUCCESS, _('Запись изменена'))
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
+                    self.logger.error(f'In - UserMedicalView.post; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -479,6 +491,7 @@ class UserMedicalView(View):
 
 
 # user gym`s
+@logme.log
 class UserGymsView(View):
     """
     UserGymsView отвечает за страницу с тренажёрными залами пользователя,
@@ -498,9 +511,11 @@ class UserGymsView(View):
                     gym_object = TrainGym.objects.get(id = request.GET['gym_object_id'], user = fitness_user)
                     self.ajax_content.update({'gym_data': gym_object.get_gym_json()})
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserGymsView.get; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.GET.get("gym_object_id")}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -579,9 +594,11 @@ class UserGymsView(View):
                             # обновляем ответ на AJAX-запрос, об ошибке при декодировании адреса в местоположение
                             self.ajax_content.update({'error_answer': _('Данный адрес не найден')})
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserGymsView.post; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -605,6 +622,7 @@ class UserGymsView(View):
 
 
 # user params
+@logme.log
 class UserParamsView(View):
     """
     UserParamsView отвечает за страницу с отслеживаемыми параметрами пользователя
@@ -630,9 +648,11 @@ class UserParamsView(View):
                     else:
                         self.ajax_content.update({'error_answer': _('Недостаточно прав')})
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserParamsView.get; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.GET.get("param_object_id")}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -710,9 +730,11 @@ class UserParamsView(View):
                         # обновляем ответ на AJAX-запрос, об успешном создании зала
                         self.ajax_content.update({'answer': True})
 
-                # TODO добавить логгирование ошибок
                 except Exception as err:
-                    print(err)
+                    self.logger.error(f'In - UserParamsView.post; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.POST}; '
+                                      f'Text - {err}')
                     self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
                 finally:
@@ -743,6 +765,7 @@ class UserParamsView(View):
 
 
 # trainer price page
+@logme.log
 class TrainerPriceView(View):
     """
     TrainerPriceView отвечает за страницу с расценками тренера,
@@ -768,7 +791,7 @@ class TrainerPriceView(View):
         if request.is_ajax() and request.user.is_authenticated:
             try:
                 # если id расценки -0, создаём новую
-                if request.POST['price_id'] == '0':
+                if request.POST.get('price_id') == '0':
                     # создаём новую расценку
                     TrainerPrice.objects.create(user = FitnessTrainer.objects.get(user__user = request.user),
                                                 trainer_price_hour = request.POST['trainer_price_hour'],
@@ -804,8 +827,11 @@ class TrainerPriceView(View):
                         # добавляем сообщение пользователю
                         messages.add_message(request, messages.SUCCESS, _('Данные обновлены'))
 
-            # TODO добавить логгирование ошибок
             except Exception as err:
+                self.logger.error(f'In - TrainerPriceView.post; '
+                                  f'User - {request.user}; '
+                                  f'Sended params - {request.POST}; '
+                                  f'Text - {err}')
                 self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
 
             finally:
