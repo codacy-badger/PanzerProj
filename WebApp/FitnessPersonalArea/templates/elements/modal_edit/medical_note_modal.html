@@ -128,10 +128,10 @@
             from browser import document as doc, alert, ajax, window
 
             def clear_inputs(ev):
-                doc["medical_note_tags_id"].val = ''
-                doc["medical_note_title_id"].val = ''
-                doc["medical_note_text_id"].val = ''
-                doc["medical_note_edit"].val = -1
+                doc["medical_note_tags_id"].value = ''
+                doc["medical_note_title_id"].value = ''
+                doc["medical_note_text_id"].value = ''
+                doc["medical_note_edit"].value = -1
 
             doc["create_medical_note"].bind("click", clear_inputs)
 

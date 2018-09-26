@@ -167,10 +167,10 @@
         from browser import document as doc, alert, ajax, window
     
         def clear_inputs(ev):
-            doc["diary_note_tags_id"].val = ''
-            doc["diary_note_title_id"].val = ''
-            doc["diary_note_text_id"].val = ''   
-            doc["diary_note_edit"].val = -1 
+            doc["diary_note_tags_id"].value = ''
+            doc["diary_note_title_id"].value = ''
+            doc["diary_note_text_id"].value = ''
+            doc["diary_note_edit"].value = -1
     
         doc["create_diary_note"].bind("click", clear_inputs)
     
