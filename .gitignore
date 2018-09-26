@@ -4,3 +4,7 @@
 WebDocker/WebApp/FitnessPersonalArea/templates/\.vscode/
 
 WebDocker/WebApp/media/
+
+*.log
+
+WebApp/media/
