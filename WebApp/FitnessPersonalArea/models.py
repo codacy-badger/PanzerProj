@@ -390,6 +390,9 @@ class ProjectionPhoto(models.Model):
                                               width_field = 'image_width', height_field = 'image_height',
                                               verbose_name = 'account photo')
 
+    # creation datetime
+    projection_view_description = models.CharField(max_length=100, blank = True)
+
     def __str__(self):
         return f'User: {self.user.user.username}; Projection: {self.get_projection_view_type_display()};'
 
