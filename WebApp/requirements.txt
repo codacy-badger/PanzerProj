@@ -2,7 +2,7 @@ django==2.0.8
 psycopg2==2.7.5
 gunicorn==19.8.1
 uwsgi==2.0.17
-django-taggit==0.22.2
+django-taggit==0.23.0
 social-auth-core>=1.7.0
 faker>=0.8
 geopy>=1.16
