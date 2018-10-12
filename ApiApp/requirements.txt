@@ -3,4 +3,4 @@ ujson==1.35
 cython==0.28.5
 gunicorn==19.8.1
 uwsgi==2.0.17
-sqlalchemy==1.2
+sqlalchemy==1.2.12
