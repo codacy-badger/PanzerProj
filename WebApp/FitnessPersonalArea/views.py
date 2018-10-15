@@ -764,6 +764,67 @@ class UserParamsView(View):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+# user photos
+@logme.log
+class UserPhotosView(View):
+    """
+    UserParamsView отвечает за страницу с фотографиями пользователя
+    """
+    content = {}
+    ajax_content = {'answer': False}
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            # получаем данные пользователя
+            fitness_user = FitnessUser.objects.get(user = request.user)
+            # если получен AJAX-get запрос с ID параметра
+            if request.is_ajax() and request.GET.get('param_object_id'):
+
+                try:
+                    # получаем данные параметра из БД. Нулевой элемент
+                    param_data = BodyParameterData.objects.filter(user_parameter__id = request.GET['param_object_id'],
+                                                                  user_parameter__body_show = True).first()
+
+                    # проверка прав на получение информации о параметре
+                    if param_data.user_parameter.user == fitness_user:
+                        self.ajax_content.update({'param_json_data': param_data.get_param_json()})
+                    else:
+                        self.ajax_content.update({'error_answer': _('Недостаточно прав')})
+
+                except Exception as err:
+                    self.logger.error(f'In - UserParamsView.get; '
+                                      f'User - {request.user}; '
+                                      f'Sended params - {request.GET.get("param_object_id")}; '
+                                      f'Text - {err}')
+                    self.ajax_content.update({'error_answer': _('Произошла ошибка!')})
+
+                finally:
+                    return JsonResponse(self.ajax_content)
+            else:
+                # получаем номер страницы для отображения при пагинации
+                page = request.GET.get('page')
+
+                print(len(ProjectionPhoto.objects.filter(user=fitness_user)))
+
+                self.content.update({
+                    'doc': 'pages/personal_area.html',
+                    'private_doc': 'pages/user_photos_projection.html',
+                    'fitness_user': fitness_user,
+
+                    'user_photos': Paginator(ProjectionPhoto.objects.filter(user = fitness_user).
+                        order_by('-projection_view_date'), 5, orphans = 2).get_page(page)
+                })
+
+                print(self.content.get('user_photos'))
+
+                return render(request, 'base.html', self.content)
+        else:
+
+            messages.add_message(request, messages.ERROR, _('Недостаточно прав для просмотра'))
+            # возвращаем пользователя назад на ту же страницу
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 # trainer price page
 @logme.log
 class TrainerPriceView(View):

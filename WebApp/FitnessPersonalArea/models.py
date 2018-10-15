@@ -386,7 +386,7 @@ class ProjectionPhoto(models.Model):
     # projection photo
     image_width = 100
     image_height = 150
-    projection_view_photo = models.ImageField(upload_to = projection_photo_path, default=None,
+    projection_view_photo = models.ImageField(upload_to = projection_photo_path, default=None, max_length = 200,
                                               width_field = 'image_width', height_field = 'image_height',
                                               verbose_name = 'account photo')
 

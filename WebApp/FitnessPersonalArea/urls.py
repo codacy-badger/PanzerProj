@@ -32,6 +32,9 @@ urlpatterns = [
     # редактирование, создание и просмотр залов пользователя
     path('user-params/', views.UserParamsView.as_view(), name = 'user_params'),
 
+    # редактирование, создание и просмотр залов пользователя
+    path('user-photos/', views.UserPhotosView.as_view(), name = 'user_photos'),
+
     # редактирование, создание и просмотр расценок тренера
     path('trainer-price/', views.TrainerPriceView.as_view(), name = 'trainer_price'),
     # редактирование, создание описаний тренера и его документов

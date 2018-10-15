@@ -1,0 +1,4 @@
+[
+  "WebDocker/tests/Selenium/admin_search_test.py::AdminSearchTest::test_admin_login",
+  "WebDocker/tests/Selenium/admin_search_test.py::AdminSearchTest::test_personal_area_models"
+]

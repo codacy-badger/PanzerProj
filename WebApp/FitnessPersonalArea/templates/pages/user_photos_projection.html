@@ -1,0 +1,132 @@
+{% block diary_notes %}
+{% load static %}
+{% load i18n %}
+    <div class="page-header">
+        <h2>
+            <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_photos' %}';">
+                <i class="fas fa-images"></i>
+                {% trans "Фото" %}
+            </button>
+            <button type="button" class="btn btn-light" id="create_diary_note" data-toggle="modal"
+                    data-target="#newProjectionPhoto">
+                <i class="fas fa-plus-square "></i>
+            </button>
+        </h2>
+    </div>
+    <hr>
+   
+    {% if user_photos %}
+        <div class="paginattion">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if user_photos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">{% trans 'Первая' %}</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_photos.previous_page_number }}">{% trans 'Предыдущая' %}</a>
+                        </li>
+                    {% endif %}
+                        
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ user_photos.number }}<span class="sr-only">(current)</span></a>
+                    </li>
+                        
+                    {% if user_photos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_photos.next_page_number }}">{% trans 'Следующая' %}</a>
+                        </li>                       
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_photos.paginator.num_pages }}">{% trans 'Последняя' %}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+    
+    <div class="row" style="padding-bottom: 20px">
+        <div class="col-12">
+
+            {% for photo in user_photos %}
+                <div class="col-lg-3 col-md-4 col-xs-6">
+                  <a href="#" class="d-block mb-4 h-100">
+                    <img class="img-fluid img-thumbnail" src="http://placehold.it/400x300" alt="">
+                  </a>
+                </div>
+            {% empty %}
+                {% trans 'Нет записей, добавьте.' %}
+            {% endfor %}
+
+        </div>
+    </div>
+
+    {% if user_photos %}
+        <div class="paginattion">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if user_photos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">{% trans 'Первая' %}</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_photos.previous_page_number }}">{% trans 'Предыдущая' %}</a>
+                        </li>
+                    {% endif %}
+                     
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ user_photos.number }}<span class="sr-only">(current)</span></a>
+                    </li>
+                    
+                    {% if user_photos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_photos.next_page_number }}">{% trans 'Следующая' %}</a>
+                        </li>                       
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ user_photos.paginator.num_pages }}">{% trans 'Последняя' %}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {%endif%}
+        {% block diary_note_modal %}
+
+            {% include 'elements/modal_edit/projection_photo_modal.html' %}
+
+        {% endblock %}
+
+    <script>
+        jQuery(document).ready(function(){
+            $( "button.btn.btn-secondary.edit" ).click(function() {
+                var diary_dom = $(this).closest("div.card.text-center");
+
+                var diary_tags = diary_dom.find('.card-header').find('.tags');
+
+                var diary_note_id = diary_dom.find('.card-body').find('.diary_note_id');
+
+                var diary_title = diary_dom.find('.card-body').find('.card-title');
+                var diary_text = diary_dom.find('.card-body').find('.card-text.text-justify');
+
+                $("#diary_note_tags_id").val($.trim(diary_tags.text()).replace(/ +(?= )/g,'').replace(/[#]/g, '').replace(/\s+/g, ', '));
+                $("#diary_note_title_id").val($.trim(diary_title.text()));
+                $("#diary_note_text_id").val(diary_text.text());
+                $("#diary_note_edit").val(diary_note_id.text());
+            });
+        });
+    </script>
+    <script type="text/python">
+        from browser import document as doc, alert, ajax, window
+    
+        def clear_inputs(ev):
+            doc["diary_note_tags_id"].value = ''
+            doc["diary_note_title_id"].value = ''
+            doc["diary_note_text_id"].value = ''
+            doc["diary_note_edit"].value = -1
+    
+        doc["create_diary_note"].bind("click", clear_inputs)
+    
+    </script>  
+
+
+{% endblock %}
