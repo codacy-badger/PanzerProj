@@ -1,6 +1,7 @@
 {% block diary_notes %}
 {% load static %}
 {% load i18n %}
+<link href="{% static "/css/projection_image.css" %}" rel="stylesheet">
     <div class="page-header">
         <h2>
             <button type="button" class="btn btn-outline-primary" onclick="location.href='{% url 'user_photos' %}';">
@@ -46,19 +47,19 @@
     {% endif %}
     
     <div class="row" style="padding-bottom: 20px">
-        <div class="col-12">
 
             {% for photo in user_photos %}
-                <div class="col-lg-3 col-md-4 col-xs-6">
-                  <a href="#" class="d-block mb-4 h-100">
-                    <img class="img-fluid img-thumbnail" src="http://placehold.it/400x300" alt="">
-                  </a>
+                <div class="col-lg-3 col-md-4 col-xs-6 col-sm-6">
+                    <img class="img-fluid" 
+                         title="{{photo.get_projection_view_type_display}} {% trans 'от' %} {{photo.projection_view_date}}" 
+                         src="{{photo.projection_view_photo.url}}" 
+                         alt="{{photo.get_projection_view_type_display}} {% trans 'от' %} {{photo.projection_view_date}}">
+                  
                 </div>
             {% empty %}
                 {% trans 'Нет записей, добавьте.' %}
             {% endfor %}
 
-        </div>
     </div>
 
     {% if user_photos %}
