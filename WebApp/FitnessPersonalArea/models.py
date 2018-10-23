@@ -54,7 +54,7 @@ def trainer_docs_path(instance, filename):
 # место для хранения фотографий пользователя в различных проекциях
 def projection_photo_path(instance, filename):
     return f'projection_view_photo/user_{instance.user.user.id}/' \
-           f'projection_{instance.get_projection_view_type_display()}/' \
+           f'projection_{instance.projection_view_type}/' \
            f'{now().date().strftime("%Y/%m/%d")}/{file_name_hash(filename)}/{filename}'
 
 
@@ -390,7 +390,7 @@ class ProjectionPhoto(models.Model):
                                               width_field = 'image_width', height_field = 'image_height',
                                               verbose_name = 'account photo')
 
-    # creation datetime
+    # projection description
     projection_view_description = models.CharField(max_length=100, blank = True)
 
     def __str__(self):
