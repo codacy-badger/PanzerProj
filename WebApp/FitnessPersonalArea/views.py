@@ -23,7 +23,7 @@ from .models import User, FitnessUser, FitnessTrainer, TrainerDoc, TrainerPrice,
     ProjectionPhoto, MedicalNote, UserDiary, TrainingContract, TrainingPayment, BodyParameter, BodyParameterData, \
     TargetBodyParameter
 
-from .forms import NewParameterData
+from .forms import NewParameterData, NewProjectionPhotoForm
 
 
 # log in
@@ -810,6 +810,8 @@ class UserPhotosView(View):
                     'doc': 'pages/personal_area.html',
                     'private_doc': 'pages/user_photos_projection.html',
                     'fitness_user': fitness_user,
+
+                    'new_projection_photo_form': NewProjectionPhotoForm,
 
                     'user_photos': Paginator(ProjectionPhoto.objects.filter(user = fitness_user).
                         order_by('-projection_view_date'), 5, orphans = 2).get_page(page)
