@@ -15,6 +15,7 @@ from django.core.paginator import Paginator
 from django.core.serializers import serialize
 from django.contrib.gis.geos import Point
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 from geopy.geocoders import GoogleV3
@@ -125,14 +126,13 @@ class RegistrationPage(View):
 
 # personal area
 @logme.log
-class ProfilePage(View):
+class ProfilePage(LoginRequiredMixin, View):
     """
     Класс отвечает за личиную страницу
     """
     content = {}
 
     def get(self, request):
-        if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             self.content.update({
                 'doc': 'pages/personal_area.html',
@@ -184,13 +184,9 @@ class ProfilePage(View):
                                      })
 
             return render(request, 'base.html', self.content)
-        else:
-            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def post(self, request):
-        if request.is_ajax() and request.user.is_authenticated:
+        if request.is_ajax():
             ajax_answer = {'answer': False}
             try:
                 # вносим изменения в описание тренера
@@ -215,7 +211,7 @@ class ProfilePage(View):
 
 # diary notes
 @logme.log
-class UserDiaryView(View):
+class UserDiaryView(LoginRequiredMixin, View):
     """
     UserDiaryView отвечает за создание, редактирование и просмотр записей в дневник пользователя
     """
@@ -223,7 +219,6 @@ class UserDiaryView(View):
     ajax_content = {'answer': False}
 
     def get(self, request, tag: str = None):
-        if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
             if request.is_ajax() and request.GET.get('diary_note_id'):
                 try:
@@ -271,7 +266,6 @@ class UserDiaryView(View):
             return render(request, 'base.html', self.content)
 
     def post(self, request, tag: str = None):
-        if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если пользователь хочет удалить пост
             if request.POST.get('diary_note_delete_id'):
@@ -351,7 +345,7 @@ class UserDiaryView(View):
 
 # medical notes
 @logme.log
-class UserMedicalView(View):
+class UserMedicalView(LoginRequiredMixin, View):
     """
     UserMedicalView отвечает за создание, редактирование и просмотр медицинских записей пользователя
     """
@@ -359,7 +353,6 @@ class UserMedicalView(View):
     ajax_content = {'answer': False}
 
     def get(self, request, tag: str = None):
-        if request.user.is_authenticated:
             # если ajax запрос на получение полной информации о записи в дневнике
             if request.is_ajax() and request.GET.get('medical_note_id'):
                 try:
@@ -405,13 +398,8 @@ class UserMedicalView(View):
 
             return render(request, 'base.html', self.content)
 
-        else:
-            messages.add_message(request, messages.ERROR, _('Недостаточно прав'))
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def post(self, request, tag: str = None):
-        if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если пользователь хочет удалить пост
             if request.POST.get('medical_note_delete_id'):
@@ -492,7 +480,7 @@ class UserMedicalView(View):
 
 # user gym`s
 @logme.log
-class UserGymsView(View):
+class UserGymsView(LoginRequiredMixin, View):
     """
     UserGymsView отвечает за страницу с тренажёрными залами пользователя,
         а так же создание, редактирование и просмотр всех залов
@@ -501,7 +489,6 @@ class UserGymsView(View):
     ajax_content = {'answer': False}
 
     def get(self, request):
-        if request.user.is_authenticated:
             # получаем данные пользователя
             fitness_user = FitnessUser.objects.get(user = request.user)
             if request.is_ajax() and request.GET.get('gym_object_id'):
@@ -534,8 +521,6 @@ class UserGymsView(View):
                 return render(request, 'base.html', self.content)
 
     def post(self, request):
-        # проверка аторизованности пользователя
-        if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если отправлен AJAX запрос
             if request.is_ajax():
@@ -623,7 +608,7 @@ class UserGymsView(View):
 
 # user params
 @logme.log
-class UserParamsView(View):
+class UserParamsView(LoginRequiredMixin, View):
     """
     UserParamsView отвечает за страницу с отслеживаемыми параметрами пользователя
     """
@@ -631,7 +616,6 @@ class UserParamsView(View):
     ajax_content = {'answer': False}
 
     def get(self, request):
-        if request.user.is_authenticated:
             # получаем данные пользователя
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если получен AJAX-get запрос с ID параметра
@@ -673,15 +657,8 @@ class UserParamsView(View):
                 })
 
                 return render(request, 'base.html', self.content)
-        else:
-
-            messages.add_message(request, messages.ERROR, _('Недостаточно прав для просмотра'))
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     def post(self, request):
-        # проверка аторизованности пользователя
-        if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если отправлен AJAX запрос
             if request.is_ajax():
@@ -757,16 +734,11 @@ class UserParamsView(View):
 
                 # возвращаем пользователя назад на ту же страницу
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-        else:
-
-            messages.add_message(request, messages.ERROR, _('Нехватает прав для просмотра'))
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 # user photos
 @logme.log
-class UserPhotosView(View):
+class UserPhotosView(LoginRequiredMixin, View):
     """
     UserParamsView отвечает за страницу с фотографиями пользователя
     """
@@ -774,7 +746,6 @@ class UserPhotosView(View):
     ajax_content = {'answer': False}
 
     def get(self, request):
-        if request.user.is_authenticated:
             # получаем данные пользователя
             fitness_user = FitnessUser.objects.get(user = request.user)
             # если получен AJAX-get запрос с ID параметра
@@ -820,16 +791,11 @@ class UserPhotosView(View):
                 print(self.content.get('user_photos'))
 
                 return render(request, 'base.html', self.content)
-        else:
-
-            messages.add_message(request, messages.ERROR, _('Недостаточно прав для просмотра'))
-            # возвращаем пользователя назад на ту же страницу
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 # trainer price page
 @logme.log
-class TrainerPriceView(View):
+class TrainerPriceView(LoginRequiredMixin, View):
     """
     TrainerPriceView отвечает за страницу с расценками тренера,
         а так же создание, редактирование и просмотр расценок тренера
@@ -837,7 +803,6 @@ class TrainerPriceView(View):
     content = {}
 
     def get(self, request):
-        if request.user.is_authenticated:
             self.content.update({
                 'doc': 'pages/personal_area.html',
                 'private_doc': 'pages/trainer_prices.html',
@@ -851,7 +816,7 @@ class TrainerPriceView(View):
     def post(self, request):
         self.ajax_content = {'answer': False}
         # проверка реквеста и авторизироанности пользователя
-        if request.is_ajax() and request.user.is_authenticated:
+        if request.is_ajax():
             try:
                 # если id расценки -0, создаём новую
                 if request.POST.get('price_id') == '0':
@@ -903,7 +868,7 @@ class TrainerPriceView(View):
 
 # trainer data page
 @logme.log
-class TrainerDataView(View):
+class TrainerDataView(LoginRequiredMixin, View):
     """
     TrainerPriceView отвечает за страницу с расценками тренера,
         а так же создание, редактирование и просмотр расценок тренера
@@ -912,7 +877,6 @@ class TrainerDataView(View):
     ajax_content = {'answer': False}
 
     def get(self, request):
-        if request.user.is_authenticated:
             fitness_user = FitnessUser.objects.get(user = request.user)
 
             # проверка прав доступа к данным страницы
@@ -965,7 +929,6 @@ class TrainerDataView(View):
                     return render(request, 'base.html', self.content)
 
     def post(self, request):
-        if request.user.is_authenticated:
             # получаем пользователя от которого пришёл запрос
             fitness_user = FitnessUser.objects.get(user = request.user)
             # проверка прав доступа к данным страницы
