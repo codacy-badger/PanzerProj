@@ -8,3 +8,9 @@ WebDocker/WebApp/media/
 *.log
 
 WebApp/media/
+
+WebApp/web_logs/
+
+*.pyc
+
+*.pyc~Updated upstream
