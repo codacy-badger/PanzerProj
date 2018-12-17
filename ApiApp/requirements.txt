@@ -2,5 +2,5 @@ falcon==1.4.1
 ujson==1.35
 gunicorn==19.9.0
 uwsgi==2.0.17
-cython==0.29.1
+cython==0.29.2
 sqlalchemy==1.2.14
